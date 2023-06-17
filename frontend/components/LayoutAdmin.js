@@ -50,12 +50,8 @@ export default function LayoutAdmin({
 			setWidthMenu(80);
 		}
 	};
-	const itemsSlider = [
-		{
-			label: <Link href="/admin">Dashboard</Link>,
-			key: "dashboard",
-			icon: <DashboardOutlined />,
-		},
+
+	const itemStudent = [
 		{
 			label: "Học sinh",
 			key: "studentManagement",
@@ -77,9 +73,9 @@ export default function LayoutAdmin({
 				},
 			],
 		},
-		// {
-		// 	type: "divider",
-		// },
+	]
+
+	const itemsTeacher = [
 		{
 			label: "Giáo viên",
 			key: "teacherManagement",
@@ -105,6 +101,17 @@ export default function LayoutAdmin({
 				},
 			],
 		},
+	]
+
+	const itemsSlider = [
+		{
+			label: <Link href="/admin">Dashboard</Link>,
+			key: "dashboard",
+			icon: <DashboardOutlined />,
+		},
+		// {
+		// 	type: "divider",
+		// },
 		{
 			label: "Trung tâm",
 			key: "centerManagement",
@@ -116,7 +123,7 @@ export default function LayoutAdmin({
 				},
 				{
 					label: (
-						<Link href="/admin">Quản lý phòng học</Link>
+						<Link href="/admin/classroom">Quản lý phòng học</Link>
 					),
 					key: "classroomManagement",
 				},
@@ -126,7 +133,7 @@ export default function LayoutAdmin({
 					children: [
 						{
 							label: (
-								<Link href="/admin">Đăng ký thi thử</Link>
+								<Link href="/admin/regisEntranceExam">Đăng ký thi thử</Link>
 							),
 							key: "regisExam",
 						},
