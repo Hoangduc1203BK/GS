@@ -66,21 +66,13 @@ export class ApiConfigService {
 	}
 
 	getDBConfig() {
-		console.log({
+		return {
 			type: this.getString('DB_TYPE'),
 			port: this.getNumber('DB_PORT'),
 			host: this.getString('DB_HOST'),
 			database: this.getString('DB_DATABASE'),
 			username: this.getString('DB_USERNAME'),
 			password: this.getString('DB_PASSWORD'),
-		});
-		return {
-			type: 'postgres',
-			port: this.getNumber('POSTGRES_PORT'),
-			host: this.getString('POSTGRES_HOST'),
-			database: this.getString('POSTGRES_DB'),
-			username: this.getString('POSTGRES_USER'),
-			password: this.getString('POSTGRES_PASS'),
 		};
 	}
 
