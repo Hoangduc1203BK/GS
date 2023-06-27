@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, OneToMany, OneToOne } from 'typeorm';
 import { Department } from './department';
 
-@Entity('subject')
+@Entity('subjects')
 export class Subject {
     @PrimaryColumn({
         type:'varchar',
@@ -15,7 +15,6 @@ export class Subject {
         type: 'varchar',
         length: '50',
         name: 'name',
-        unique: true,
         nullable: false,
     })
     name: string;
@@ -41,7 +40,7 @@ export class Subject {
         name: 'department_id',
         nullable: false,
     })
-    departmentId: string;
+    departmentId: number;
 
     @ManyToOne(() => Department, d => d.subject)
     @JoinColumn({name: 'department_id', referencedColumnName: 'id'})

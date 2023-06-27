@@ -1,7 +1,8 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, OneToMany, OneToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, BeforeUpdate, PrimaryColumn, OneToMany, OneToOne } from 'typeorm';
 import { Subject } from './subject';
+import { User } from './user';
 
-@Entity('department')
+@Entity('departments')
 export class Department {
     @PrimaryColumn({
         type:'int',
@@ -50,7 +51,34 @@ export class Department {
     })
     leader: string;
 
+    @Column({
+		name: 'created_at',
+		type: 'timestamp',
+		default: () => 'CURRENT_TIMESTAMP',
+	})
+	ctime: Date;
+
+	@Column({
+		name: 'updated_at',
+		type: 'timestamp',
+		default: () => 'CURRENT_TIMESTAMP',
+	})
+	mtime: Date;
+
+	@BeforeUpdate()
+	updateDates() {
+		this.mtime = new Date();
+	}
+
     @OneToMany(() => Subject, s => s.department)
     subject: Subject[];
+
+    @OneToMany(() => User, u => u.department)
+    teacher: User[];
+
+    @OneToOne(() => User)
+    @JoinColumn()
+    user: User;
+
 }
 

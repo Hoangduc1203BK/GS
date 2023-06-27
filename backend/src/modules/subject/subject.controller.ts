@@ -7,22 +7,39 @@ import {
     Post,
     Query,
   } from '@nestjs/common';
-import { ListSubjectDto } from './dto';
+import { CreateSubjectDto, ListSubjectDto, UpdateSubjectDto } from './dto';
+import { SubjectService } from './subject.service';
   
   @Controller('department')
-  export class DepartmentController {
-    constructor() {}
+  export class SubjectController {
+    constructor(private readonly subjectService: SubjectService) {}
   
     @Get('/')
-    async listSubject(@Query() query: ListSubjectDto) {}
+    async listSubject(@Query() query: ListSubjectDto) {
+      const result = await this.subjectService.listSubject(query);
+
+      return result;
+    }
   
     @Get('/:id')
-    async getSubject(@Param('id') id: string) {}
+    async getSubject(@Param('id') id: string) {
+      const result = await this.subjectService.getSubject(id);
+
+      return result;
+    }
   
     @Post('/')
-    async createSubject(@Body() createSubjectDto ) {}
+    async createSubject(@Body() createSubjectDto: CreateSubjectDto ) {
+      const result = await this.subjectService.createSubject(createSubjectDto);
+
+      return result;
+    }
   
     @Patch('/:id')
-    async updateSubject(@Param('id') id: number, @Body() updateSubjectDto) {}
+    async updateSubject(@Param('id') id: string, @Body() updateSubjectDto: UpdateSubjectDto) {
+      const result = await this.subjectService.updateSubject(id,updateSubjectDto);
+
+      return result;
+    }
   }
   

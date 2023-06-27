@@ -7,3 +7,12 @@ export const ONE_WEEK = 7 * ONE_DAY;
 // INFO: 2 ** 10 = 1024
 export const GB = 2 ** 30;
 export const MB = 2 ** 20;
+
+
+//ROLE
+
+export enum ROLE {
+    ADMIN = 'admin',
+    USER = 'user',
+    TEACHER = 'teacher',
+}

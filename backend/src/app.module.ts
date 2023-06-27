@@ -5,6 +5,7 @@ import { SharedModule } from './core/shared/shared.module';
 import { ConfigModule } from '@nestjs/config';
 import { DatabaseModule } from './databases/database.module';
 import { DepartmentModule } from './modules/department/department.module';
+import { MODULES } from './modules';
 
 @Module({
   imports: [
@@ -14,7 +15,7 @@ import { DepartmentModule } from './modules/department/department.module';
 		}),
     DatabaseModule,
     SharedModule,
-    DepartmentModule
+    ...MODULES
   ],
   controllers: [AppController],
   providers: [AppService],

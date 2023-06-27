@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ROLE } from 'src/common/constants';
 import { v1 as uuid } from 'uuid';
 
 @Injectable()
@@ -32,5 +33,20 @@ export class GeneratorService {
 		}
 
 		return result;
+	}
+
+	public randomUserID(role: string): string {
+		let randomID = ''
+		switch(role) {
+			case ROLE.ADMIN:
+				randomID = `AD${this.randomNumber(4)}`
+				break;
+			case ROLE.TEACHER:
+				randomID = `TC${this.randomNumber(4)}`
+				break;
+			default:
+				randomID = `ST${this.randomNumber(4)}`
+		}
+		return randomID;
 	}
 }
