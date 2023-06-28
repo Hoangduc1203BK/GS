@@ -1,6 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, BeforeUpdate, OneToOne, OneToMany } from 'typeorm';
 import { Department } from './department';
 import { Auth } from './auth';
+import { Classes } from './class';
 
 @Entity('users')
 export class User {
@@ -168,5 +169,8 @@ export class User {
     department1: Department;
 
     @OneToMany(() => Auth, a => a.userId)
-    auth: Auth
+    auth: Auth[];
+
+    @OneToMany(() => Classes, c => c.user)
+    classes: Classes[];
 }

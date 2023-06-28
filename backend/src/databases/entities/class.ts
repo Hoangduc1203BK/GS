@@ -1,6 +1,8 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, OneToMany, OneToOne, BeforeUpdate } from 'typeorm';
 import { Department } from './department';
 import { Subject } from './subject';
+import { TimeTable } from './time-table';
+import { User } from './user';
 
 @Entity('class')
 export class Classes {
@@ -21,14 +23,6 @@ export class Classes {
     name: string;
 
     @Column({
-        type: 'varchar',
-        length: '50',
-        name: 'time_table',
-        nullable: false,
-    })
-    timeTable: string;
-
-    @Column({
         type: 'int',
         name: 'number_student',
         nullable: false,
@@ -41,7 +35,14 @@ export class Classes {
         name: 'type',
         nullable: false,
     })
-    fee: string;
+    type: string;
+
+    @Column({
+        type: 'int',
+        name: 'fee',
+        nullable: false,
+    })
+    fee: number;
 
     @Column({
         type: 'varchar',
@@ -88,5 +89,12 @@ export class Classes {
     @ManyToOne(() => Subject, d => d.classes)
     @JoinColumn({name: 'subject_id', referencedColumnName: 'id'})
     subject: Subject;
+
+    @ManyToOne(() => User, u => u.classes)
+    @JoinColumn({name: 'teacher', referencedColumnName: 'id'})
+    user: User;
+
+    @OneToMany(() => TimeTable, t => t.classes)
+    timeTables: TimeTable[]
 }
 
