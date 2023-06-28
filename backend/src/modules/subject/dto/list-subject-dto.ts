@@ -23,6 +23,6 @@ export class ListSubjectDto {
     @ApiProperty({ required: true })
     @IsOptional()
 	@IsNotEmpty()
-	@IsNumberString()
-	departmentId?: number;
+	@IsString()
+	departmentId?: string;
 }

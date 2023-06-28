@@ -1,9 +1,9 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, OneToMany, OneToOne, BeforeUpdate } from 'typeorm';
 import { Department } from './department';
-import { Classes } from './class';
+import { Subject } from './subject';
 
-@Entity('subjects')
-export class Subject {
+@Entity('class')
+export class Classes {
     @PrimaryColumn({
         type:'varchar',
         length: '6',
@@ -23,26 +23,41 @@ export class Subject {
     @Column({
         type: 'varchar',
         length: '50',
-        name: 'grade',
+        name: 'time_table',
         nullable: false,
     })
-    grade: string;
+    timeTable: string;
 
     @Column({
-        type: 'varchar',
-        length: '50',
-        name: 'description',
+        type: 'int',
+        name: 'number_student',
         nullable: false,
     })
-    description: string;
+    numberStudent: number;
 
     @Column({
         type: 'varchar',
         length: '6',
-        name: 'department_id',
+        name: 'type',
         nullable: false,
     })
-    departmentId: string;
+    fee: string;
+
+    @Column({
+        type: 'varchar',
+        length: '6',
+        name: 'subject_id',
+        nullable: false,
+    })
+    subjectId: string;
+
+    @Column({
+        type: 'varchar',
+        length: '6',
+        name: 'teacher',
+        nullable: false,
+    })
+    teacher: string;
 
     @Column({
 		name: 'created_at',
@@ -70,11 +85,8 @@ export class Subject {
 		this.mtime = new Date();
 	}
 
-    @ManyToOne(() => Department, d => d.subject)
-    @JoinColumn({name: 'department_id', referencedColumnName: 'id'})
-    department: Department;
-
-    @OneToMany(() => Classes, (c) => c.subject)
-    classes: Classes[];
+    @ManyToOne(() => Subject, d => d.classes)
+    @JoinColumn({name: 'subject_id', referencedColumnName: 'id'})
+    subject: Subject;
 }
 

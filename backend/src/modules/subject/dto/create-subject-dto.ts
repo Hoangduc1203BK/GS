@@ -19,6 +19,6 @@ export class CreateSubjectDto {
 
     @ApiProperty({ required: true })
 	@IsNotEmpty()
-	@IsNumberString()
-	departmentId: number;
+	@IsString()
+	departmentId: string;
 }

@@ -10,7 +10,7 @@ import {
 import { CreateSubjectDto, ListSubjectDto, UpdateSubjectDto } from './dto';
 import { SubjectService } from './subject.service';
   
-  @Controller('department')
+  @Controller('subject')
   export class SubjectController {
     constructor(private readonly subjectService: SubjectService) {}
   

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Department, Subject } from 'src/databases/entities';
 import { DataSource, Repository } from 'typeorm';
@@ -6,6 +6,8 @@ import { DEFAULT_PAGING } from 'src/common/constants/paging';
 import { paginate } from 'src/common/interfaces/paginate';
 import { CreateSubjectDto, ListSubjectDto, UpdateSubjectDto } from './dto';
 import { DepartmentService } from '../department/department.service';
+import { GeneratorService } from 'src/core/shared/services';
+import { UserService } from '../user';
 
 @Injectable()
 export class SubjectService {
@@ -13,6 +15,7 @@ export class SubjectService {
     @InjectRepository(Subject)
     private readonly subjectRepos: Repository<Subject>,
     private readonly departmentService: DepartmentService,
+    private readonly generatorService: GeneratorService,
   ) {}
 
   async listSubject(dto: ListSubjectDto) {
@@ -29,16 +32,16 @@ export class SubjectService {
     }
     if (departmentId) {
       await this.departmentService.getDepartment(departmentId);
-      filter.grade = grade;
+      filter.departmentId = departmentId;
     }
 
     const subjects = await this.subjectRepos.find({
       where: {
         ...filter,
-        order: { id: 'ASC' },
-        skip: (page - 1) * size,
-        take: size,
       },
+      order: { ctime: 'ASC' },
+      skip: (page - 1) * size,
+      take: size,
     });
 
     return {
@@ -59,7 +62,10 @@ export class SubjectService {
 
   async createSubject(dto: CreateSubjectDto) {
     await this.departmentService.getDepartment(dto.departmentId);
-    const result = await this.subjectRepos.save(dto);
+    const result = await this.subjectRepos.save({
+      id: this.generatorService.randomNumber(6),
+      ...dto,
+    });
 
     return result;
   }

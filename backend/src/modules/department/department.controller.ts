@@ -25,7 +25,7 @@ export class DepartmentController {
   }
 
   @Get('/:id')
-  async getDepartment(@Param('id') id: number) {
+  async getDepartment(@Param('id') id: string) {
     const result = await this.departmentService.getDepartment(id)
 
     return result;
@@ -39,7 +39,7 @@ export class DepartmentController {
   }
 
   @Patch('/:id')
-  async updateDepartment(@Param('id') id: number, @Body() updateDepartment: UpdateDepartmentDto) {
+  async updateDepartment(@Param('id') id: string, @Body() updateDepartment: UpdateDepartmentDto) {
     const result = await this.departmentService.updateDepartment(id, updateDepartment)
 
     return result;

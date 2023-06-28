@@ -1,5 +1,6 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, BeforeUpdate, OneToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, BeforeUpdate, OneToOne, OneToMany } from 'typeorm';
 import { Department } from './department';
+import { Auth } from './auth';
 
 @Entity('users')
 export class User {
@@ -23,9 +24,18 @@ export class User {
         type: 'varchar',
         length: '50',
         name: 'email',
+        unique: true,
         nullable: false,
     })
     email: string;
+
+    @Column({
+        type: 'varchar',
+        length: '100',
+        name: 'password',
+        nullable: false,
+    })
+    password: string;
 
     @Column({
         type: 'varchar',
@@ -103,19 +113,19 @@ export class User {
     major: string;
 
     @Column({
-        type: 'varchar',
-        length: '50',
+        type: 'boolean',
         name: 'graduated',
         nullable: true,
     })
-    graduated: string;
+    graduated: boolean;
 
     @Column({
-        type: 'int',
+        type: 'varchar',
+        length: '6',
         name: 'department_id',
         nullable: true,
     })
-    departmentId: number;
+    departmentId: string;
 
     @Column({
         type: 'int',
@@ -138,6 +148,13 @@ export class User {
 	})
 	mtime: Date;
 
+    @Column({
+		name: 'deleted_at',
+		type: 'timestamp',
+        nullable: true,
+	})
+	dtime: Date;
+
 	@BeforeUpdate()
 	updateDates() {
 		this.mtime = new Date();
@@ -149,5 +166,7 @@ export class User {
 
     @OneToOne(() => Department, d => d.leader)
     department1: Department;
-}
 
+    @OneToMany(() => Auth, a => a.userId)
+    auth: Auth
+}

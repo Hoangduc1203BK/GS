@@ -46,7 +46,6 @@ export async function bootstrap(): Promise<NestExpressApplication> {
 		origin: '*',
 		credentials: true,
 	});
-  app.use(helmet());
 	// app.use(compression());
 	app.enableVersioning({
 		defaultVersion: '1',

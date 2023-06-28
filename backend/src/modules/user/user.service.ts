@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from 'src/databases/entities';
@@ -8,13 +8,19 @@ import { DEFAULT_PAGING } from 'src/common/constants/paging';
 import { ROLE } from 'src/common/constants/util';
 import { paginate } from 'src/common/interfaces/paginate';
 import { GeneratorService } from 'src/core/shared/services/generator.service';
+import { BcryptService } from './bcrypt.service';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private readonly userRepos: Repository<User>,
-    private readonly departmentService: DepartmentService,
     private readonly generatorService: GeneratorService,
+    private readonly bcryptService: BcryptService,
+    @Inject(forwardRef(() => DepartmentService))
+    private readonly departmentService: DepartmentService,
+    // @Inject(forwardRef(() => AuthService))
+    // private readonly authService: AuthService,
   ) {}
 
   async listUser(dto: ListUsertDto) {
@@ -38,7 +44,7 @@ export class UserService {
       where: {
         ...filter,
       },
-      order: { id: 'ASC' },
+      order: { ctime: 'ASC' },
       skip: (page - 1) * size,
       take: size,
     });
@@ -64,40 +70,45 @@ export class UserService {
 
   async createUser(dto: CreateUserDto) {
     let department;
-    if(dto.departmentId) {
-        department = await this.departmentService.getDepartment(dto.departmentId)
+    const user = await this.userRepos.findOne({ where: { email: dto.email } });
+    if (user) {
+      throw new Error('Email already exist');
+    }
+    if (dto.departmentId) {
+      department = await this.departmentService.getDepartment(dto.departmentId);
     }
 
+    const hashPassword = await this.bcryptService.hash('12345');
     const doc = {
-        id: this.generatorService.randomUserID(dto.role),
-        ...dto,
-    }
+      id: this.generatorService.randomUserID(dto.role),
+      password: hashPassword,
+      ...dto,
+    };
 
     const result = await this.userRepos.save(doc);
 
     return {
-        ...result,
-        department: department
-    }
+      ...result,
+      department: department,
+    };
   }
 
   async updateUser(id: string, dto: UpdateUserDto) {
     let department;
-    if(dto.departmentId) {
-        department = await this.departmentService.getDepartment(dto.departmentId)
+    if (dto.departmentId) {
+      department = await this.departmentService.getDepartment(dto.departmentId);
     }
     const user = await this.getUser(id);
     const doc = {
-        ...user,
-        ...dto,
-    }
-
-    const result = await this.userRepos.save({id: id, ...doc})
-    if(department.id) {
-        return {
-            ...result,
-            department: department
-        }
+      ...user,
+      ...dto,
+    };
+    const result = await this.userRepos.save({ id: id, ...doc });
+    if (department && department.id) {
+      return {
+        ...result,
+        department: department,
+      };
     }
 
     return result;

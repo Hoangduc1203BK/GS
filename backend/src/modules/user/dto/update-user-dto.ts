@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsNumber, IsEnum, IsNumberString, IsOptional, IsEmail } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber, IsEnum, IsNumberString, IsOptional, IsEmail, IsBoolean } from 'class-validator';
 import { ROLE } from 'src/common/constants';
 
 export class UpdateUserDto {
@@ -67,8 +67,8 @@ export class UpdateUserDto {
     @ApiProperty({ required: false })
     @IsOptional()
 	@IsNotEmpty()
-	@IsString()
-	graduated?: string;
+	@IsBoolean()
+	graduated?: boolean;
 
     @ApiProperty({ required: false })
     @IsOptional()
@@ -79,6 +79,6 @@ export class UpdateUserDto {
     @ApiProperty({ required: false })
     @IsOptional()
 	@IsNotEmpty()
-	@IsNumberString()
-	departmentId?: number;
+	@IsString()
+	departmentId?: string;
 }
