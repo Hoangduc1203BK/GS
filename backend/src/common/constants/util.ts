@@ -16,3 +16,9 @@ export enum ROLE {
     USER = 'user',
     TEACHER = 'teacher',
 }
+
+//CLASS
+export enum CLASS_TYPE {
+    ACTIVE = 'active',
+    DEACTIVE = 'deactive'
+}

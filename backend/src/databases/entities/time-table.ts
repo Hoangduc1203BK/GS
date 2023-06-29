@@ -22,20 +22,22 @@ export class TimeTable {
     date: string;
 
     @Column({
-        type: 'varchar',
-        length: '50',
-        name: 'start',
-        nullable: false,
-    })
-    start: string;
+		type: 'decimal',
+		precision: 10,
+		scale: 2,
+		name: 'start',
+		nullable: false,
+	})
+	start: number;
 
-    @Column({
-        type: 'varchar',
-        length: '50',
-        name: 'end',
-        nullable: false,
-    })
-    end: string;
+	@Column({
+		type: 'decimal',
+		precision: 10,
+		scale: 2,
+		name: 'end',
+		nullable: false,
+	})
+	end: number;
 
     @Column({
         type: 'varchar',

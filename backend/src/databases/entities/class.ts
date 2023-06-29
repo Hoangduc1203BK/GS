@@ -3,6 +3,7 @@ import { Department } from './department';
 import { Subject } from './subject';
 import { TimeTable } from './time-table';
 import { User } from './user';
+import { Room } from './room';
 
 @Entity('class')
 export class Classes {
@@ -61,6 +62,13 @@ export class Classes {
     teacher: string;
 
     @Column({
+        type: 'int',
+        name: 'room_id',
+        nullable: false,
+    })
+    roomId: number;
+
+    @Column({
 		name: 'created_at',
 		type: 'timestamp',
 		default: () => 'CURRENT_TIMESTAMP',
@@ -93,6 +101,10 @@ export class Classes {
     @ManyToOne(() => User, u => u.classes)
     @JoinColumn({name: 'teacher', referencedColumnName: 'id'})
     user: User;
+
+    @ManyToOne(() => Room, r => r.classes)
+    @JoinColumn({name: 'roomId', referencedColumnName: 'id'})
+    room: Room;
 
     @OneToMany(() => TimeTable, t => t.classes)
     timeTables: TimeTable[]
