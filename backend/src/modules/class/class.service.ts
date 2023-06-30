@@ -1,16 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Classes, Room, TimeTable } from 'src/databases/entities';
+import { Classes, Room, Subject, TimeTable } from 'src/databases/entities';
 import { DataSource, Repository } from 'typeorm';
 import { CreateClassDto, ListClassDto, UpdateClassDto } from './dto';
 import { DEFAULT_PAGING } from 'src/common/constants/paging';
 import { CLASS_TYPE } from 'src/common/constants';
-import { SubjectService } from '../subject';
 import { UserService } from '../user';
 import { paginate } from 'src/common/interfaces/paginate';
 import * as moment from 'moment';
 import { Schedule } from 'src/common/interfaces/time-table';
 import { GeneratorService } from 'src/core/shared/services';
+import { DepartmentService } from '../department';
 @Injectable()
 export class ClassService {
   constructor(
@@ -18,10 +18,11 @@ export class ClassService {
     @InjectRepository(Room) private readonly roomRepos: Repository<Room>,
     @InjectRepository(TimeTable)
     private readonly timeRepos: Repository<TimeTable>,
-    private readonly subjectService: SubjectService,
-    private readonly userService: UserService,
+    @InjectRepository(Subject) private readonly subjectRepos: Repository<Subject>,
     private readonly datasource: DataSource,
     private readonly generatorService: GeneratorService,
+    @Inject(forwardRef(() => UserService)) 
+    private readonly userService: UserService,
   ) {}
 
   async createRoom(data: any) {
@@ -65,7 +66,7 @@ export class ClassService {
     } as any;
 
     if (subjectId) {
-      await this.subjectService.getSubject(query.subjectId);
+      await this.subjectRepos.findOne({where: {id: query.subjectId}});
       filter.subjectId = query.subjectId;
     }
 
@@ -95,7 +96,7 @@ export class ClassService {
 
   async updateClass(dto: UpdateClassDto) {
     if (dto.subjectId) {
-      await this.subjectService.getSubject(dto.subjectId);
+      await this.subjectRepos.findOne({where: {id: dto.subjectId}});
     }
 
     if (dto.teacher) {
@@ -107,8 +108,8 @@ export class ClassService {
     }
   }
 
-  async checkSchedule(start: string, end: string, date: string) {
-    const schedules = await this.timeRepos.find({ where: { date: date } });
+  async checkSchedule(start: string, end: string, date: string, roomId: number) {
+    const schedules = await this.timeRepos.find({ where: { date: date, roomId: roomId } });
     if (schedules.length > 0) {
       for (const s of schedules) {
         if (
@@ -170,14 +171,16 @@ export class ClassService {
 
   async createClass(dto: CreateClassDto) {
     const {schedules, ...rest} = dto;
+    let user;
     //check teacher exist
-    const user = await this.userService.getUser(dto.teacher);
+    if(dto.teacher) {
+        user = await this.userService.getUser(dto.teacher);
+    }
 
     //check subject exist
-    const subject = await this.subjectService.getSubject(dto.subjectId);
+    const subject = await this.subjectRepos.findOne({where: {id: dto.subjectId}});
 
     //check room exist
-    const room = await this.getRoom(dto.roomId);
     const id = this.generatorService.randomString(6);
 
     const doc = {
@@ -190,7 +193,7 @@ export class ClassService {
     if(result && result.id){
         await this.datasource.manager.transaction(async manager => {
             for(const s of schedules) {
-                const check = await this.checkSchedule(s.start, s.end, s.date)
+                const check = await this.checkSchedule(s.start, s.end, s.date, s.roomId)
                 if(!check) {
                     await this.classRepos.delete({ id });
                     throw new Error(`Another class already in this time`);
@@ -202,7 +205,8 @@ export class ClassService {
                     classId: id,
                     date: s.date,
                     start: moment.duration(s.start).asHours(),
-                    end: moment.duration(s.end).asHours()
+                    end: moment.duration(s.end).asHours(),
+                    roomId: s.roomId
                 }
 
                 await manager.save(TimeTable,data);
@@ -210,12 +214,18 @@ export class ClassService {
         })
     }
 
-    return {
+    let classes = {
         ...doc,
         schedules: schedules,
-        teacherName: user.name,
         subject: subject,
-        room: room
+    } as any;
+    if(user && user.id) {
+        classes = {
+            ...classes,
+            teacherName: user.name
+        }
     }
+
+    return classes;
   }
 }

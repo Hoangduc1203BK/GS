@@ -57,16 +57,11 @@ export class Classes {
         type: 'varchar',
         length: '6',
         name: 'teacher',
-        nullable: false,
+        nullable: true,
     })
-    teacher: string;
+    teacher?: string;
 
-    @Column({
-        type: 'int',
-        name: 'room_id',
-        nullable: false,
-    })
-    roomId: number;
+    
 
     @Column({
 		name: 'created_at',
@@ -102,9 +97,9 @@ export class Classes {
     @JoinColumn({name: 'teacher', referencedColumnName: 'id'})
     user: User;
 
-    @ManyToOne(() => Room, r => r.classes)
-    @JoinColumn({name: 'roomId', referencedColumnName: 'id'})
-    room: Room;
+    // @ManyToOne(() => Room, r => r.classes)
+    // @JoinColumn({name: 'roomId', referencedColumnName: 'id'})
+    // room: Room;
 
     @OneToMany(() => TimeTable, t => t.classes)
     timeTables: TimeTable[]

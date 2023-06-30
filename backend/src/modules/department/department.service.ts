@@ -7,6 +7,7 @@ import { DEFAULT_PAGING } from "src/common/constants/paging";
 import { paginate } from "src/common/interfaces/paginate";
 import { GeneratorService } from "src/core/shared/services";
 import { UserService } from "../user";
+import { SubjectService } from "../subject";
 
 @Injectable()
 export class DepartmentService {

@@ -19,8 +19,6 @@ export class UserService {
     private readonly bcryptService: BcryptService,
     @Inject(forwardRef(() => DepartmentService))
     private readonly departmentService: DepartmentService,
-    // @Inject(forwardRef(() => AuthService))
-    // private readonly authService: AuthService,
   ) {}
 
   async listUser(dto: ListUsertDto) {

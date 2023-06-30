@@ -5,11 +5,12 @@ import { SubjectController } from "./subject.controller";
 import { SubjectService } from "./subject.service";
 import { DepartmentService } from "../department/department.service";
 import { UserModule } from "../user";
+import { DepartmentModule } from "../department";
 
 @Module({
     imports:[
         TypeOrmModule.forFeature([Subject, Department]),
-        forwardRef(() => UserModule)
+        forwardRef(() => UserModule),
     ],
     controllers: [SubjectController],
     providers: [SubjectService, DepartmentService],

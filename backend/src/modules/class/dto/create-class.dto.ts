@@ -11,12 +11,12 @@ export class CreateClassDto {
 
     @ApiProperty({ required: true })
 	@IsNotEmpty()
-	@IsNumberString()
+	@IsNumber()
 	numberStudent: number;
 
     @ApiProperty({ required: true })
 	@IsNotEmpty()
-	@IsNumberString()
+	@IsNumber()
 	fee: number;
 
 	@ApiProperty({ required: true })
@@ -25,14 +25,10 @@ export class CreateClassDto {
 	subjectId: string;
 
 	@ApiProperty({ required: true })
+    @IsOptional()
 	@IsNotEmpty()
 	@IsString()
-	teacher: string;
-
-	@ApiProperty({ required: true })
-	@IsNotEmpty()
-	@IsNumberString()
-	roomId: number;
+	teacher?: string;
 
 	@ApiProperty({ required: true })
 	@IsNotEmpty()

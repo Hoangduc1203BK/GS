@@ -2,6 +2,7 @@ import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, OneToMan
 import { Department } from './department';
 import { Subject } from './subject';
 import { Classes } from './class';
+import { TimeTable } from './time-table';
 
 @Entity('rooms')
 export class Room {
@@ -20,7 +21,7 @@ export class Room {
     })
     name: string;
 
-    @ManyToOne(() => Classes, c => c.room)
-    classes: Classes[];
+    @OneToMany(() => TimeTable, t => t.room)
+    schedules: TimeTable[];
 }
 

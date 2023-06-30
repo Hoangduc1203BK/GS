@@ -1,13 +1,13 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, OneToMany, OneToOne, BeforeUpdate } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, OneToMany, OneToOne, BeforeUpdate, PrimaryGeneratedColumn } from 'typeorm';
 import { Department } from './department';
 import { Subject } from './subject';
 import { Classes } from './class';
+import { Room } from './room';
 
 @Entity('time-tables')
 export class TimeTable {
-    @PrimaryColumn({
-        type:'varchar',
-        length: '6',
+    @PrimaryGeneratedColumn({
+        type:'int',
         name: 'id',
         unsigned: true,
     })
@@ -40,6 +40,13 @@ export class TimeTable {
 	end: number;
 
     @Column({
+        type: 'int',
+        name: 'room_id',
+        nullable: false,
+    })
+    roomId: number;
+
+    @Column({
         type: 'varchar',
         length: '6',
         name: 'class_id',
@@ -50,5 +57,9 @@ export class TimeTable {
     @ManyToOne(() => Classes, d => d.timeTables)
     @JoinColumn({name: 'class_id', referencedColumnName: 'id'})
     classes: Classes;
+
+    @ManyToOne(() => Room, r => r.schedules)
+    @JoinColumn({name: 'room_id', referencedColumnName: 'id'})
+    room: Room;
 }
 
