@@ -11,7 +11,7 @@ export class TimeTable {
         name: 'id',
         unsigned: true,
     })
-    id: string;
+    id: number;
 
     @Column({
         type: 'varchar',

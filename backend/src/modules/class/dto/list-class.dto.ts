@@ -3,17 +3,17 @@ import { IsString, IsNotEmpty, IsNumber, IsEnum, IsNumberString, IsOptional } fr
 import { CLASS_TYPE } from 'src/common/constants';
 
 export class ListClassDto {
-	@ApiProperty({ required: true })
-    @IsOptional()
-	@IsNotEmpty()
-	@IsNumberString()
-	page?: number;
+	// @ApiProperty({ required: true })
+    // @IsOptional()
+	// @IsNotEmpty()
+	// @IsNumberString()
+	// page?: number;
 
-	@ApiProperty({ required: true })
-    @IsOptional()
-	@IsNotEmpty()
-	@IsNumberString()
-	size?: number;
+	// @ApiProperty({ required: true })
+    // @IsOptional()
+	// @IsNotEmpty()
+	// @IsNumberString()
+	// size?: number;
 
 	@ApiProperty({ required: true })
     @IsOptional()

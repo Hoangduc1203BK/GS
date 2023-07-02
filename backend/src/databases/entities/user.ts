@@ -2,6 +2,7 @@ import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, BeforeUpdate, One
 import { Department } from './department';
 import { Auth } from './auth';
 import { Classes } from './class';
+import { UserClass } from './user-class';
 
 @Entity('users')
 export class User {
@@ -171,6 +172,11 @@ export class User {
     @OneToMany(() => Auth, a => a.userId)
     auth: Auth[];
 
+    //teacher
     @OneToMany(() => Classes, c => c.user)
     classes: Classes[];
+
+    //student
+    @OneToMany(() => UserClass, uc => uc.user)
+    userClass: UserClass[];
 }

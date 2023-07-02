@@ -4,6 +4,7 @@ import { Subject } from './subject';
 import { TimeTable } from './time-table';
 import { User } from './user';
 import { Room } from './room';
+import { UserClass } from './user-class';
 
 @Entity('class')
 export class Classes {
@@ -103,5 +104,8 @@ export class Classes {
 
     @OneToMany(() => TimeTable, t => t.classes)
     timeTables: TimeTable[]
+
+    @OneToMany(() => UserClass, uc => uc.classes)
+    userClass: UserClass[];
 }
 

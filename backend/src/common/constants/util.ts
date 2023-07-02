@@ -22,3 +22,9 @@ export enum CLASS_TYPE {
     ACTIVE = 'active',
     DEACTIVE = 'deactive'
 }
+
+//USER_CLASS_TYPE
+export enum USER_CLASS_TYPE {
+    TEST = 'test',
+    MAIN = 'main'
+}

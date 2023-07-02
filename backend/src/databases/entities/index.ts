@@ -5,3 +5,4 @@ export * from './auth';
 export * from './class';
 export * from './time-table';
 export * from './room';
+export * from './user-class';
