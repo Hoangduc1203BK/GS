@@ -59,7 +59,7 @@ export default function LayoutAdmin({
 			children: [
 				{
 					label: (
-						<Link href="/admin">Thông tin cá nhân</Link>
+						<Link href="/student">Thông tin cá nhân</Link>
 					),
 					key: "infoStudent",
 				},
@@ -277,7 +277,7 @@ export default function LayoutAdmin({
 						theme="light"
 						mode="inline"
 						defaultSelectedKeys={["1"]}
-						items={itemsSlider}
+						items={itemStudent}
 					/>
 				</Sider>
 				<Layout

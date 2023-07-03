@@ -28,3 +28,13 @@ body{
   vertical-align: middle !important;
   margin-bottom: 3px !important;
 }
+
+.custom-table table tr th,
+.custom-table table tr td {
+  border: 1px solid;
+  padding: 5px;
+} 
+
+.custom-table table tr th{
+  text-align: left;
+}
