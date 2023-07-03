@@ -60,7 +60,7 @@ export class UserService {
     });
 
     if (!user) {
-      throw new Error('User not found');
+      throw new Error('Không tìm thấy người dùng');
     }
 
     return user;
@@ -70,7 +70,7 @@ export class UserService {
     let department;
     const user = await this.userRepos.findOne({ where: { email: dto.email } });
     if (user) {
-      throw new Error('Email already exist');
+      throw new Error('Email đã tồn tại');
     }
     if (dto.departmentId) {
       department = await this.departmentService.getDepartment(dto.departmentId);

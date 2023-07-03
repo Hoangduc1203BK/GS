@@ -3,6 +3,10 @@ import { Department } from './department';
 import { Auth } from './auth';
 import { Classes } from './class';
 import { UserClass } from './user-class';
+import { Attendance } from './attendance';
+import { SubAttendance } from './sub-attendance';
+import { RegisterExam } from './register-exam';
+import { Exam } from './exam';
 
 @Entity('users')
 export class User {
@@ -179,4 +183,16 @@ export class User {
     //student
     @OneToMany(() => UserClass, uc => uc.user)
     userClass: UserClass[];
+
+    //attendance
+    @OneToMany(() => SubAttendance, a => a.student)
+    subAttendances: SubAttendance[];
+
+
+    //register exam
+    @OneToMany(() => RegisterExam, re => re.user)
+    registerExams: RegisterExam[];
+
+    @OneToMany(() => Exam, e => e.teacher)
+    exams: Exam[];
 }

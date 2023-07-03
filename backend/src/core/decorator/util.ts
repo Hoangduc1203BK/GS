@@ -7,7 +7,7 @@ export const checkEmailDecorator = createParamDecorator(
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
         if(!emailRegex.test(email)) {
-            throw new Error('Invalid email');
+            throw new Error('Email không đúng định dạng');
         }
 
         return request;

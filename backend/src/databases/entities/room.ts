@@ -3,6 +3,7 @@ import { Department } from './department';
 import { Subject } from './subject';
 import { Classes } from './class';
 import { TimeTable } from './time-table';
+import { Exam } from './exam';
 
 @Entity('rooms')
 export class Room {
@@ -23,5 +24,8 @@ export class Room {
 
     @OneToMany(() => TimeTable, t => t.room)
     schedules: TimeTable[];
+
+    @OneToMany(() => Exam, e => e.room)
+    exams: Exam[];
 }
 

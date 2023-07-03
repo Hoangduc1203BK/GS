@@ -54,7 +54,7 @@ export class SubjectService {
     const result = await this.subjectRepos.findOne({ where: { id } });
 
     if (!result) {
-      throw new Error('Subject not found');
+      throw new Error('Môn học không tồn tại');
     }
 
     return result;

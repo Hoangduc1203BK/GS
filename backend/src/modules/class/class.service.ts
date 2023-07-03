@@ -1,8 +1,23 @@
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Classes, Room, Subject, TimeTable, UserClass } from 'src/databases/entities';
+import {
+  Attendance,
+  Classes,
+  Room,
+  SubAttendance,
+  Subject,
+  TimeTable,
+  UserClass,
+} from 'src/databases/entities';
 import { DataSource, Repository } from 'typeorm';
-import { CreateClassDto, CreateUserClassDto, ListClassDto, UpdateClassDto } from './dto';
+import {
+  CreateAttendanceDto,
+  CreateClassDto,
+  CreateUserClassDto,
+  ListClassDto,
+  UpdateAttendanceDto,
+  UpdateClassDto,
+} from './dto';
 import { DEFAULT_PAGING } from 'src/common/constants/paging';
 import { CLASS_TYPE } from 'src/common/constants';
 import { UserService } from '../user';
@@ -19,13 +34,17 @@ export class ClassService {
     @InjectRepository(Room) private readonly roomRepos: Repository<Room>,
     @InjectRepository(TimeTable)
     private readonly timeRepos: Repository<TimeTable>,
-    @InjectRepository(Subject) private readonly subjectRepos: Repository<Subject>,
-    @InjectRepository(UserClass) private readonly userClassRepos: Repository<UserClass>,
+    @InjectRepository(Subject)
+    private readonly subjectRepos: Repository<Subject>,
+    @InjectRepository(UserClass)
+    private readonly userClassRepos: Repository<UserClass>,
+    @InjectRepository(Attendance) private readonly attendanceRepos: Repository<Attendance>,
+    @InjectRepository(SubAttendance) private readonly subAttendanceRepos: Repository<SubAttendance>,
     private readonly datasource: DataSource,
     private readonly generatorService: GeneratorService,
     @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
-  ) { }
+  ) {}
 
   async createRoom(data: any) {
     const result = await this.roomRepos.save(data);
@@ -37,7 +56,7 @@ export class ClassService {
     const result = await this.roomRepos.findOne({ where: { id } });
 
     if (!result) {
-      throw new Error('Room not found');
+      throw new Error('Không tìm thấy phòng');
     }
 
     return result;
@@ -68,18 +87,18 @@ export class ClassService {
       end,
     } = query;
     let classFilter = {
-      type: "'" + CLASS_TYPE.ACTIVE + "'"
+      type: "'" + CLASS_TYPE.ACTIVE + "'",
     } as any;
 
     let scheduleFilter = {
       date: "'2','3','4','5','6'",
       start: 7.5,
-      end: 21.5
+      end: 21.5,
     } as any;
 
     if (subjectId) {
       await this.subjectRepos.findOne({ where: { id: subjectId } });
-      classFilter["subject_id"] = "'" + subjectId + "'";
+      classFilter['subject_id'] = "'" + subjectId + "'";
     }
 
     if (teacher) {
@@ -92,11 +111,13 @@ export class ClassService {
     }
 
     if (roomId) {
-      scheduleFilter["room_id"] = roomId;
+      scheduleFilter['room_id'] = roomId;
     }
     if (date) {
-      scheduleFilter.date = date.split(",").map(el => "'" + el + "'").join(',')
-
+      scheduleFilter.date = date
+        .split(',')
+        .map((el) => "'" + el + "'")
+        .join(',');
     }
 
     if (start) {
@@ -107,64 +128,78 @@ export class ClassService {
       scheduleFilter.end = end;
     }
 
-    let qr = ` select c.*, t."start" ,t."end" ,t."date" ,r."name" as room_name from "class" c, "time-tables" t, "rooms" r where c.id = t.class_id and t.room_id = r.id `
+    let qr = ` select c.*, t."start" ,t."end" ,t."date" ,r."name" as room_name from "class" c, "time-tables" t, "rooms" r where c.id = t.class_id and t.room_id = r.id `;
     let classArr = [];
 
     if (Object.keys(classFilter).length > 0) {
       for (const [k, v] of Object.entries(classFilter)) {
-        classArr.push(" c." + `"${k}" = ` + `${v} `)
+        classArr.push(' c.' + `"${k}" = ` + `${v} `);
       }
     }
     if (Object.keys(scheduleFilter).length > 0) {
       for (const [k, v] of Object.entries(scheduleFilter)) {
         if (k == 'room_id') {
-          classArr.push(` t."room_id" = ` + `${v} `)
+          classArr.push(` t."room_id" = ` + `${v} `);
         }
-        if (k == "start") {
-          classArr.push(` t."start" >= ` + `${v} `)
+        if (k == 'start') {
+          classArr.push(` t."start" >= ` + `${v} `);
         }
-        if (k == "end") {
-          classArr.push(` t."end" <= ` + `${v} `)
+        if (k == 'end') {
+          classArr.push(` t."end" <= ` + `${v} `);
         }
-        if (k == "date") {
-          classArr.push(` t."date" in ( ${v} ) `)
+        if (k == 'date') {
+          classArr.push(` t."date" in ( ${v} ) `);
         }
       }
     }
 
     if (classArr.length > 0) {
-      qr = qr + " and " + classArr.join(" and ")
+      qr = qr + ' and ' + classArr.join(' and ');
     }
-
 
     let classes = await this.classRepos.query(qr);
     if (classes.length >= 1) {
       const { start, end, date, room_name, ...rest } = classes[0];
-      const result = [{
-        ...rest,
-        time_tables: [{
-          start, end, date, room_name
-        }]
-      }];
+      const result = [
+        {
+          ...rest,
+          time_tables: [
+            {
+              start,
+              end,
+              date,
+              room_name,
+            },
+          ],
+        },
+      ];
 
       classes.shift();
 
       classes.reduce((init, curr) => {
         const { start, end, date, room_name, ...rest } = curr;
-        const item = result.find(el => el.id == curr.id);
+        const item = result.find((el) => el.id == curr.id);
         if (!item) {
           result.push({
             ...rest,
-            time_tables: [{
-              start, end, date, room_name
-            }]
-          })
+            time_tables: [
+              {
+                start,
+                end,
+                date,
+                room_name,
+              },
+            ],
+          });
         } else {
           item.time_tables.push({
-            start, end, date, room_name
-          })
+            start,
+            end,
+            date,
+            room_name,
+          });
         }
-      }, classes)
+      }, classes);
 
       return result;
     } else {
@@ -173,13 +208,20 @@ export class ClassService {
   }
 
   async getClass(id: string) {
-    const result = await this.classRepos.findOne({
+    const classes = await this.classRepos.findOne({
       where: { id },
-      relations: ['timeTables', 'timeTables.room', 'user'],
+      relations: ['subject','user'],
     });
 
-    if (!result) {
-      throw new Error('Class not found');
+    if (!classes) {
+      throw new Error('Không tìm thấy lớp');
+    }
+    
+    const timeTables= await this.timeRepos.find({where: { classId: id}});
+
+    const result = {
+      ...classes,
+      time_tables: timeTables
     }
 
     return result;
@@ -194,27 +236,27 @@ export class ClassService {
       await this.userService.getUser(dto.teacher);
     }
 
-    const classes = await this.classRepos.findOne({ where: { id } })
+    const classes = await this.classRepos.findOne({ where: { id } });
 
     const { schedules, ...rest } = dto;
 
     const doc = {
       ...classes,
-      ...rest
-    }
+      ...rest,
+    };
 
     const updateDoc = await this.classRepos.save(doc);
 
-    if (updateDoc && updateDoc.id) {
+    if (schedules && Object.keys(schedules).length > 0) {
       await this.datasource.manager.transaction(async (manager) => {
-        const schedules1 = await this.timeRepos.find({ where: { classId: id } });
-        await Promise.all(schedules1.map(async (s) => {
-          await this.deleteSchedule(s.id)
-        }))
-
         if (schedules && Object.keys(schedules).length > 0) {
           for (const s of schedules) {
-            const check = await this.checkSchedule(s.start.toString(), s.end.toString(), s.date, s.roomId);
+            const check = await this.checkSchedule(
+              s.start.toString(),
+              s.end.toString(),
+              s.date,
+              s.roomId,
+            );
 
             if (!check) {
               throw new Error(`Phòng này đã có lớp đăng kí sẵn`);
@@ -222,27 +264,40 @@ export class ClassService {
           }
         }
 
-        if (schedules && Object.keys(schedules).length > 0) {
-          for (const s of schedules) {
-            const doc = {
-              date: s.date,
-              start: moment.duration(s.start).asHours(),
-              end: moment.duration(s.end).asHours(),
-              roomId: s.roomId,
-              classId: id,
-            };
+        const schedules1 = await this.timeRepos.find({
+          where: { classId: id },
+        });
+        await Promise.all(
+          schedules1.map(async (s) => {
+            await this.deleteSchedule(s.id);
+          }),
+        );
+        for (const s of schedules) {
+          const doc = {
+            date: s.date,
+            start: moment.duration(s.start).asHours(),
+            end: moment.duration(s.end).asHours(),
+            roomId: s.roomId,
+            classId: id,
+          };
 
-            await manager.save(TimeTable, doc);
-          }
+          await manager.save(TimeTable, doc);
         }
-      })
+      });
     }
 
     return this.getClass(id);
   }
 
-  async checkSchedule(start: string, end: string, date: string, roomId: number) {
-    const schedules = await this.timeRepos.find({ where: { date: date, roomId: roomId } });
+  async checkSchedule(
+    start: string,
+    end: string,
+    date: string,
+    roomId: number,
+  ) {
+    const schedules = await this.timeRepos.find({
+      where: { date: date, roomId: roomId },
+    });
     if (schedules.length > 0) {
       for (const s of schedules) {
         if (
@@ -268,7 +323,9 @@ export class ClassService {
       const listTeacherNOtEmpty = [];
       for (const s of schedules) {
         const { start, end, date, roomId } = s;
-        const timeTables = await this.timeRepos.find({ where: { date: date, roomId: roomId } });
+        const timeTables = await this.timeRepos.find({
+          where: { date: date, roomId: roomId },
+        });
         for (const s1 of timeTables) {
           if (
             (moment.duration(start).asHours() >= s1.start &&
@@ -279,7 +336,7 @@ export class ClassService {
               moment.duration(end).asHours() >= s1.end)
           ) {
             if (!listClassNotEmpty.includes(s1.classId)) {
-              listClassNotEmpty.push(s1.classId)
+              listClassNotEmpty.push(s1.classId);
             }
           }
         }
@@ -291,18 +348,20 @@ export class ClassService {
       }
 
       let listTeacher = await this.userService.listUser({
-        role: 'teacher'
-      })
+        role: 'teacher',
+      });
 
-      let listTeacherID = listTeacher.result.map(el => {
-        return { id: el.id, name: el.name }
-      })
+      let listTeacherID = listTeacher.result.map((el) => {
+        return { id: el.id, name: el.name };
+      });
 
-      const result = listTeacherID.filter(el => !listTeacherNOtEmpty.some(el2 => el2 === el.id));
+      const result = listTeacherID.filter(
+        (el) => !listTeacherNOtEmpty.some((el2) => el2 === el.id),
+      );
 
       return result;
     } else {
-      return []
+      return [];
     }
   }
 
@@ -315,7 +374,9 @@ export class ClassService {
     }
 
     //check subject exist
-    const subject = await this.subjectRepos.findOne({ where: { id: dto.subjectId } });
+    const subject = await this.subjectRepos.findOne({
+      where: { id: dto.subjectId },
+    });
 
     //check room exist
     const id = this.generatorService.randomString(6);
@@ -324,16 +385,21 @@ export class ClassService {
       id: id,
       ...rest,
       type: CLASS_TYPE.ACTIVE,
-    }
-    const result = await this.classRepos.save(doc)
+    };
+    const result = await this.classRepos.save(doc);
 
     if (result && result.id) {
-      await this.datasource.manager.transaction(async manager => {
+      await this.datasource.manager.transaction(async (manager) => {
         for (const s of schedules) {
-          const check = await this.checkSchedule(s.start, s.end, s.date, s.roomId)
+          const check = await this.checkSchedule(
+            s.start,
+            s.end,
+            s.date,
+            s.roomId,
+          );
           if (!check) {
             await this.classRepos.delete({ id });
-            throw new Error(`Another class already in this time`);
+            throw new Error(`Phòng này đã có lớp đăng ký sẵn`);
           }
         }
 
@@ -343,12 +409,12 @@ export class ClassService {
             date: s.date,
             start: moment.duration(s.start).asHours(),
             end: moment.duration(s.end).asHours(),
-            roomId: s.roomId
-          }
+            roomId: s.roomId,
+          };
 
           await manager.save(TimeTable, data);
         }
-      })
+      });
     }
 
     let classes = {
@@ -359,8 +425,8 @@ export class ClassService {
     if (user && user.id) {
       classes = {
         ...classes,
-        teacherName: user.name
-      }
+        teacherName: user.name,
+      };
     }
 
     return classes;
@@ -370,10 +436,10 @@ export class ClassService {
   async getUserClass(id: number) {
     const result = await this.userClassRepos.findOne({
       where: {
-        id
+        id,
       },
-      relations: ['user', 'classes']
-    })
+      relations: ['user', 'classes'],
+    });
 
     return result;
   }
@@ -394,10 +460,10 @@ export class ClassService {
         type: type,
         dtime: null,
       },
-      relations: ['user']
-    })
+      relations: ['user'],
+    });
 
-    return result.map(el => el["user"]);
+    return result.map((el) => el['user']);
   }
 
   async listClassOfUser(userId: string, type: string) {
@@ -408,10 +474,10 @@ export class ClassService {
         userId: userId,
         dtime: null,
       },
-      relations: ['classes']
-    })
+      relations: ['classes'],
+    });
 
-    return classes
+    return classes;
   }
 
   async updateUserClass(id: number, dto: UpdateClassDto) {
@@ -419,11 +485,92 @@ export class ClassService {
 
     const doc = {
       ...userClass,
-      ...dto
-    }
+      ...dto,
+    };
 
-    await this.userClassRepos.save({id: id, ...doc})
+    await this.userClassRepos.save({ id: id, ...doc });
 
     return this.getUserClass(id);
+  }
+
+
+  //attendance
+  async createAttendance(dto: CreateAttendanceDto) {
+    const {classId, teacherId, day, date, attendances} = dto;
+    const classes = await this.classRepos.findOne({where: {id: classId}});
+    const teacher = await this.userService.getUser(teacherId);
+    const id = this.generatorService.randomString(6);
+    const doc = {
+      id: id,
+      classId: classId,
+      day: day,
+      date: date,
+      teacherId: teacherId 
+    }
+    let result = await this.attendanceRepos.save(doc);
+    await this.datasource.manager.transaction(async (manager) => {
+      await Promise.all(attendances.map(async (el) => {
+        const attendance = {
+          studentId: el.id,
+          attendanceId: id,
+          status: el.status,
+        }
+        await this.subAttendanceRepos.save(attendance);
+      }))
+    })
+
+    return {
+      ...result,
+      attendances: attendances
+    }
+  }
+
+  async updateAttendance(query: any, dto: UpdateAttendanceDto) {
+    const { date, day, classId } = query;
+    const attendance = await this.attendanceRepos.findOne({
+      where: {
+        classId: classId,
+        date: date,
+        day: day
+      },
+    }) 
+
+    if(!attendance) {
+      throw new Error('Bảng điểm danh không tồn tại')
+    }
+
+    const {attendances, ...rest} = dto;
+
+    const doc = {
+      ...attendance,
+      ...rest
+    }
+
+    const result = await this.attendanceRepos.save(doc);
+
+    if(attendances && attendances.length >0) {
+      await this.datasource.manager.transaction(async (manager) => {
+        const listSubAttendance = await this.subAttendanceRepos.find({where: {attendanceId: attendance.id}})
+        for(const s of listSubAttendance) {
+          await this.subAttendanceRepos.delete({id: s.id})
+        }
+
+        await Promise.all(dto.attendances.map(async (el) => {
+          const update = {
+            studentId: el.id,
+            attendanceId: attendance.id,
+            status: el.status,
+          }
+          await this.subAttendanceRepos.save(update);
+        }))
+      })
+    }
+
+    const subAttendances = await this.subAttendanceRepos.find({where: { attendanceId: attendance.id}});
+
+    return {
+      ...result,
+      attendances: subAttendances
+    }
   }
 }

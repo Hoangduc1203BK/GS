@@ -30,7 +30,7 @@ export class DepartmentService {
         const department = await this.departmentRepos.findOne({where: { id }});
 
         if(!department) {
-            throw new Error('Department not found')
+            throw new Error('Không tìm thấy bộ môn')
         }
 
         return department

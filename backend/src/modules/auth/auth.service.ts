@@ -80,7 +80,7 @@ export class AuthService {
 					await this.accountRepos.save({ id: doc.id, ...doc });
 				}),
 			);
-			throw new Error('Invalid token');
+			throw new Error('Token không hợp lệ');
 		} else {
 			await this.accountRepos.save({ id: token.id, ...token, blacklisted: true });
 			const payload = {
@@ -118,7 +118,7 @@ export class AuthService {
 		});
 
 		if (!token) {
-			throw new Error('Invalid refresh token');
+			throw new Error('Refresh token không hợp lệ');
 		}
 
 		await this.accountRepos.delete({
@@ -132,7 +132,7 @@ export class AuthService {
 	async resetPassword(email: string) {
 		const user = await this.userRepos.findOne({ where: { email: email } });
 		if (!user) {
-			throw new Error('User not found');
+			throw new Error('Không tìm thấy người dùng');
 		}
 
 		const newPassword = this.generatorService.randomString(10);

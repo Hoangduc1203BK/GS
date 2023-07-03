@@ -28,3 +28,9 @@ export enum USER_CLASS_TYPE {
     TEST = 'test',
     MAIN = 'main'
 }
+
+//ATTENDANCE_STATUS
+export enum ATTENDANCE_STATUS {
+    ATTEND = 'attend',
+    ABSENT = 'absent'
+}

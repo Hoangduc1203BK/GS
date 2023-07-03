@@ -1,6 +1,7 @@
 import { AuthModule } from "./auth/auth.module";
 import { ClassModule } from "./class";
 import { DepartmentModule } from "./department";
+import { ExamModule } from "./exam";
 import { SubjectModule } from "./subject";
 import { UserModule } from "./user";
 
@@ -10,4 +11,5 @@ export const MODULES = [
     SubjectModule,
     AuthModule,
     ClassModule,
+    ExamModule,
 ]

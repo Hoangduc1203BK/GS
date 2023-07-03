@@ -35,7 +35,7 @@ export class ApiConfigService {
 		try {
 			return Number(value);
 		} catch {
-			throw new Error(key + ' environment variable is not a number');
+			throw new Error(key + ' Biến môi trường không phải số');
 		}
 	}
 
@@ -45,7 +45,7 @@ export class ApiConfigService {
 		try {
 			return Boolean(JSON.parse(value));
 		} catch {
-			throw new Error(key + ' env var is not a boolean');
+			throw new Error(key + ' Biến môi trường không phải boolean');
 		}
 	}
 
@@ -59,7 +59,7 @@ export class ApiConfigService {
 		const value = this.configService.get<string>(key);
 
 		if (isNil(value)) {
-			throw new Error(key + ' environment variable does not set');
+			throw new Error(key + ' Biến môi trường chưa được set');
 		}
 
 		return value;
