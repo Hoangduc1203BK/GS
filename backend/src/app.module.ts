@@ -3,6 +3,9 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { SharedModule } from './core/shared/shared.module';
 import { ConfigModule } from '@nestjs/config';
+import { DatabaseModule } from './databases/database.module';
+import { DepartmentModule } from './modules/department/department.module';
+import { MODULES } from './modules';
 
 @Module({
   imports: [
@@ -10,7 +13,9 @@ import { ConfigModule } from '@nestjs/config';
 			isGlobal: true,
 			envFilePath: '.env',
 		}),
-    SharedModule
+    DatabaseModule,
+    SharedModule,
+    ...MODULES
   ],
   controllers: [AppController],
   providers: [AppService],

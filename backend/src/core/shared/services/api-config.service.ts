@@ -35,7 +35,7 @@ export class ApiConfigService {
 		try {
 			return Number(value);
 		} catch {
-			throw new Error(key + ' environment variable is not a number');
+			throw new Error(key + ' Biến môi trường không phải số');
 		}
 	}
 
@@ -45,7 +45,7 @@ export class ApiConfigService {
 		try {
 			return Boolean(JSON.parse(value));
 		} catch {
-			throw new Error(key + ' env var is not a boolean');
+			throw new Error(key + ' Biến môi trường không phải boolean');
 		}
 	}
 
@@ -59,28 +59,20 @@ export class ApiConfigService {
 		const value = this.configService.get<string>(key);
 
 		if (isNil(value)) {
-			throw new Error(key + ' environment variable does not set');
+			throw new Error(key + ' Biến môi trường chưa được set');
 		}
 
 		return value;
 	}
 
 	getDBConfig() {
-		console.log({
+		return {
 			type: this.getString('DB_TYPE'),
 			port: this.getNumber('DB_PORT'),
 			host: this.getString('DB_HOST'),
 			database: this.getString('DB_DATABASE'),
 			username: this.getString('DB_USERNAME'),
 			password: this.getString('DB_PASSWORD'),
-		});
-		return {
-			type: 'postgres',
-			port: this.getNumber('POSTGRES_PORT'),
-			host: this.getString('POSTGRES_HOST'),
-			database: this.getString('POSTGRES_DB'),
-			username: this.getString('POSTGRES_USER'),
-			password: this.getString('POSTGRES_PASS'),
 		};
 	}
 
