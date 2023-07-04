@@ -39,7 +39,7 @@ export class User {
         type: 'varchar',
         length: '100',
         name: 'password',
-        nullable: false,
+        nullable: true,
     })
     password: string;
 
@@ -47,7 +47,7 @@ export class User {
         type: 'varchar',
         length: '50',
         name: 'birth_day',
-        nullable: false,
+        nullable: true,
     })
     birthDay: string;
 
@@ -55,7 +55,7 @@ export class User {
         type: 'varchar',
         length: '50',
         name: 'gender',
-        nullable: false,
+        nullable: true,
     })
     gender: string;
 
@@ -63,7 +63,7 @@ export class User {
         type: 'varchar',
         length: '50',
         name: 'address',
-        nullable: false,
+        nullable: true,
     })
     address: string;
 

@@ -6,24 +6,44 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import {
   CreateAttendanceDto,
   CreateClassDto,
   CreateUserClassDto,
   ListClassDto,
+  ListTeacherEmptyDto,
   UpdateAttendanceDto,
   UpdateClassDto,
   UpdateUserClassDto,
 } from './dto';
 import { ClassService } from './class.service';
+import { ListAttendanceDto } from './dto/list-attendance.dto';
+import { AttendanceGuard } from 'src/core/guards';
+import { GeneratorService } from 'src/core/shared/services';
 
 @Controller('class')
 export class ClassController {
   constructor(private readonly classService: ClassService) {}
 
   //attendance
+  @Get('/attendances')
+  async listAttendance(@Query() data:ListAttendanceDto) {
+    const result = await this.classService.listAttendance(data)
+
+    return result;
+  }
+
+  @Get('/attendance')
+  async getAttendance(@Query() query: any) {
+    const result = await this.classService.getAttendance(query)
+
+    return result;
+  }
+
   @Post('/attendance')
+  @UseGuards(AttendanceGuard)
   async createAttendance(@Body() createAttendanceDto: CreateAttendanceDto) {
     const result = await this.classService.createAttendance(
       createAttendanceDto,
@@ -33,6 +53,7 @@ export class ClassController {
   }
 
   @Patch('/attendance')
+  @UseGuards(AttendanceGuard)
   async updateAttendance(
     @Query() query: any,
     @Body() updateAttendanceDto: UpdateAttendanceDto,
@@ -62,6 +83,13 @@ export class ClassController {
   @Post('/room')
   async createRoom(@Body() data: any) {
     const result = await this.classService.createRoom(data);
+
+    return result;
+  }
+
+  @Patch('/room/:id')
+  async updateRoom(@Param('id') id: number,@Body() data:any) {
+    const result = await this.classService.updateRoom(id, data);
 
     return result;
   }
@@ -98,7 +126,7 @@ export class ClassController {
   }
 
   @Post('/teacher-empty')
-  async listTeacherEmpty(@Body() data: any) {
+  async listTeacherEmpty(@Body() data: ListTeacherEmptyDto) {
     const result = await this.classService.listTeacherEmpty(data);
 
     return result;

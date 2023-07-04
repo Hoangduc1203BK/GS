@@ -15,11 +15,12 @@ import {
   CreateClassDto,
   CreateUserClassDto,
   ListClassDto,
+  ListTeacherEmptyDto,
   UpdateAttendanceDto,
   UpdateClassDto,
 } from './dto';
 import { DEFAULT_PAGING } from 'src/common/constants/paging';
-import { CLASS_TYPE } from 'src/common/constants';
+import { CLASS_TYPE, ROLE } from 'src/common/constants';
 import { UserService } from '../user';
 import { paginate } from 'src/common/interfaces/paginate';
 import * as moment from 'moment';
@@ -27,6 +28,7 @@ import { Schedule } from 'src/common/interfaces/time-table';
 import { GeneratorService } from 'src/core/shared/services';
 import { DepartmentService } from '../department';
 import { ListUserClassDto } from './dto/list-user-class.dto';
+import { ListAttendanceDto } from './dto/list-attendance.dto';
 @Injectable()
 export class ClassService {
   constructor(
@@ -52,6 +54,19 @@ export class ClassService {
     return result;
   }
 
+  async updateRoom(id: number, data:any) {
+    const room = await this.getRoom(id);
+
+    const doc = {
+      ...room,
+      ...data
+    }
+
+    const result = await this.roomRepos.save({id: id, ...doc})
+
+    return result;
+  }
+
   async getRoom(id: number) {
     const result = await this.roomRepos.findOne({ where: { id } });
 
@@ -69,7 +84,9 @@ export class ClassService {
   }
 
   async listRoom() {
-    const result = await this.roomRepos.find();
+    const result = await this.roomRepos.find({
+      order: { id: 'ASC'}
+    });
 
     return result;
   }
@@ -317,11 +334,11 @@ export class ClassService {
     return true;
   }
 
-  async listTeacherEmpty(schedules: Schedule[]) {
-    if (schedules && schedules.length > 0) {
+  async listTeacherEmpty(dto: ListTeacherEmptyDto) {
+    if (dto.schedules && dto.schedules.length > 0) {
       const listClassNotEmpty = [];
       const listTeacherNOtEmpty = [];
-      for (const s of schedules) {
+      for (const s of dto.schedules) {
         const { start, end, date, roomId } = s;
         const timeTables = await this.timeRepos.find({
           where: { date: date, roomId: roomId },
@@ -347,9 +364,15 @@ export class ClassService {
         listTeacherNOtEmpty.push(result.teacher);
       }
 
-      let listTeacher = await this.userService.listUser({
-        role: 'teacher',
-      });
+      let filter = {
+        role: ROLE.TEACHER
+      } as any;
+
+      if(dto.departmentId) {
+        filter.departmentId = dto.departmentId
+      }
+
+      let listTeacher = await this.userService.listUser(filter);
 
       let listTeacherID = listTeacher.result.map((el) => {
         return { id: el.id, name: el.name };
@@ -525,6 +548,11 @@ export class ClassService {
     }
   }
 
+  async deleteSubAttendance(id: number) {
+    await this.subAttendanceRepos.delete(id)
+
+    return true;
+  }
   async updateAttendance(query: any, dto: UpdateAttendanceDto) {
     const { date, day, classId } = query;
     const attendance = await this.attendanceRepos.findOne({
@@ -550,27 +578,80 @@ export class ClassService {
 
     if(attendances && attendances.length >0) {
       await this.datasource.manager.transaction(async (manager) => {
-        const listSubAttendance = await this.subAttendanceRepos.find({where: {attendanceId: attendance.id}})
-        for(const s of listSubAttendance) {
-          await this.subAttendanceRepos.delete({id: s.id})
-        }
-
-        await Promise.all(dto.attendances.map(async (el) => {
-          const update = {
-            studentId: el.id,
-            attendanceId: attendance.id,
-            status: el.status,
-          }
-          await this.subAttendanceRepos.save(update);
+        const listSubAttendance = await this.subAttendanceRepos.find({where: {attendanceId: attendance.id}});
+        await Promise.all(listSubAttendance.map(async (at) => {
+          await this.deleteSubAttendance(at.id)
         }))
+
+        for(const at of dto.attendances) {
+          const update = {
+            studentId: at.id,
+            attendanceId: attendance.id,
+            status: at.status,
+          }
+          await manager.save(SubAttendance,update);
+        }
       })
     }
 
-    const subAttendances = await this.subAttendanceRepos.find({where: { attendanceId: attendance.id}});
+    return this.getAttendance(result.id)
+  }
+
+  async getAttendance(query: any) {
+    const { classId, date, day } = query;
+    const result = await this.attendanceRepos.findOne({
+      where: {
+        classId, date, day
+      },
+      relations: ['subAttendances', 'subAttendances.student']
+    })
+
+    if(!result) {
+      throw new Error('Bảng điểm danh không tồn tại')
+    }
+
+    const { subAttendances, ...rest} = result;
+
+    const teacher = await this.userService.getUser(result.teacherId)
+    const classes = await this.classRepos.findOne({where: {id: result.classId}});
+    const students = result.subAttendances.map(el => {
+      return {
+        studentId: el.student.id,
+        name: el.student.name,
+        status: el.status
+      }
+    })
 
     return {
-      ...result,
-      attendances: subAttendances
+      ...rest,
+      teacher: teacher.name,
+      class: classes.name,
+      students: students
+    };
+  }
+
+  async listAttendance(dto: ListAttendanceDto) {
+    let paramsArr = [];
+    for(let [k,v] of Object.entries(dto)) {
+      if(k == 'start') {
+        paramsArr.push(" a.day >= '" + v + "'"  )
+      }
+      else if(k == 'end') {
+        paramsArr.push(" a.day <= '" + v + "'"  )
+      }
+      else if(k == 'classId') {
+        paramsArr.push(` a.class_id = '` + v + "'")
+      }else if(k == 'teacher') {
+        paramsArr.push(` a.teacher_of_day = '` + v + "'")
+      }
     }
+
+    let qr = 'select a.id, a.teacher_of_day as teacher_id,  u.name as teacher, a.class_id , c.name as class, a.date, a.day, a.created_at from attendance a, class c, users u where a.class_id = c.id and c.teacher=u.id ';
+    if(paramsArr.length>0) {
+      qr = qr + ' AND ' + paramsArr.join(' AND ')
+    }
+
+    const result = await this.attendanceRepos.query(qr)
+    return result;
   }
 }

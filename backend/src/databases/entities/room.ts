@@ -22,6 +22,14 @@ export class Room {
     })
     name: string;
 
+    @Column({
+        type: 'varchar',
+        length: '50',
+        name: 'description',
+        nullable: true,
+    })
+    description: string;
+
     @OneToMany(() => TimeTable, t => t.room)
     schedules: TimeTable[];
 
