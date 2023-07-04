@@ -139,7 +139,7 @@ export default function LayoutAdmin({
 						},
 						{
 							label: (
-								<Link href="/admin">Danh sách thi thử</Link>
+								<Link href="/admin/listEntranceExam">Danh sách thi thử</Link>
 							),
 							key: "listRegisExam",
 						},
