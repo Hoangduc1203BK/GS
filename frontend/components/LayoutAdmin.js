@@ -24,16 +24,20 @@ import {
 	Layout,
 	Menu,
 	Row,
+	message,
 	theme,
 } from "antd";
 import { useState } from "react";
+import { deleteCookie } from "@/api/cookies";
+import { goTo } from "@/common/util";
 const { Header, Sider, Content } = Layout;
 const inter = Inter({ subsets: ["latin"] });
 
 export default function LayoutAdmin({
 	children,
-	user_name,
+	user,
 }) {
+	console.log(user, 'user layout');
 	const [collapsed, setCollapsed] = useState(false);
 	const {
 		token: { colorBgContainer },
@@ -175,7 +179,7 @@ export default function LayoutAdmin({
 					children: [
 						{
 							label: (
-								<Link href="/admin">Tạo lớp học mới</Link>
+								<Link href="/admin/manageClass/createClass">Tạo lớp học mới</Link>
 							),
 							key: "createClass",
 						},
@@ -213,7 +217,12 @@ export default function LayoutAdmin({
 			],
 		},
 	];
-
+	const logout = () => {
+		message.success("Đăng xuất!!!!");
+		localStorage.clear();
+		deleteCookie('token')
+		goTo('/login')
+	};
 	const items = [
 		{
 			key: "account",
@@ -239,14 +248,11 @@ export default function LayoutAdmin({
 					}}
 				/>
 			),
-			label: <Link href="/">Đăng xuất</Link>,
+			label: <p onClick={logout}>Đăng xuất</p>,
 		},
 	];
 
-	const logout = () => {
-		message.success("Đăng xuất!!!!");
-		localStorage.clear();
-	};
+
 	return (
 		<div className={`${inter.className}`}>
 			<Layout className="!min-h-screen">
@@ -273,12 +279,33 @@ export default function LayoutAdmin({
 							{!collapsed ? "Trung tâm gia sư" : "GS"}
 						</p>
 					</div>
-					<Menu
-						theme="light"
-						mode="inline"
-						defaultSelectedKeys={["1"]}
-						items={itemsSlider}
-					/>
+					{
+						user?.role == "admin" &&
+						<Menu
+							theme="light"
+							mode="inline"
+							defaultSelectedKeys={["1"]}
+							items={itemsSlider}
+						/>
+					}
+					{
+						user?.role == "teacher" &&
+						<Menu
+							theme="light"
+							mode="inline"
+							defaultSelectedKeys={["1"]}
+							items={itemsTeacher}
+						/>
+					}
+					{
+						user?.role == "user" &&
+						<Menu
+							theme="light"
+							mode="inline"
+							defaultSelectedKeys={["1"]}
+							items={itemStudent}
+						/>
+					}
 				</Sider>
 				<Layout
 					style={{
@@ -322,7 +349,7 @@ export default function LayoutAdmin({
 								>
 									<a onClick={(e) => e.preventDefault()}>
 										<Avatar icon={<UserOutlined />} />{" "}
-										&nbsp; Username
+										&nbsp; {user?.name}
 									</a>
 								</Dropdown>
 							</Col>
