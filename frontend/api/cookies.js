@@ -11,11 +11,10 @@ export function getCookie(name) {
 	if (match) return match[2];
 }
 
-export function setCookie(name, value, expiredInSeconds) {
-	const day = new Date(
-		new Date().getTime() + expiredInSeconds * 1000
-	).toUTCString();
-	document.cookie = `${name}=${value};expires=${day};path=/`;
+export function setCookie(name, value) {
+	const day = new Date()
+	day.setMonth(day.getMonth() + 1)
+	document.cookie = `${name}=${value};expires=${day};path=/`
 }
 
 export function deleteCookie(name, path, domain) {

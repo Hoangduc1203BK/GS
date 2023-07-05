@@ -10,7 +10,7 @@ export const setToken = (token) => {
 		"Authorization"
 	] = `Bearer ${token}`;
 };
-axios.defaults.baseURL = "http://localhost:3333";
+axios.defaults.baseURL = "http://localhost:4000/api/v1";
 
 // axios.interceptors.response.use(
 // 	(response) => {
@@ -33,48 +33,60 @@ axios.defaults.baseURL = "http://localhost:3333";
 // 	}
 // );
 
-axios.interceptors.request.use(
-	async (config) => {
-		const token = Cookies.get("token");
-		const refreshToken = Cookies.get("rf_token");
-		if (token) {
-			config.headers.Authorization = `Bearer ${token}`;
-		}
-		if (!token && refreshToken) {
-			const result = await Axios.post(
-				"http://localhost:3000/auth/refresh-token",
-				{
-					refresh_token: refreshToken,
-				}
-			);
-			if (result?.data?.access_token) {
-				Cookies.set(
-					"token",
-					result?.data?.access_token?.value,
-					{
-						expires:
-							result?.data?.access_token?.expires_in /
-							86400,
-					}
-				);
-				config.headers.Authorization = `Bearer ${result?.data?.access_token?.value}`;
-			}
-		}
-		return config;
-	},
-	(error) => Promise.reject(error)
-);
+// axios.interceptors.request.use(
+// 	async (config) => {
+// 		const token = Cookies.get("token");
+// 		const refreshToken = Cookies.get("rf_token");
+// 		if (token) {
+// 			config.headers.Authorization = `Bearer ${token}`;
+// 		}
+// 		if (!token && refreshToken) {
+// 			const result = await Axios.post(
+// 				"http://localhost:3000/auth/refresh-token",
+// 				{
+// 					refresh_token: refreshToken,
+// 				}
+// 			);
+// 			if (result?.data?.access_token) {
+// 				Cookies.set(
+// 					"token",
+// 					result?.data?.access_token?.value,
+// 					{
+// 						expires:
+// 							result?.data?.access_token?.expires_in /
+// 							86400,
+// 					}
+// 				);
+// 				config.headers.Authorization = `Bearer ${result?.data?.access_token?.value}`;
+// 			}
+// 		}
+// 		return config;
+// 	},
+// 	(error) => Promise.reject(error)
+// );
 
-export const getListTodos = () => {
-	return axios.get("/todos");
+export async function getMeInfo(token) {
+	return fetch(`http://localhost:4000/api/v1/auth/me`, {
+		headers: {
+			Authorization: `Bearer ${token}`,
+		},
+	})
+}
+
+export const authMe = () => {
+	return axios.get("/auth/me");
 };
 
-export const createTodo = (params) => {
-	return axios.post("/todos", params);
+export const getListClassRoom = () => {
+	return axios.get("/class/room");
 };
 
-export const updateTodo = (id, params) => {
-	return axios.put(`/todos/${id}`, params);
+export const createClassRoom = (params) => {
+	return axios.post("/class/room", params);
+};
+
+export const updateClassRoom = (id, params) => {
+	return axios.patch(`/class/room/${id}`, params);
 };
 
 export const createUser = (params) => {

@@ -3,25 +3,21 @@ import "tailwindcss/tailwind.css";
 import "../styles/globalPages.css";
 import Head from "next/head";
 import { getCookie, hasCookie } from "@/api/cookies";
-import { setToken } from "@/api/address";
-// import { getCookie } from "@/api/cookies";
+import { authMe, getMeInfo, setToken } from "@/api/address";
 // import App from "next/app";
 export default function MyApp({ Component, pageProps }) {
 	if (typeof window !== "undefined") {
 		if (hasCookie("token")) {
 			pageProps.token = getCookie("token");
 		} else {
-			delete pageProps.user_id;
-			delete pageProps.user_name;
+			delete pageProps.user;
 		}
 	}
 	if (pageProps?.token) {
 		setToken(pageProps?.token);
 	}
 
-	const getLayout =
-		Component.getLayout || (({ page, pageProps }) => page);
-	// return <Component {...pageProps} />;
+	const getLayout = Component.getLayout || (({ page, pageProps }) => page);
 	return getLayout({
 		page: (
 			<>
@@ -34,22 +30,25 @@ export default function MyApp({ Component, pageProps }) {
 		pageProps,
 	});
 }
-// console.log("page props");
 
 MyApp.getInitialProps = async ({ Component, ctx }) => {
-	// App.getInitialProps(appContext);
 	const pageProps = Component.getInitialProps
 		? await Component.getInitialProps(ctx)
 		: {};
-	// if (typeof window !== "undefined") {
-	// 	pageProps.user_id = getCookie("user_id");
-	// 	pageProps.user_name = getCookie("user_name");
-	// 	pageProps.token = getCookie("token");
-	// } else {
-	// 	pageProps.user_id = ctx?.req?.cookies?.user_id;
-	// 	pageProps.user_name = ctx?.req?.cookies?.user_name;
-	// 	pageProps.token = ctx?.req?.cookies?.token;
-	// }
+	if (typeof window !== "undefined") {
+		pageProps.token = getCookie("token");
+	} else {
+		pageProps.token = ctx?.req?.cookies?.token;
+	}
+	if (pageProps.token) {
+		try {
+			let res = await getMeInfo(pageProps.token)
+			pageProps.user = await res.json()
+		} catch (error) {
+			console.log("call api error", error)
+		}
+	}
+
 	//Anything returned here can be access by the client
 	return { pageProps };
 };

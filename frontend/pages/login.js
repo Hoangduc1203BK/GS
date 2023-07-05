@@ -16,6 +16,7 @@ import dayjs from "dayjs";
 import { createUser, login } from "@/api/address";
 import { setCookie } from "@/api/cookies";
 import Router from "next/router";
+import { LockOutlined, MailOutlined, PlusCircleFilled } from "@ant-design/icons";
 
 const jose = Josefin_Sans({ subsets: ["latin"] });
 export default function Login() {
@@ -23,76 +24,28 @@ export default function Login() {
 
 	const [checkRegister, setCheckRegister] = useState(false);
 
-	const clickRegister = () => {
-		setCheckRegister(!checkRegister);
-		form.resetFields();
-	};
 
 	const handleSubmitForm = (values) => {
-		values.dob = dayjs(values.dob).format("YYYY-MM-DD");
-		values.gender = +values.gender;
-		if (checkRegister) {
-			createUser(values)
-				.then((res) => {
-					if (res?.data?.status) {
-						message.success("Register successfully!");
-						setCheckRegister(!checkRegister);
-						form.resetFields();
-					} else {
-						message.error(
-							"Have an error! Please contact to dev!"
-						);
-					}
-				})
-				.catch((err) =>
-					message.error(
-						err.response.data.message ||
-							err.response.data.errors
-					)
+		login(values).then((res) => {
+			console.log(res, "resss");
+			if (res?.data?.accessToken) {
+				message.success("Đăng nhập thành công!");
+				setCookie(
+					"token",
+					res?.data?.accessToken
 				);
-		} else {
-			login(values)
-				.then((res) => {
-					if (res?.data?.status) {
-						console.log(res, "resss");
-						message.success(
-							"Login success! Welcome " +
-								res?.data?.data?.user?.fullname
-						);
-						setCookie(
-							"user_id",
-							res?.data?.data?.user?.id,
-							res?.data?.data?.access_token?.expires_in
-						);
-						setCookie(
-							"user_name",
-							res?.data?.data?.user?.fullname,
-							res?.data?.data?.access_token?.expires_in
-						);
-						setCookie(
-							"token",
-							res?.data?.data?.access_token?.value,
-							res?.data?.data?.access_token?.expires_in
-						);
-						setCookie(
-							"rf_token",
-							res?.data?.data?.refresh_token?.value,
-							res?.data?.data?.refresh_token?.expires_in
-						);
-						Router.push("/home");
-					} else {
-						message.error(
-							"Have an error! Please contact to dev!"
-						);
-					}
-				})
-				.catch((err) => {
-					message.error(
-						err?.response?.data?.message ||
-							err?.response?.data?.errors
-					);
-				});
-		}
+				Router.push("/admin");
+			} else {
+				message.error(
+					"Đăng nhập thất bại! Vui lòng kiểm tra lại tài khoản và mật khẩu!"
+				);
+			}
+		}).catch((err) => {
+			message.error(
+				err?.response?.data?.message ||
+				err?.response?.data?.errors
+			);
+		});
 	};
 	return (
 		<>
@@ -101,7 +54,7 @@ export default function Login() {
 			</Head>
 			<div
 				style={{
-					backgroundImage: "url(http://bit.ly/2gPLxZ4)",
+					backgroundImage: "url(/bg.png)",
 					backgroundRepeat: "no-repeat",
 					backgroundAttachment: "fixed",
 					backgroundSize: "cover",
@@ -109,180 +62,69 @@ export default function Login() {
 					height: "100vh",
 					width: "100%",
 				}}
-				className={`${jose.className} flex justify-center items-center `}
+				className={`${jose.className} h-screen flex justify-center items-center`}
 			>
-				<div
-					className=" w-[550px] min-h-[450px] rounded-sm bg-inherit"
-					style={{
-						boxShadow:
-							"inset 0 0 0 300px rgba(255,255,255,0.05)",
-					}}
-				>
-					<div className="h-[100px] flex justify-center">
+				<div className="w-1/2">
+					<div className="h-full flex justify-center">
 						<Image
-							src="/duck.svg"
+							src="/layer.png"
 							alt="QuacQuac Logo"
 							// className="dark:invert"
-							width={100}
+							width={600}
 							height={64}
 							priority
 						/>
 					</div>
-					<div className="px-6">
-						<h1 className="text-[50px] uppercase text-blue-400 flex justify-center font-bold">
-							{checkRegister ? "Register" : "Login"}
+				</div>
+				<div
+					className=" w-1/2 h-full rounded-sm bg-inherit flex justify-center items-center"
+
+				>
+					<div className="px-6 py-16 w-1/2 rounded-md bg-white"
+						style={{
+							boxShadow: "5px 5px 50px 0px rgba(0, 157, 255, 0.5)"
+
+						}}
+					>
+						<h1 className="text-[30px] text-[#13005A] flex justify-center font-bold">
+							{checkRegister ? "Đăng ký" : "Đăng nhập"}
 						</h1>
 						<Form
 							form={form}
 							className="mt-4"
-							labelCol={{ span: 6 }}
+							labelCol={{ span: 4 }}
 							labelAlign="left"
 							labelWrap="wrap"
 							onFinish={handleSubmitForm}
 						>
-							{checkRegister ? (
-								<>
-									<Form.Item
-										label="Full name"
-										name="fullname"
-										rules={[
-											{
-												required: true,
-												message: "This is required field!",
-											},
-										]}
-									>
-										<Input placeholder="Enter your full name" />
-									</Form.Item>
-									<Form.Item
-										label="Date of birdth"
-										name="dob"
-										rules={[
-											{
-												required: true,
-												message: "This is required field!",
-											},
-										]}
-									>
-										<DatePicker
-											style={{
-												width: "100%",
-											}}
-										/>
-									</Form.Item>
-									<Form.Item
-										label="Gender"
-										name="gender"
-										rules={[
-											{
-												required: true,
-												message: "This is required field!",
-											},
-										]}
-									>
-										<Select placeholder="Choose your gender">
-											<Select.Option value="0">
-												Male
-											</Select.Option>
-											<Select.Option value="1">
-												Fe Male
-											</Select.Option>
-										</Select>
-									</Form.Item>
-									<Form.Item
-										label="Email"
-										name="email"
-										rules={[
-											{
-												required: true,
-												message: "This is required field!",
-											},
-											{
-												type: "email",
-												message:
-													"Email is not valid format!",
-											},
-										]}
-									>
-										<Input placeholder="Enter your email" />
-									</Form.Item>
-									<Form.Item
-										label="Phone"
-										name="phone"
-										rules={[
-											{
-												required: true,
-												message: "This is required field!",
-											},
-										]}
-									>
-										<Input placeholder="Enter your phone number" />
-									</Form.Item>
-									<Form.Item
-										label="Username"
-										name="username"
-										rules={[
-											{
-												required: true,
-												message: "This is required field!",
-											},
-										]}
-									>
-										<Input placeholder="Enter your username" />
-									</Form.Item>
-									<Form.Item
-										name="password"
-										label="Password"
-										className="mb-2"
-										rules={[
-											{
-												required: true,
-												message: "This is required field!",
-											},
-										]}
-									>
-										<Input.Password placeholder="Press your password" />
-									</Form.Item>
-									<Row justify="end">
-										<Col className="text-white">
-											Have an account?
-											<Button
-												type="link"
-												onClick={clickRegister}
-											>
-												Login now!
-											</Button>
-										</Col>
-									</Row>
-								</>
-							) : (
-								<>
-									<Form.Item
-										label="Username"
-										name="username"
-										rules={[
-											{
-												required: true,
-												message: "This is required field!",
-											},
-										]}
-									>
-										<Input placeholder="Press your username" />
-									</Form.Item>
-									<Form.Item
-										label="Password"
-										className="mb-2"
-										name="password"
-										rules={[
-											{
-												required: true,
-												message: "This is required field!",
-											},
-										]}
-									>
-										<Input.Password placeholder="Press your password" />
-									</Form.Item>
-									<Row justify="end">
+
+							<>
+								<Form.Item
+									label=""
+									name="email"
+									rules={[
+										{
+											required: true,
+											message: "Trường dữ liệu bắt buộc!",
+										},
+									]}
+								>
+									<Input prefix={<MailOutlined />} placeholder="Nhập email" />
+								</Form.Item>
+								<Form.Item
+									label=""
+									// className="mb-2"
+									name="password"
+									rules={[
+										{
+											required: true,
+											message: "Trường dữ liệu bắt buộc!",
+										},
+									]}
+								>
+									<Input.Password prefix={<LockOutlined />} placeholder="Nhập mật khẩu" />
+								</Form.Item>
+								{/* <Row justify="end">
 										<Col className="text-white">
 											Have not an account?
 											<Button
@@ -292,17 +134,15 @@ export default function Login() {
 												Register now!
 											</Button>
 										</Col>
-									</Row>
-								</>
-							)}
+									</Row> */}
+							</>
 							<Row justify="center" className="mt-4">
 								<Col className="text-white">
 									<Button
 										type="primary"
-										className="w-20"
 										htmlType="submit"
 									>
-										{checkRegister ? "Register" : "Login"}
+										{checkRegister ? "Đăng ký" : "Đăng nhập"}
 									</Button>{" "}
 								</Col>
 							</Row>
