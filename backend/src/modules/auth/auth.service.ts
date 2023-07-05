@@ -59,7 +59,6 @@ export class AuthService {
 			expires: moment().add(this.configService.getAuthConfig().refreshTime, 'days').toDate(),
 			userId: data.id,
 		};
-		console.log(doc);
 		await this.accountRepos.save(doc);
 
 		return { accessToken, refreshToken };

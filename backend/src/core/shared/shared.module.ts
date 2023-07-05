@@ -6,7 +6,6 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { join } from "path";
 import { MailService } from "./services/mail/mail.service";
 const providers = [GeneratorService, ApiConfigService, MailService];
-console.log(__dirname);
 @Global()
 @Module({
     imports: [
