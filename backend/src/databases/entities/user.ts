@@ -5,7 +5,6 @@ import { Classes } from './class';
 import { UserClass } from './user-class';
 import { Attendance } from './attendance';
 import { SubAttendance } from './sub-attendance';
-import { RegisterExam } from './register-exam';
 import { Exam } from './exam';
 
 @Entity('users')
@@ -190,9 +189,9 @@ export class User {
 
 
     //register exam
-    @OneToMany(() => RegisterExam, re => re.user)
-    registerExams: RegisterExam[];
-
     @OneToMany(() => Exam, e => e.teacher)
     exams: Exam[];
+
+    @OneToOne(() => Exam, e => e.student)
+    exam: Exam;
 }

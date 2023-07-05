@@ -32,15 +32,6 @@ export class UserClass {
     classId: string;
 
     @Column({
-        type: 'decimal',
-		precision: 10,
-		scale: 2,
-        name: 'score',
-        nullable: true,
-    })
-    score: number;
-
-    @Column({
         type: 'varchar',
         length: '10',
         name: 'type',

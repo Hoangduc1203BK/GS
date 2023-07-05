@@ -1,15 +1,15 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Exam, ExamResult, RegisterExam, SubExam } from "src/databases/entities";
+import { Exam, SubExam } from "src/databases/entities";
 import { DataSource, Repository } from "typeorm";
-import { CreateExamDto } from "./dto/create-exam.dto";
+import { CreateExamDto, UpdateExamDto,ListExamDto } from "./dto";
 import { UserService } from "../user";
 import { ClassService } from "../class";
 import { GeneratorService } from "src/core/shared/services";
-import { UpdateExamDto } from "./dto/update-exam.dto";
-import { CreateRegisterExamDto } from "./dto/create-register-exam.dto";
-import { UpdateRegisterExamDto } from "./dto/update-register-exam.dto";
-import { CreateExamResultDto } from "./dto/create-exam-result.dto";
+import { DEFAULT_PAGING } from "src/common/constants/paging";
+import { paginate } from "src/common/interfaces/paginate";
+import { EXAM_RESULT, STANDARD_SCORE } from "src/common/constants";
+import { SubjectService } from "../subject";
 
 
 @Injectable()
@@ -17,189 +17,159 @@ export class ExamService {
     constructor(
         @InjectRepository(Exam) private readonly examRepos: Repository<Exam>,
         @InjectRepository(SubExam) private readonly subExamRepos: Repository<SubExam>,
-        @InjectRepository(RegisterExam) private readonly registerExamRepos: Repository<RegisterExam>,
-        @InjectRepository(ExamResult) private readonly examResultRepos: Repository<ExamResult>,
         private readonly generatorService: GeneratorService,
         private readonly userService: UserService,
         private readonly classService: ClassService,
+        private readonly subjectService: SubjectService,
         private readonly datasource: DataSource,
-    ) {}
+    ) { }
 
-    //exam
-    async listExam() {
+    async listExam(query: ListExamDto) {
+        const { page = DEFAULT_PAGING.PAGE, size = DEFAULT_PAGING.LIMIT, ...rest } = query;
         const result = await this.examRepos.find({
-            relations: ['teacher', 'room']
-        });
-
-        return result;
-    }
-
-    async getExam(id: string) {
-        const result = await this.examRepos.findOne({
-            where: {id},
-            relations: ['teacher','room']
+            where: rest,
+            skip: (page - 1)* size,
+            take: page,
         })
 
-        if(!result) {
-            throw new Error('Kì thi không tồn tại')
-        }
-        const subjects = await this.subExamRepos.find({where: { examId: id}, relations: ['subject']})
-
-        return {
-            ...result,
-            subjects: subjects
-        };
+        return {result: result, ...paginate(result.length, Number(page), Number(size))}
     }
 
-    async createExam(dto: CreateExamDto) {
-        const {subjects, ...rest} = dto;
-        const teacher = await this.userService.getUser(dto.teacherId);
-        const room = await this.classService.getRoom(dto.roomId);
-        const id =  this.generatorService.randomString(6);
-        const doc = {
-            id: id,
-            name: dto.name,
-            teacherId: dto.teacherId,
-            time: dto.time,
-            roomId: dto.roomId
-        }
-
-        const exam = await this.examRepos.save(doc);
-
-        await this.datasource.manager.transaction(async (manager) => {
-            for(const s of dto.subjects) {
-                const subExam = {
-                    examId: id,
-                    subjectId: s,
-                }
-                await this.subExamRepos.save(subExam)
-            }
+    async getExam(id: number) {
+        const exam = await this.examRepos.findOne({
+            where: { id: id },
+            relations: ['subExams']
         })
 
-        const subExams = await this.subExamRepos.find({where: { examId: id }})
+        if(!exam) {
+            throw new Error('Không tìm thấy thông tin đăng ký thi thử với id:'+id);
+        }
 
+
+        const { subExams, ...rest } = exam;
+        
         return {
-            ...doc,
+            ...rest,
             subjects: subExams
         }
     }
 
-    async updateExam(id: string, dto: UpdateExamDto) {
-        const {subjects, ...rest} = dto;
-        const exam = await this.examRepos.findOne({where: { id }})
-        if(!exam) {
-            throw new Error ('Kì thi không tồn tại')
+    async createExam(dto: CreateExamDto) {
+        const { subjects, ...rest} = dto
+        const student = await this.userService.getUser(dto.studentId);
+        if(dto.teacherId) {
+            await this.userService.getUser(dto.teacherId)
         }
-        
-        const doc = {
-            ...exam,
-            ...rest
+        if(dto.roomId) {
+            await this.classService.getRoom(dto.roomId)
         }
 
-        const result = await this.examRepos.save(doc);
-        if(subjects && subjects.length > 0) {
+        const exam = await this.examRepos.save({
+            ...rest,
+            result: EXAM_RESULT.PENDDING,
+        });
+
+        if(exam) {
             await this.datasource.manager.transaction(async (manager) => {
-                const subExams = await this.subExamRepos.find({where: { examId: id}})
-                for(const se of subExams) {
-                    await this.subExamRepos.delete({ id: se.id })
-                }
-
-                for(const s of subjects) {
-                    const doc = {
-                        examId: id,
-                        subjectId: s,
+                for(let s of subjects) {
+                    try {
+                        await this.subjectService.getSubject(s.id);
+                    } catch (error) {
+                        await this.examRepos.delete(exam.id)
                     }
-                    await this.subExamRepos.save(doc)
+                    const item = {
+                        subjectId: s.id,
+                        examId: exam.id,
+                    }
+                    await manager.save(SubExam, item)
                 }
             })
         }
 
-        const subExams = await this.subExamRepos.find({where: { examId: id }})
-
+        const subExams = await this.subExamRepos.find({ where: { examId: exam.id}});
+        
         return {
-            ...doc,
-            subjects: subExams
+            ...exam,
+            subjects: subExams,
         }
     }
 
-    //register-exam
-    async listRegisterExam(examId: string) {
-        const result = await this.registerExamRepos.find({
-            where: { examId },
-            relations: ['user']
+
+    async updateExam(id: number, dto: UpdateExamDto) {
+        const { subjects, ...rest } = dto;
+        const exam = await this.examRepos.findOne({
+            where: { id }
         })
 
-        return result;
-    }
-
-    async getRegisterExam(id: number) {
-        const result = await this.registerExamRepos.findOne({
-            where: {id}
-        })
-
-        if(!result) {
-            throw new Error('Học sinh chưa đăng ký kì thi đầu vào')
+        if(!exam) {
+            throw new Error('Không tìm thấy thông tin đăng ký thi thử với id:'+id);
         }
 
-        return result;
-    }
-
-    async createRegisterExam(dto: CreateRegisterExamDto) {
-        const user = await this.userService.getUser(dto.userId);
-        const exam = await this.getExam(dto.examId);
-
-        const doc = {
-            ...dto,
-            status: false,
+        if(dto.roomId) {
+            await this.classService.getRoom(dto.roomId);
         }
 
-        const result = await this.registerExamRepos.save(doc)
-
-        return result;
-    }
-
-    async updateRegisterExam(id:number, dto: UpdateRegisterExamDto) {
-        const register = await this.getRegisterExam(id);
-
-        const doc = {
-            ...register,
-            ...dto,
+        if(dto.teacherId) {
+            await this.userService.getUser(dto.teacherId);
         }
 
-        const result = await this.registerExamRepos.save(doc);
-
-        return result;
-    }
-
-    // exam-result
-    async getExamResult(id: number) {
-        const result = await this.examResultRepos.findOne({where: {id}})
-        if(!result) {
-            throw new Error('Kết quả thi không tồn tại')
+        let doc = {
+            ...exam,
+            ...rest
         }
 
-        return result;
-    }
-    async createExamResult(dto: CreateExamResultDto) {
-        const register = await this.getRegisterExam(dto.registerId);
-        const subjects = await this.subExamRepos.find({where: {
-            examId: register.examId
-        }})
+        if(subjects && subjects.length>0) {
+            await this.datasource.manager.transaction(async (manager) => {
+                const subExams = await this.subExamRepos.find({
+                    where: { examId: exam.id}
+                })
 
-        const check = subjects.find(el => el.subjectId == dto.subjectId);
+                for(let s of subExams) {
+                    await this.subExamRepos.delete(s.id)
+                }
 
-        if(!check) {
-            throw new Error('Môn học không tồn tại trong kì thi')
+                for(let s of subjects) {
+                    await this.subjectService.getSubject(s.id);
+                    let item = {
+                        examId: exam.id,
+                    } as any;
+
+                    if(s.id) {
+                        item.subjectId = s.id;
+                    }
+
+                    if(s.score) {
+                        item.score = s.score;
+                    }
+
+                    await this.subExamRepos.save(item);
+                }
+            })
         }
 
-        const doc = {
-            registerId: dto.registerId,
-            subjectId: dto.subjectId,
-            score: dto.score
+        // await this.examRepos.save({id: id, ...doc});
+        const subExams = await this.subExamRepos.find({where: {examId: exam.id}});
+        const check = subExams.every(el => el.score >=0 && el.score<=10);
+        if(check) {
+            const sumScore = subExams.reduce((init, curr) => {
+                return init+curr.score;
+            },0) 
+            const avgScore = sumScore/subExams.length;
+            if(avgScore >= STANDARD_SCORE) {
+                doc = {
+                    ...doc,
+                    result: EXAM_RESULT.PASS
+                }
+            } else {
+                doc = {
+                    ...doc,
+                    result: EXAM_RESULT.FAIL
+                }
+            }
         }
 
-        const result = await this.examResultRepos.save(doc);
+        await this.examRepos.save({id: id, ...doc});
 
-        return result;
+        return this.getExam(id);
     }
 }

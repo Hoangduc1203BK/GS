@@ -20,7 +20,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
 				});
 		}
 
-		response.status(statusCode).json(responseBody);
+		response.status(statusCode).json({
+			...responseBody,
+			data: null,
+		});
 	}
 	catch(exception: HttpException | Error, host: ArgumentsHost): void {
 		const ctx = host.switchToHttp();

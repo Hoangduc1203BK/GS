@@ -3,35 +3,48 @@ import { IsString, IsNotEmpty, IsNumber, IsEnum, IsNumberString, IsOptional, IsA
 import { CLASS_TYPE } from 'src/common/constants';
 import { AttendanceInterface } from 'src/common/interfaces/attendance';
 import { Schedule } from 'src/common/interfaces/time-table';
+import { Column } from 'typeorm';
 
 export class UpdateExamDto {
     @ApiProperty({ required: true })
-    @IsOptional()
+	@IsOptional()
 	@IsNotEmpty()
 	@IsString()
-	name?: string;
+	studentId?: string;
 
-    @ApiProperty({ required: true })
-    @IsOptional()
+	@ApiProperty({ required: true })
+	@IsOptional()
 	@IsNotEmpty()
 	@IsString()
 	teacherId?: string;
 
 	@ApiProperty({ required: true })
-    @IsOptional()
+	@IsOptional()
 	@IsNotEmpty()
-	@IsString()
-	time?: string;
-
-	@ApiProperty({ required: true })
-    @IsOptional()
-	@IsNotEmpty()
-	@IsNumber()
+	@IsNumberString()
 	roomId?: number;
 
 	@ApiProperty({ required: true })
-    @IsOptional()
+	@IsOptional()
+	@IsNotEmpty()
+	@IsString()
+	hour?: string;
+
+	@ApiProperty({ required: true })
+	@IsOptional()
+	@IsNotEmpty()
+	@IsString()
+	date?: string;
+
+	@ApiProperty({ required: true })
+	@IsOptional()
+	@IsNotEmpty()
+	@IsString()
+	description?: string;
+
+	@ApiProperty({ required: true })
+	@IsOptional()
 	@IsNotEmpty()
 	@IsArray()
-	subjects?: string[];
+	subjects?: any;
 }
