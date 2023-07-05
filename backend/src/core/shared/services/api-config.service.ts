@@ -3,7 +3,9 @@ import { ConfigService } from '@nestjs/config';
 import { isNil } from 'lodash';
 @Injectable()
 export class ApiConfigService {
-	constructor(private configService: ConfigService) {}
+	constructor(private configService: ConfigService) {
+		this.getMailConfig()
+	}
 
 	get Port(): number {
 		return this.getNumber('PORT');
@@ -101,13 +103,13 @@ export class ApiConfigService {
 		};
 	}
 
-	// getMailConfig() {
-	// 	return {
-	// 		host: this.getString('MAIL_HOST'),
-	// 		user: this.getString('MAIL_USER'),
-	// 		pass: this.getString('MAIL_PASSWORD'),
-	// 		from: this.getString('MAIL_FROM'),
-	// 		transport: this.getString('MAIL_TRANSPORT'),
-	// 	};
-	// }
+	getMailConfig() {
+		return {
+			host: this.getString('MAIL_HOST'),
+			user: this.getString('MAIL_USER'),
+			pass: this.getString('MAIL_PASSWORD'),
+			from: this.getString('MAIL_FROM'),
+			transport: this.getString('MAIL_TRANSPORT'),
+		};
+	}
 }
