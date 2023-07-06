@@ -70,7 +70,7 @@ export class ExamService {
     async getExam(id: number) {
         const exam = await this.examRepos.findOne({
             where: { id: id },
-            relations: ['subExams']
+            relations: ['subExams', 'subExams.subject']
         })
 
         if(!exam) {
@@ -179,12 +179,16 @@ export class ExamService {
             })
         }
 
-        // await this.examRepos.save({id: id, ...doc});
         const subExams = await this.subExamRepos.find({where: {examId: exam.id}});
-        const check = subExams.every(el => el.score >=0 && el.score<=10);
-        if(check) {
+        const checkNull = subExams.some(el => el.score == null);
+        if(checkNull) {
+            doc = {
+                ...doc,
+                result: EXAM_RESULT.PENDDING
+            }
+        }else {
             const sumScore = subExams.reduce((init, curr) => {
-                return init+curr.score;
+                return init+Number(curr.score);
             },0) 
             const avgScore = sumScore/subExams.length;
             if(avgScore >= STANDARD_SCORE) {
