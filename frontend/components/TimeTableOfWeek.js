@@ -3,13 +3,9 @@ import { CalendarOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 
 export default function LayoutTimeTables({ schedule }) {
-  console.log(schedule);
 
   return (
     <div>
-      <div className="flex font-bold text-2xl items-center gap-3">
-        <CalendarOutlined className="mb-0" /> <div className="mb-1">Thời khoá biểu tuần này</div>
-      </div>
 
       <div className="rounded-md mt-3	border-solid border-black border-2 p-4">
         {schedule.map((el,index) => (

@@ -4,8 +4,15 @@ import LayoutTimeTables from "@/components/TimeTableOfWeek";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { MockDataInfo } from "@/common/mock";
-import { checkNameField } from "@/common/const"
+import { Button } from "antd";
+import PopupStudentSuggest from "@/components/popup/popupStudentSuggest";
+import PopupStudentFeedback from "@/components/popup/popupStudentFeedback";
+import PopupStudentTuitionFee from "@/components/popup/popupStudentTuitionFee";
 const Dashboard = () => {
+  
+  const [openSugget, setOpenSuggest] = useState(false);
+  const [openFeedback, setOpenFeedback] = useState(false);
+  const [openTuitionFee, setOpenTuitionFee] = useState(false);
   const [schedule, setSchedule] = useState([]);
   const [info, setInfo] = useState(MockDataInfo);
   useEffect(() => {
@@ -27,8 +34,38 @@ const Dashboard = () => {
 
   return (
     <div className="flex">
+       <PopupStudentSuggest open={openSugget} setOpen={setOpenSuggest} />
+      <PopupStudentFeedback open={openFeedback} setOpen={setOpenFeedback} />
+      <PopupStudentTuitionFee open={openTuitionFee} setOpen={setOpenTuitionFee} info={info} />
       <div className="w-2/5">
-        <InfoStuTea info={info || {}} />
+        <InfoStuTea info={info || {}}>
+          <div className="flex gap-2 w-full mt-3">
+            <Button
+              type="primary"
+              className="w-1/2"
+              onClick={() => setOpenSuggest(true)}
+            >
+              Đề xuất
+            </Button>
+            <Button
+              type="primary"
+              className="w-1/2 !bg-violet-700"
+              onClick={() => setOpenTuitionFee(true)}
+            >
+              Học phí
+            </Button>
+          </div>
+          <div className="flex gap-2 w-full mt-3">
+            <Button
+              type="primary"
+              className="w-1/2 !bg-green-600"
+              onClick={() => setOpenFeedback(true)}
+            >
+              Thư góp ý
+            </Button>
+            <div className="w-1/2"></div>
+          </div>
+        </InfoStuTea>
       </div>
       <div className="w-3/5">
         <LayoutTimeTables schedule={schedule} />
