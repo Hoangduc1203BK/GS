@@ -167,7 +167,7 @@ const ClassroomManagement = ({ user }) => {
           emptyText: <div style={{ marginTop: '20px' }}>{dataSource.length === 0 ? "Không có dữ liệu!" : null}</div>,
         }}
         size="middle"
-        dataSource={dataSource?.map(x => ({ ...x, key: x?.classroom }))}
+        dataSource={dataSource?.map(x => ({ ...x, key: x?.id }))}
         columns={columns}
         bordered
         scroll={{ x: 1000 }}
