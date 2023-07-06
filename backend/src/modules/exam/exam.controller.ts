@@ -27,6 +27,8 @@ export class ExamController {
     @Post('/')
     async createExam(@Body() dto: CreateExamDto) {
         const result = await this.examService.createExam(dto);
+
+        return result;
     }
 
     @Patch('/:id')
