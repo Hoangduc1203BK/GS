@@ -184,7 +184,7 @@ export class ExamService {
         if(checkNull) {
             doc = {
                 ...doc,
-                result: EXAM_RESULT.PENDDING
+                result: EXAM_RESULT.PENDING
             }
         }else {
             const sumScore = subExams.reduce((init, curr) => {
