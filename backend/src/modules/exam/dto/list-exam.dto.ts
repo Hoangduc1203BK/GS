@@ -18,7 +18,7 @@ export class ListExamDto {
     @ApiProperty({ required: true })
     @IsOptional()
 	@IsNotEmpty()
-	@IsNumberString()
+	@IsNumber()
 	roomId?: number;
 
     @ApiProperty({ required: true })

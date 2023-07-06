@@ -37,9 +37,15 @@ export enum ATTENDANCE_STATUS {
 
 //EXAM_RESULT
 export enum EXAM_RESULT {
-    PENDDING = 'pendding',
+    PENDING = 'pending',
     PASS = 'pass',
     FAIL = 'fail',
 }
 
 export const STANDARD_SCORE = 7;
+
+export enum TEST_LEARNING_STATUS {
+    PENDING = 'pending',
+    ACTIVE = 'active',
+    DONE = 'done',
+}
