@@ -14,19 +14,22 @@ export class CreateUserDto {
 	email: string;
 
     @ApiProperty({ required: true })
+	@IsOptional()
 	@IsNotEmpty()
 	@IsString()
-	birthDay: string;
+	birthDay?: string;
 
     @ApiProperty({ required: true })
+	@IsOptional()
 	@IsNotEmpty()
 	@IsString()
-	gender: string;
+	gender?: string;
 
     @ApiProperty({ required: true })
+	@IsOptional()
 	@IsNotEmpty()
 	@IsString()
-	address: string;
+	address?: string;
 
     @ApiProperty({ required: true })
 	@IsNotEmpty()

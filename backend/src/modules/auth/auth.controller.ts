@@ -48,7 +48,7 @@ export class AuthController {
 		await this.authService.logOut(refreshToken);
 		res.clearCookie('refresh_token');
 
-		return res.json(true);
+		res.json(true);
 	}
 
 	@Post('/reset-password')

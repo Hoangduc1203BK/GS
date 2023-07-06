@@ -1,6 +1,6 @@
 import { Module, forwardRef } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { Attendance, Classes, Exam, ExamResult, RegisterExam, Room, SubExam, Subject, TimeTable, User, UserClass } from "src/databases/entities";
+import { Attendance, Classes, Exam, Room, SubExam, Subject, TimeTable, User, UserClass } from "src/databases/entities";
 import { ExamController } from "./exam.controller";
 import { ExamService } from "./exam.service";
 import { UserModule, UserService } from "../user";
@@ -10,7 +10,7 @@ import { SubjectModule } from "../subject";
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([Exam, SubExam, ExamResult, RegisterExam]),
+        TypeOrmModule.forFeature([Exam, SubExam]),
         forwardRef(() => UserModule),
         forwardRef(() => ClassModule),
         forwardRef(() => SubjectModule),

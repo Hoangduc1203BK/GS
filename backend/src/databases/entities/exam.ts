@@ -2,50 +2,74 @@ import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, OneToMany, OneToO
 import { Department } from './department';
 import { Classes } from './class';
 import { SubExam } from './sub-exam';
-import { RegisterExam } from './register-exam';
 import { User } from './user';
 import { Room } from './room';
 
 @Entity('exams')
 export class Exam {
-    @PrimaryColumn({
-        type:'varchar',
-        length: '6',
+    @PrimaryGeneratedColumn({
+        type:'int',
         name: 'id',
         unsigned: true,
     })
-    id: string;
+    id: number;
+
 
     @Column({
         type: 'varchar',
-        length: '50',
-        name: 'name',
+        length: '6',
+        name: 'user_id',
         nullable: false,
     })
-    name: string;
+    studentId: string;
 
     @Column({
         type: 'varchar',
         length: '6',
         name: 'teacher_id',
-        nullable: false,
+        nullable: true,
     })
     teacherId: string;
 
     @Column({
-        type: 'varchar',
-        length: '50',
-        name: 'time',
-        nullable: false,
-    })
-    time: string;
-
-    @Column({
         type: 'int',
         name: 'room_id',
-        nullable: false,
+        nullable: true,
     })
     roomId: number;
+
+    @Column({
+        type: 'varchar',
+        length: '10',
+        name: 'hour',
+        nullable: true,
+    })
+    hour: string;
+
+
+    @Column({
+        type: 'varchar',
+        length: '10',
+        name: 'date',
+        nullable: true,
+    })
+    date: string;
+
+    @Column({
+        type: 'varchar',
+        length: '10',
+        name: 'result',
+        nullable: false,
+    })
+    result: string;
+
+    @Column({
+        type: 'varchar',
+        length: '50',
+        name: 'description',
+        nullable: true,
+    })
+    description: string;
 
     @Column({
 		name: 'created_at',
@@ -69,12 +93,15 @@ export class Exam {
     @OneToMany(() => SubExam, se => se.exam)
     subExams: SubExam[];
 
-    @OneToMany(() => RegisterExam, re => re.exam)
-    registerExams: RegisterExam[];
-
+    //teacher
     @ManyToOne(() => User, u => u.exams)
     @JoinColumn({name: 'teacher_id', referencedColumnName: 'id'})
     teacher: User;
+
+    //student
+    @OneToOne(() => User, u => u.exam)
+    @JoinColumn({name: 'user_id', referencedColumnName: 'id'})
+    student: User;
 
     @ManyToOne(() => Room, r => r.exams)
     @JoinColumn({name: 'room_id', referencedColumnName:'id'})

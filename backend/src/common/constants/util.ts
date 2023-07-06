@@ -34,3 +34,12 @@ export enum ATTENDANCE_STATUS {
     ATTEND = 'attend',
     ABSENT = 'absent'
 }
+
+//EXAM_RESULT
+export enum EXAM_RESULT {
+    PENDDING = 'pendding',
+    PASS = 'pass',
+    FAIL = 'fail',
+}
+
+export const STANDARD_SCORE = 7;

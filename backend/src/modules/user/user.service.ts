@@ -101,6 +101,12 @@ export class UserService {
       ...user,
       ...dto,
     };
+
+    if(dto.password) {
+      const hashPassword = await this.bcryptService.hash(dto.password);
+      doc.password = hashPassword
+    }
+    
     const result = await this.userRepos.save({ id: id, ...doc });
     if (department && department.id) {
       return {

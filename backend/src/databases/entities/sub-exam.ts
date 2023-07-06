@@ -18,12 +18,11 @@ export class SubExam {
     id: number;
 
     @Column({
-        type: 'varchar',
-        length: '6',
+        type: 'int',
         name: 'exam_id',
         nullable: false,
     })
-    examId: string;
+    examId: number;
 
     @Column({
         type: 'varchar',
@@ -32,6 +31,15 @@ export class SubExam {
         nullable: false,
     })
     subjectId: string;
+
+    @Column({
+        type: 'decimal',
+		precision: 10,
+		scale: 2,
+		name: 'score',
+		nullable: true,
+    })
+    score: number;
 
     @ManyToOne(() => Exam, e => e.subExams)
     @JoinColumn({name: 'exam_id', referencedColumnName: 'id'})

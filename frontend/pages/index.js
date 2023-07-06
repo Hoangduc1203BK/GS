@@ -2,7 +2,7 @@ import LayoutPages from "@/components/LayoutPages";
 import { Button, Row } from "antd";
 import Link from "next/link";
 
-export default function Home() {
+export default function Home({ user }) {
 	return (
 		<main className="items-center">
 			<h1 className="uppercase font-bold text-[25px] text-center text-blue-500">

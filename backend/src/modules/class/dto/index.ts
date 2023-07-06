@@ -5,3 +5,4 @@ export * from './create-user-class.dto';
 export * from './update-user-class.dto';
 export * from './create-attendance.dto';
 export * from './update-attendance.dto';
+export * from './list-teacher-empty.dto';

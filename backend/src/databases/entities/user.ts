@@ -5,7 +5,6 @@ import { Classes } from './class';
 import { UserClass } from './user-class';
 import { Attendance } from './attendance';
 import { SubAttendance } from './sub-attendance';
-import { RegisterExam } from './register-exam';
 import { Exam } from './exam';
 
 @Entity('users')
@@ -39,7 +38,7 @@ export class User {
         type: 'varchar',
         length: '100',
         name: 'password',
-        nullable: false,
+        nullable: true,
     })
     password: string;
 
@@ -47,7 +46,7 @@ export class User {
         type: 'varchar',
         length: '50',
         name: 'birth_day',
-        nullable: false,
+        nullable: true,
     })
     birthDay: string;
 
@@ -55,7 +54,7 @@ export class User {
         type: 'varchar',
         length: '50',
         name: 'gender',
-        nullable: false,
+        nullable: true,
     })
     gender: string;
 
@@ -63,7 +62,7 @@ export class User {
         type: 'varchar',
         length: '50',
         name: 'address',
-        nullable: false,
+        nullable: true,
     })
     address: string;
 
@@ -190,9 +189,9 @@ export class User {
 
 
     //register exam
-    @OneToMany(() => RegisterExam, re => re.user)
-    registerExams: RegisterExam[];
-
     @OneToMany(() => Exam, e => e.teacher)
     exams: Exam[];
+
+    @OneToOne(() => Exam, e => e.student)
+    exam: Exam;
 }

@@ -20,16 +20,18 @@ export class AuthService {
 		private readonly jwtService: JwtService,
 		private readonly configService: ApiConfigService,
 		private readonly generatorService: GeneratorService,
-        // @Inject(forwardRef(() => UserService)) private readonly userService: UserService
+		// @Inject(forwardRef(() => UserService)) private readonly userService: UserService
 		// private readonly mailService: MailerService,
-	) {}
+	) { }
 
 	async validateUser(loginDto: LoginDto) {
 		const { email, password } = loginDto;
 		const result = await this.userRepos.findOne({ where: { email: email } });
-		const compare = await this.bcrytService.compare(password, result.password);
-		if (compare) {
-			return result;
+		if (result) {
+			const compare = await this.bcrytService.compare(password, result.password);
+			if (compare) {
+				return result;
+			}
 		}
 	}
 
@@ -57,7 +59,6 @@ export class AuthService {
 			expires: moment().add(this.configService.getAuthConfig().refreshTime, 'days').toDate(),
 			userId: data.id,
 		};
-        console.log(doc);
 		await this.accountRepos.save(doc);
 
 		return { accessToken, refreshToken };

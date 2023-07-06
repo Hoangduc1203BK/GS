@@ -2,11 +2,12 @@ import { Body, Controller, Get, Param, Patch, Post, Query } from "@nestjs/common
 import { CreateUserDto, ListUsertDto, UpdateUserDto } from "./dto";
 import { UserService } from "./user.service";
 import { checkEmailDecorator } from "src/core/decorator/util";
-
+import { MailService } from "src/core/shared/services/mail/mail.service";
 @Controller('user')
 export class UserController {
     constructor(
         private readonly userService: UserService,
+        private readonly mailService: MailService,
     ) {}
 
     @Get('/')
