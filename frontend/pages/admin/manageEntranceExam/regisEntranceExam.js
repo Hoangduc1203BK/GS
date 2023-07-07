@@ -51,7 +51,6 @@ const RegisEntranceExam = () => {
           }
           createExam(paramExam).then(
             res => {
-              console.log(res?.data, 'res dataa');
               if (res?.data?.id) {
                 message.success("Đăng ký thi thử thành công!")
                 setData({})
@@ -65,12 +64,11 @@ const RegisEntranceExam = () => {
   }
 
   async function handleSelectGrade(value) {
-    getListSubject({ grade: value }).then(
+    getListSubject({ grade: value, page: 1, size: 999 }).then(
       res => {
         setListSubject(res?.data?.result);
       }
     ).catch(err => message.error("Lấy dữ liệu môn thất bại!"))
-
   }
   const submitRegis = (values) => {
     setData({ ...values })
