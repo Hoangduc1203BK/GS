@@ -121,3 +121,8 @@ export const updateExam = (id, params) => {
 	return axios.patch(`/exam/${id}`, params);
 };
 
+// test learning
+
+export const createTestLearning = (params) => {
+	return axios.post("/test-learning", params)
+}
