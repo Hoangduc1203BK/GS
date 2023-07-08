@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+
 export function isExpired(dateString) {
 	var inputDate = new Date(dateString);
 	var today = new Date();
@@ -91,4 +93,15 @@ export const removeVietnameseTones = (data) => {
 		"-"
 	);
 	return result;
+};
+
+
+
+export function disabledDate(current) {
+	// Can not select days before today and today
+	// Lấy ngày hiện tại
+	const today = dayjs().startOf('day');
+	// Trả về true nếu ngày đó là ngày trong quá khứ
+	return current < today;
+	// return current && current <= moment().endOf('day');
 };

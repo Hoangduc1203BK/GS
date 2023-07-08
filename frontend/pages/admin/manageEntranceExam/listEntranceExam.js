@@ -1,6 +1,7 @@
 "use client";
 
 import { getListClassRoom, getListExam, getListUser, updateExam } from "@/api/address";
+import { disabledDate } from "@/common/util";
 import LayoutAdmin from "@/components/LayoutAdmin";
 import { CalendarOutlined, DeleteOutlined, EditOutlined, SnippetsOutlined } from "@ant-design/icons";
 import { Button, Col, DatePicker, Form, Input, Modal, Row, Select, Space, Table, TimePicker, Tooltip, message } from "antd";
@@ -14,6 +15,7 @@ const ListEntranceExam = () => {
   const [listUser, setListUser] = useState([]);
   const [recall, setRecall] = useState(false);
   const [listExam, setListExam] = useState([]);
+  const [record, setRecord] = useState([]);
   const [modal, setModal] = useState({
     open: false,
     mode: 1 // mode: 1 - add / 2 - edit 
@@ -133,14 +135,6 @@ const ListEntranceExam = () => {
     setModal(option)
   }
 
-  function disabledDate(current) {
-    // Can not select days before today and today
-    // Lấy ngày hiện tại
-    const today = dayjs().startOf('day');
-    // Trả về true nếu ngày đó là ngày trong quá khứ
-    return current < today;
-    // return current && current <= moment().endOf('day');
-  };
 
   async function handleFinish(values) {
     values.hour = `${dayjs(values.hour).hour().toString().padStart(2, '0')}:${dayjs(values.hour).minute().toString().padStart(2, '0')}`
@@ -288,7 +282,7 @@ const ListEntranceExam = () => {
                           <Button
                             type="primary"
                             onClick={openModal}
-                            disabled={idSelect.length !== 1}
+                            disabled={idSelect.length !== 1 || record[0]?.date}
                           >Xếp lịch thi</Button>
                         </Col>
                       </Row>
@@ -304,7 +298,7 @@ const ListEntranceExam = () => {
                     selectedRowKeys: idSelect,
                     onChange: (selectedRowKeys, selectedRows) => {
                       setIdSelect(selectedRowKeys)
-                      // setRecordSelect(selectedRows)
+                      setRecord(selectedRows)
                     }
                   }}
                   size="middle"
