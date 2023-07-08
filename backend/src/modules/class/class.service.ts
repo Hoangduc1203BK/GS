@@ -48,6 +48,20 @@ export class ClassService {
     private readonly userService: UserService,
   ) {}
 
+  async getTimeTable(id: number) {
+    const result = await this.timeRepos.findOne({
+      where: {id},
+      relations: ['classes','room']
+    })
+
+    if(!result) {
+      throw new Error('Không tìm thấy lớp có lịch đăng ký với id là:'+id);
+    }
+
+    return result;
+  }
+
+
   async createRoom(data: any) {
     const result = await this.roomRepos.save(data);
 

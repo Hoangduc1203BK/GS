@@ -3,6 +3,7 @@ import { Department } from './department';
 import { Subject } from './subject';
 import { Classes } from './class';
 import { Room } from './room';
+import { TestLearning } from './test-learning';
 
 @Entity('time-tables')
 export class TimeTable {
@@ -61,5 +62,9 @@ export class TimeTable {
     @ManyToOne(() => Room, r => r.schedules)
     @JoinColumn({name: 'room_id', referencedColumnName: 'id'})
     room: Room;
+
+     //test-learning
+     @OneToMany(() => TestLearning, t => t.timeTable)
+     testLearnings: TestLearning[];
 }
 

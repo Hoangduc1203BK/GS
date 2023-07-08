@@ -112,9 +112,5 @@ export class Classes {
 
     @OneToMany(() => Attendance, t => t.classes)
     attendances: Attendance[];
-
-    //test-learning
-    @OneToMany(() => TestLearning, t => t.classes)
-    testLearnings: TestLearning[];
 }
 

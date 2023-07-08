@@ -25,12 +25,11 @@ export class TestLearning {
     studentId: string;
 
     @Column({
-        type: 'varchar',
-        length: '6',
-        name: 'class_id',
+        type: 'int',
+        name: 'time_table_id',
         nullable: false,
     })
-    classId: string;
+    timeTableId: number;
 
     @Column({
         type: 'varchar',
@@ -38,7 +37,7 @@ export class TestLearning {
         name: 'status',
         nullable: false,
     })
-    status: boolean;
+    status: string;
 
     @Column({
         type: 'varchar',
@@ -60,8 +59,8 @@ export class TestLearning {
     @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
     student: User;
 
-    @ManyToOne(() => Classes, c => c.testLearnings)
-    @JoinColumn({ name: 'class_id', referencedColumnName: 'id' })
-    classes: Classes;
+    @ManyToOne(() => TimeTable, c => c.testLearnings)
+    @JoinColumn({ name: 'time_table_id', referencedColumnName: 'id' })
+    timeTable: TimeTable;
 }
 

@@ -3,6 +3,7 @@ import { ClassModule } from "./class";
 import { DepartmentModule } from "./department";
 import { ExamModule } from "./exam";
 import { SubjectModule } from "./subject";
+import { TestLearningModule } from "./test-learning";
 import { UserModule } from "./user";
 
 export const MODULES = [
@@ -12,4 +13,5 @@ export const MODULES = [
     AuthModule,
     ClassModule,
     ExamModule,
+    TestLearningModule,
 ]
