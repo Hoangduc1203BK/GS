@@ -77,6 +77,11 @@ export const authMe = () => {
 	return axios.get("/auth/me");
 };
 
+export const login = (params) => {
+	return axios.post("/auth/login", params);
+};
+
+// classroom
 export const getListClassRoom = () => {
 	return axios.get("/class/room");
 };
@@ -89,26 +94,30 @@ export const updateClassRoom = (id, params) => {
 	return axios.patch(`/class/room/${id}`, params);
 };
 
+// user
+export const getListUser = (params) => {
+	return axios.get("/user", { params: params });
+};
 export const createUser = (params) => {
-	return axios.post("/users", params);
+	return axios.post("/user", params);
 };
 
-export const login = (params) => {
-	return axios.post("/auth/login", params);
+
+// subject
+export const getListSubject = (params) => {
+	return axios.get("/subject", { params: params });
 };
 
-export const listBox = () => {
-	return axios.get("/rooms");
+// exam
+export const getListExam = (params) => {
+	return axios.get("/exam", { params: params });
 };
 
-export const getListUsers = () => {
-	return axios.get("/users");
+export const createExam = (params) => {
+	return axios.post("/exam", params);
 };
 
-export const createRoom = (params) => {
-	return axios.post("/rooms", params);
+export const updateExam = (id, params) => {
+	return axios.patch(`/exam/${id}`, params);
 };
 
-export const listMessageByRoom = (id, params) => {
-	return axios.get(`/messages/${id}`, { params });
-};
