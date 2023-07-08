@@ -131,6 +131,11 @@ export class TestLearningService {
             await this.testLearningRepos.save(doc);
         }
 
+        await this.examRepos.save({
+            ...student,
+            result: EXAM_RESULT.TEST_LEARNING,
+        })
+
         return true;
         // const doc = {
         //     ...dto,
@@ -165,15 +170,6 @@ export class TestLearningService {
         }
 
         await this.testLearningRepos.save({id: id, ...doc});
-
-        const student = await this.examRepos.findOne({
-            where: { studentId: testLearning.studentId}
-        })
-
-        await this.examRepos.save({
-            ...student,
-            result: EXAM_RESULT.TEST_LEARNING,
-        })
 
         return this.getTestLearning(id);
     }
