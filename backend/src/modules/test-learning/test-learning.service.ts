@@ -44,14 +44,15 @@ export class TestLearningService {
             const item = {
                 ...rest,
                 student: student.name,
+                grade: student.grade,
                 phoneNumber: student.phoneNumber,
-                class: timeTable.classes.name,
+                class: timeTable ? timeTable.classes.name : null,
                 timeTable: {
-                    date: timeTable.date,
-                    start: timeTable.start,
-                    end: timeTable.end
+                    date: timeTable ? timeTable.date: null,
+                    start: timeTable ? timeTable.start: null,
+                    end: timeTable ? timeTable.end : null
                 },
-                room: timeTable.room.name
+                room: timeTable ?timeTable.room.name: null
             }
 
             return item;
@@ -72,20 +73,39 @@ export class TestLearningService {
 
         const { timeTable, student, ...rest} = testLearning;
 
-        const result = {
-            ...rest,
-            student: student.name,
-            phoneNumber: student.phoneNumber,
-            class: timeTable.classes.name,
-            timeTable: {
-                date: timeTable.date,
-                start: timeTable.start,
-                end: timeTable.end
-            },
-            room: timeTable.room.name
-        }
+        if(timeTable) {
+            const result = {
+                ...rest,
+                student: student.name,
+                grade: student.grade,
+                phoneNumber: student.phoneNumber,
+                class: timeTable.classes.name,
+                timeTable: {
+                    date: timeTable.date,
+                    start: timeTable.start,
+                    end: timeTable.end
+                },
+                room: timeTable.room.name
+            }
+    
+            return result;
+        }else {
+            const result = {
+                ...rest,
+                student: student.name,
+                grade: student.grade,
+                phoneNumber: student.phoneNumber,
+                class: null,
+                timeTable: {
+                    date: null,
+                    start: null,
+                    end: null
+                },
+                room: null
+            }
 
-        return result;
+            return result;
+        }
     }
 
     async createTestLearning(dto: CreateTestLearningDto) {
@@ -97,15 +117,28 @@ export class TestLearningService {
         if(!student || student.result != EXAM_RESULT.PASS) {
             throw new Error('Học sinh với id:'+dto.studentId + ' không có trong danh sách học thử');
         }
-        const timeTableId = await this.classService.getTimeTable(dto.timeTableId);
-        const doc = {
-            ...dto,
-            status: TEST_LEARNING_STATUS.PENDING,
-        }
-        console.log(doc)
-        const result = await this.testLearningRepos.save(doc);
 
-        return this.getTestLearning(result.id);
+        const { subjects, ...rest} = dto;
+        for(const s of subjects) {
+            const doc = {
+                ...rest,
+                status: TEST_LEARNING_STATUS.PENDING,
+                subjectId: s.subjectId,
+                description: s.description ? s.description : null,
+                desiredDate: s.desiredDate ? s.desiredDate : null,
+            }
+
+            await this.testLearningRepos.save(doc);
+        }
+
+        return true;
+        // const doc = {
+        //     ...dto,
+        //     status: TEST_LEARNING_STATUS.PENDING,
+        // }
+        // const result = await this.testLearningRepos.save(doc);
+
+        // return this.getTestLearning(result.id);
     }
 
 

@@ -27,7 +27,7 @@ export class TestLearning {
     @Column({
         type: 'int',
         name: 'time_table_id',
-        nullable: false,
+        nullable: true,
     })
     timeTableId: number;
 
@@ -38,6 +38,22 @@ export class TestLearning {
         nullable: false,
     })
     status: string;
+
+    @Column({
+        type: 'varchar',
+        length: '6',
+        name: 'subject_id',
+        nullable: false,
+    })
+    subjectId: string;
+
+    @Column({
+        type: 'varchar',
+        length: '10',
+        name: 'desired_date',
+        nullable: true,
+    })
+    desiredDate: string;
 
     @Column({
         type: 'varchar',

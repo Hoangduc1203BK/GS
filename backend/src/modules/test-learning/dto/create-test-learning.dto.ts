@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsNumber, IsEnum, IsNumberString, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber, IsEnum, IsNumberString, IsOptional, IsArray } from 'class-validator';
 import { TEST_LEARNING_STATUS } from 'src/common/constants';
+import { TEST_LEARNING_ITEM } from 'src/common/interfaces/test-learning';
 
 export class CreateTestLearningDto {
 	@ApiProperty({ required: true })
@@ -8,20 +9,13 @@ export class CreateTestLearningDto {
 	@IsString()
 	studentId: string;
 
+	// @ApiProperty({ required: true })
+	// @IsNotEmpty()
+	// @IsNumber()
+	// timeTableId: number;
+
 	@ApiProperty({ required: true })
 	@IsNotEmpty()
-	@IsNumber()
-	timeTableId: number;
-
-    @ApiProperty({ required: true })
-	@IsOptional()
-	@IsNotEmpty()
-	@IsString()
-	day?: string;
-
-    @ApiProperty({ required: true })
-	@IsOptional()
-	@IsNotEmpty()
-	@IsString()
-	description?: string;
+	@IsArray()
+	subjects: TEST_LEARNING_ITEM[];
 }

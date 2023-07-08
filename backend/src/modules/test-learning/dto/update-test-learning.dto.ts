@@ -7,7 +7,7 @@ export class UpdateTestLearningDto {
     @IsOptional()
 	@IsNotEmpty()
 	@IsString()
-	userId?: string;
+	studentId?: string;
 
 	@ApiProperty({ required: true })
     @IsOptional()
