@@ -6,6 +6,8 @@ import { UserClass } from './user-class';
 import { Attendance } from './attendance';
 import { SubAttendance } from './sub-attendance';
 import { Exam } from './exam';
+import { TestLearning } from './test-learning';
+import { Proposals } from './proposals';
 
 @Entity('users')
 export class User {
@@ -194,4 +196,12 @@ export class User {
 
     @OneToOne(() => Exam, e => e.student)
     exam: Exam;
+
+    //test-learning
+    @OneToMany(() => TestLearning, t => t.student)
+    testLearnings: TestLearning[];
+
+    //proposals
+    @OneToMany(() => Proposals, p => p.user)
+    proposals: Proposals[];
 }

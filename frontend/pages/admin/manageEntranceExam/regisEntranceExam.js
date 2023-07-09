@@ -1,7 +1,9 @@
 "use client";
 
+import { createExam, createUser, getListSubject } from "@/api/address";
+import { GRADE } from "@/common/const";
 import LayoutAdmin from "@/components/LayoutAdmin";
-import { Button, Col, Form, Input, Row, Select, Table } from "antd";
+import { Button, Col, Form, Input, Row, Select, Table, message } from "antd";
 import { useState } from "react";
 
 const { Option } = Select
@@ -11,14 +13,16 @@ const RegisEntranceExam = () => {
   const [formRegis] = Form.useForm()
 
   const [data, setData] = useState({});
+  const [listSubject, setListSubject] = useState([]);
 
   const columns = [
     {
       title: "Môn",
       render: (text, record, index) => {
-        return <div>{record?.subject}</div>;
+        return <div>{listSubject?.find(i => i.id === record?.subject)?.name}</div>;
       },
       align: "center",
+      width: 200
     },
     {
       title: "Ghi chú",
@@ -29,6 +33,43 @@ const RegisEntranceExam = () => {
     },
   ]
 
+  async function regisExam() {
+    const paramUser = {
+      name: data?.name,
+      phoneNumber: data?.phoneNumber,
+      email: data?.email,
+      role: 'user',
+      grade: data?.grade,
+    }
+    await createUser(paramUser).then(
+      res => {
+        if (res?.data?.id) {
+          const paramExam = {
+            studentId: res?.data?.id,
+            subjects: data?.subject?.map(item => ({ id: item })),
+            description: data?.note
+          }
+          createExam(paramExam).then(
+            res => {
+              if (res?.data?.id) {
+                message.success("Đăng ký thi thử thành công!")
+                setData({})
+                formRegis.resetFields()
+              } else message.error("Đăng ký thi thử thất bại!")
+            }
+          ).catch(err => message.error("Đăng ký thi thử thất bại!" + err))
+        }
+      }
+    ).catch(err => message.error("Tạo học sinh thất bại!" + err))
+  }
+
+  async function handleSelectGrade(value) {
+    getListSubject({ grade: value, page: 1, size: 999 }).then(
+      res => {
+        setListSubject(res?.data?.result);
+      }
+    ).catch(err => message.error("Lấy dữ liệu môn thất bại!"))
+  }
   const submitRegis = (values) => {
     setData({ ...values })
   }
@@ -47,41 +88,43 @@ const RegisEntranceExam = () => {
             className="mx-2 my-5"
             onFinish={submitRegis}
           >
+
             <Form.Item
-              name="code"
+              name="name"
               rules={[
                 { required: true, message: "Đây là trường thông tin bắt buộc!" }
               ]}
             >
-              <Input placeholder="Tạo mã HS" disabled={data?.code} />
+              <Input placeholder="Tên HS" disabled={data?.name} />
             </Form.Item>
             <Form.Item
-              name="fullname"
+              name="phoneNumber"
               rules={[
                 { required: true, message: "Đây là trường thông tin bắt buộc!" }
               ]}
             >
-              <Input placeholder="Tên HS" disabled={data?.code} />
+              <Input placeholder="SĐT" disabled={data?.name} />
             </Form.Item>
             <Form.Item
-              name="phone"
+              name="email"
               rules={[
-                { required: true, message: "Đây là trường thông tin bắt buộc!" }
+                { required: true, message: "Đây là trường thông tin bắt buộc!" },
+                { type: 'email', message: 'Không đúng định dạng!' }
               ]}
             >
-              <Input placeholder="SĐT" disabled={data?.code} />
+              <Input placeholder="Nhập email" disabled={data?.name} />
             </Form.Item>
             <Form.Item
-              name="class"
+              name="grade"
               rules={[
                 { required: true, message: "Đây là trường thông tin bắt buộc!" }
               ]}>
               <Select
                 placeholder="-- Chọn lớp --"
-                disabled={data?.code}
-              >
-                <Option value="1">Lớp 1</Option>
-              </Select>
+                disabled={data?.name}
+                options={GRADE}
+                onSelect={handleSelectGrade}
+              />
             </Form.Item>
             <Form.Item
               name="subject"
@@ -91,18 +134,21 @@ const RegisEntranceExam = () => {
               <Select
                 placeholder="-- Chọn môn --"
                 mode="multiple"
-                disabled={data?.code}
+                disabled={data?.name}
               >
-                <Option value="Môn Văn">Môn Văn</Option>
-                <Option value="Môn Toán">Môn Toán</Option>
+                {
+                  listSubject?.map(item => (<>
+                    <Select.Option value={item?.id} key={item?.id}>{item?.name}</Select.Option>
+                  </>))
+                }
               </Select>
             </Form.Item>
             <Form.Item name="note">
-              <Input placeholder="Ghi chú" disabled={data?.code} />
+              <Input placeholder="Ghi chú" disabled={data?.name} />
             </Form.Item>
             <Row justify="center">
               <Col>
-                <Button type="primary" htmlType="submit" disabled={data?.code}>Xác nhận</Button>
+                <Button type="primary" htmlType="submit" disabled={data?.name}>Xác nhận</Button>
               </Col>
             </Row>
           </Form>
@@ -112,48 +158,39 @@ const RegisEntranceExam = () => {
           <Row gutter={[16, 16]} className="px-14 my-5">
             <Col xs={12} className="border-[1px] border-r-0">
               <div className="flex">
-                <div className="w-1/4 py-2 font-semibold border-r-[1px]">Mã số</div>
-                <div className="w-3/4 py-2">{data?.code}</div>
+                <div className="w-1/4 py-2 font-semibold border-r-[1px]">Họ và tên</div>
+                <div className="w-3/4 p-2">{data?.name}</div>
               </div>
             </Col>
             <Col xs={12} className="border-[1px]">
               <div className="flex">
                 <div className="w-1/4 py-2  font-semibold border-r-[1px]">SĐT</div>
-                <div className="w-2/4 py-2 ">{data?.phone}</div>
+                <div className="w-2/4 p-2 ">{data?.phoneNumber}</div>
               </div>
             </Col>
             <Col xs={12} className="border-[1px] border-r-0">
               <div className="flex ">
-                <div className="w-1/4 py-2  font-semibold border-r-[1px]">Họ và tên</div>
-                <div className="w-2/4 py-2 ">{data?.fullname}</div>
+                <div className="w-1/4 py-2  font-semibold border-r-[1px]">Email</div>
+                <div className="w-2/4 p-2 ">{data?.email}</div>
               </div>
             </Col>
             <Col xs={12} className="border-[1px]">
               <div className="flex ">
                 <div className="w-1/4 py-2  font-semibold border-r-[1px]">Lớp</div>
-                <div className="w-2/4 py-2 ">{data?.class}</div>
+                <div className="w-2/4 p-2 ">{data?.grade}</div>
               </div>
             </Col>
             <Table
-              // locale={{
-              //                     emptyText: <div style={{ marginTop: '20px' }}>{loading ? null : listResult.length === 0 ? "Sinh viên chưa đăng ký HP nào trong kỳ này!" : null}</div>,
-              //                 }}
-              // rowSelection={{
-              //     type: 'checkbox',
-              //     selectedRowKeys: idSelect,
-              //     onChange: (selectedRowKeys, selectedRows) => {
-              //         setIdSelect(selectedRowKeys)
-              //         // setRecordSelect(selectedRows)
-              //     }
-              // }}
               size="middle"
+              style={{
+                width: '100%'
+              }}
               dataSource={data?.subject?.length > 0 && data?.subject?.map((x, i) => ({ key: i, subject: x, note: data?.note }))}
               columns={columns}
               bordered
-              scroll={{ x: 1000 }}
               pagination={{
                 locale: { items_per_page: "/ trang" },
-                // total: listResult?.length,
+                total: data?.subject?.length,
                 showTotal: (total, range) => (
                   <span>{`${range[0]} - ${range[1]} / ${total}`}</span>
                 ),
@@ -162,15 +199,13 @@ const RegisEntranceExam = () => {
                 defaultPageSize: 10,
                 position: ["bottomRight"],
               }}
-
-
             />
             <Row gutter={[8, 8]} justify="center" className="w-full">
               <Col>
-                <Button onClick={cancelRegis} disabled={!data?.code}>Hủy bỏ</Button>
+                <Button onClick={cancelRegis} disabled={!data?.name}>Hủy bỏ</Button>
               </Col>
               <Col>
-                <Button type="primary" disabled={!data?.code}>Xác nhận</Button>
+                <Button type="primary" disabled={!data?.name} onClick={regisExam}>Xác nhận</Button>
               </Col>
             </Row>
           </Row>

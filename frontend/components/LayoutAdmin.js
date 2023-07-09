@@ -37,7 +37,6 @@ export default function LayoutAdmin({
 	children,
 	user,
 }) {
-	console.log(user, 'user layout');
 	const [collapsed, setCollapsed] = useState(false);
 	const {
 		token: { colorBgContainer },
@@ -122,7 +121,7 @@ export default function LayoutAdmin({
 			icon: <FileProtectOutlined />,
 			children: [
 				{
-					label: <Link href="/admin">Thời khóa biểu</Link>,
+					label: <Link href="/admin">Quản lý bộ môn</Link>,
 					key: "tkbCenter",
 				},
 				{
@@ -137,19 +136,19 @@ export default function LayoutAdmin({
 					children: [
 						{
 							label: (
-								<Link href="/admin/regisEntranceExam">Đăng ký thi thử</Link>
+								<Link href="/admin/manageEntranceExam/regisEntranceExam">Đăng ký thi thử</Link>
 							),
 							key: "regisExam",
 						},
 						{
 							label: (
-								<Link href="/admin/listEntranceExam">Danh sách thi thử</Link>
+								<Link href="/admin/manageEntranceExam/listEntranceExam">Danh sách thi thử</Link>
 							),
 							key: "listRegisExam",
 						},
 						{
 							label: (
-								<Link href="/admin">Kết quả thi thử</Link>
+								<Link href="/admin/manageEntranceExam/resultExam">Kết quả thi thử</Link>
 							),
 							key: "resultExam",
 						},
@@ -161,7 +160,7 @@ export default function LayoutAdmin({
 					children: [
 						{
 							label: (
-								<Link href="/admin">Đăng ký học thử</Link>
+								<Link href="/admin/testLearning/regisTestLearning">Đăng ký học thử</Link>
 							),
 							key: "regisLearning",
 						},

@@ -27,7 +27,6 @@ export default function Login() {
 
 	const handleSubmitForm = (values) => {
 		login(values).then((res) => {
-			console.log(res, "resss");
 			if (res?.data?.accessToken) {
 				message.success("Đăng nhập thành công!");
 				setCookie(

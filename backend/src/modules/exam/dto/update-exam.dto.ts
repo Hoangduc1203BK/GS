@@ -21,7 +21,7 @@ export class UpdateExamDto {
 	@ApiProperty({ required: true })
 	@IsOptional()
 	@IsNotEmpty()
-	@IsNumberString()
+	@IsNumber()
 	roomId?: number;
 
 	@ApiProperty({ required: true })

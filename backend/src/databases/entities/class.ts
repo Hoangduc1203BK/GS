@@ -6,6 +6,7 @@ import { User } from './user';
 import { Room } from './room';
 import { UserClass } from './user-class';
 import { Attendance } from './attendance';
+import { TestLearning } from './test-learning';
 
 @Entity('class')
 export class Classes {

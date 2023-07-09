@@ -87,3 +87,13 @@ export const dayOfWeekVn = (date) => {
 	const dayName = dayjs(date).format('dddd');
 	return dayName;
 };
+
+
+export function disabledDate(current) {
+	// Can not select days before today and today
+	// Lấy ngày hiện tại
+	const today = dayjs().startOf('day');
+	// Trả về true nếu ngày đó là ngày trong quá khứ
+	return current < today;
+	// return current && current <= moment().endOf('day');
+};

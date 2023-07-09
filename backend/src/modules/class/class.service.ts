@@ -48,6 +48,20 @@ export class ClassService {
     private readonly userService: UserService,
   ) {}
 
+  async getTimeTable(id: number) {
+    const result = await this.timeRepos.findOne({
+      where: {id},
+      relations: ['classes','room']
+    })
+
+    if(!result) {
+      throw new Error('Không tìm thấy lớp có lịch học với id là:'+id);
+    }
+
+    return result;
+  }
+
+
   async createRoom(data: any) {
     const result = await this.roomRepos.save(data);
 
@@ -145,7 +159,7 @@ export class ClassService {
       scheduleFilter.end = end;
     }
 
-    let qr = ` select c.*, t."start" ,t."end" ,t."date" ,r."name" as room_name from "class" c, "time-tables" t, "rooms" r where c.id = t.class_id and t.room_id = r.id `;
+    let qr = ` select c.*,t.id as time_id, t."start" ,t."end" ,t."date" ,r."name" as room_name from "class" c, "time-tables" t, "rooms" r where c.id = t.class_id and t.room_id = r.id `;
     let classArr = [];
 
     if (Object.keys(classFilter).length > 0) {
@@ -176,12 +190,13 @@ export class ClassService {
 
     let classes = await this.classRepos.query(qr);
     if (classes.length >= 1) {
-      const { start, end, date, room_name, ...rest } = classes[0];
+      const { start, end, date, room_name,time_id, ...rest } = classes[0];
       const result = [
         {
           ...rest,
           time_tables: [
             {
+              id:time_id,
               start,
               end,
               date,
@@ -194,13 +209,14 @@ export class ClassService {
       classes.shift();
 
       classes.reduce((init, curr) => {
-        const { start, end, date, room_name, ...rest } = curr;
+        const { id,start, end, date, room_name, ...rest } = curr;
         const item = result.find((el) => el.id == curr.id);
         if (!item) {
           result.push({
             ...rest,
             time_tables: [
               {
+                id:time_id,
                 start,
                 end,
                 date,
@@ -210,6 +226,7 @@ export class ClassService {
           });
         } else {
           item.time_tables.push({
+            id:time_id,
             start,
             end,
             date,

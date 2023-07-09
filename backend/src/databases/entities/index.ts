@@ -10,3 +10,5 @@ export * from './attendance';
 export * from './sub-attendance';
 export * from './exam';
 export * from './sub-exam';
+export * from './test-learning';
+export * from './proposals';

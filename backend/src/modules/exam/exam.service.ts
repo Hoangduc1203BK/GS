@@ -26,10 +26,42 @@ export class ExamService {
 
     async listExam(query: ListExamDto) {
         const { page = DEFAULT_PAGING.PAGE, size = DEFAULT_PAGING.LIMIT, ...rest } = query;
-        const result = await this.examRepos.find({
+        const exams = await this.examRepos.find({
             where: rest,
+            relations: ['student', 'subExams','subExams.subject', 'teacher', 'room'],
             skip: (page - 1)* size,
-            take: page,
+            take: size,
+        })
+
+        const result = exams.map((e) => {
+            const {student, subExams,teacher,room, ...rest1} = e;
+            const subExams1 = subExams.map(el => {
+                return {
+                    id: el.id,
+                    examId: el.examId,
+                    subjectId: el.subjectId,
+                    score: el.score,
+                    name: el.subject.name,
+                }
+            })
+
+            const doc = {
+                ...rest1,
+                studentName: student.name,
+                phoneNumber: student.phoneNumber,
+                grade: student.grade,
+                subjects: subExams1,
+                teacherName: null,
+                room: null
+            } as any;
+            if(teacher && teacher.id) {
+                doc.teacherName = teacher.name;
+            }
+
+            if(room && room.id) {
+                doc.room = room.name
+            }
+            return doc;
         })
 
         return {result: result, ...paginate(result.length, Number(page), Number(size))}
@@ -66,7 +98,7 @@ export class ExamService {
 
         const exam = await this.examRepos.save({
             ...rest,
-            result: EXAM_RESULT.PENDDING,
+            result: EXAM_RESULT.PENDING,
         });
 
         if(exam) {
@@ -152,7 +184,7 @@ export class ExamService {
         if(checkNull) {
             doc = {
                 ...doc,
-                result: EXAM_RESULT.PENDDING
+                result: EXAM_RESULT.PENDING
             }
         }else {
             const sumScore = subExams.reduce((init, curr) => {

@@ -1,34 +1,35 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, IsNumber, IsEnum, IsNumberString, IsOptional } from 'class-validator';
-import { EXAM_RESULT } from 'src/common/constants';
+import { TEST_LEARNING_STATUS } from 'src/common/constants';
 
-export class ListExamDto {
+export class UpdateTestLearningDto {
 	@ApiProperty({ required: true })
     @IsOptional()
 	@IsNotEmpty()
-	@IsNumberString()
-	page?: number;
+	@IsString()
+	studentId?: string;
 
 	@ApiProperty({ required: true })
     @IsOptional()
 	@IsNotEmpty()
-	@IsNumberString()
-	size?: number;
+	@IsNumber()
+	timeTableId?: number;
 
     @ApiProperty({ required: true })
     @IsOptional()
 	@IsNotEmpty()
-	@IsNumber()
-	roomId?: number;
+	@IsEnum(TEST_LEARNING_STATUS)
+	status?: string;
 
     @ApiProperty({ required: true })
     @IsOptional()
 	@IsNotEmpty()
 	@IsString()
-	teacherId?: string;
+	day?: string;
 
     @ApiProperty({ required: true })
     @IsOptional()
-	@IsEnum(EXAM_RESULT)
-	result?: string;
+	@IsNotEmpty()
+	@IsString()
+	description?: string;
 }

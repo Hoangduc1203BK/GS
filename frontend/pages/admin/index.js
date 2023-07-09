@@ -1,8 +1,6 @@
 import LayoutAdmin from "@/components/LayoutAdmin";
 
 const Dashboard = ({ user }) => {
-	console.log(user, 'user Home');
-
 	return (
 		<>
 			<h1>Dashboard</h1>
