@@ -50,3 +50,17 @@ export enum TEST_LEARNING_STATUS {
     ACTIVE = 'active',
     DONE = 'done',
 }
+
+export enum PROPOSAL_TYPE {
+    TEACHER_REGISTER_CLASS = 'teacher_register_class',
+    STUDENT_REGISTER_CLASS = 'student_register_class',
+    TEACHER_TAKE_BRAKE = 'teacher_take_break',
+    STUDENT_TERMINATE_CLASS = 'student_terminate_class'
+}
+
+export enum PROPOSAL_STATUS {
+    PENDING = 'pending',
+    REJECTED = 'rejected',
+    CANCELED = 'canceled',
+    APPROVED = 'approved'
+}

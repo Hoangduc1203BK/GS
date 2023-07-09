@@ -60,7 +60,7 @@ export class UserService {
     });
 
     if (!user) {
-      throw new Error('Không tìm thấy người dùng');
+      throw new Error('Không tìm thấy người dùng với id:'+id);
     }
 
     return user;

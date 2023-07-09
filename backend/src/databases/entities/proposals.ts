@@ -1,20 +1,15 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, OneToMany, OneToOne, BeforeUpdate, PrimaryGeneratedColumn } from 'typeorm';
-import { Department } from './department';
-import { Classes } from './class';
-import { SubExam } from './sub-exam';
 import { User } from './user';
-import { Room } from './room';
+import { STUDENT_REGISTER_CLASS, STUDENT_TERMINATE_CLASS, TEACHER_REGISTER_CLASS, TEACHER_TAKE_BRAKE } from 'src/common/interfaces/proposals';
 
 @Entity('proposals')
 export class Proposals {
-    @PrimaryColumn({
-        type:'varchar',
-        length: '6',
+    @PrimaryGeneratedColumn({
+        type:'int',
         name: 'id',
         unsigned: true,
     })
-    id: string;
-
+    id: number;
 
     @Column({
         type: 'varchar',
@@ -33,7 +28,8 @@ export class Proposals {
     type: string;
 
     @Column({
-        type: 'int',
+        type: 'varchar',
+        length: '10',
         name: 'time',
         nullable: false,
     })
@@ -46,7 +42,6 @@ export class Proposals {
         nullable: true,
     })
     description: string;
-
 
     @Column({
         type: 'varchar',
@@ -61,7 +56,7 @@ export class Proposals {
         name: 'sub_data',
         nullable: false,
     })
-    subData: string;
+    subData: TEACHER_REGISTER_CLASS | STUDENT_REGISTER_CLASS | TEACHER_TAKE_BRAKE | STUDENT_TERMINATE_CLASS;
 
     @Column({
 		name: 'created_at',
