@@ -1,17 +1,23 @@
 import LayoutAdmin from "@/components/LayoutAdmin";
+import StudentsInClass from "@/components/student/StudentsInClass";
 import TeacherComment from "@/components/student/TeacherComment";
 import Transcript from "@/components/student/Transcript";
 import { Tabs } from "antd";
-const LearningOutcomes = () => {
+const LearningOutcomes = ({user}) => {
 
   const items = [
     {
       key: "1",
+      label: `Danh sách lớp`,
+      children: <StudentsInClass info={user} />,
+    },
+    {
+      key: "2",
       label: `Bảng điểm`,
       children: <Transcript />,
     },
     {
-      key: "2",
+      key: "3",
       label: `Nhận xét của giáo viên`,
       children: <TeacherComment />,
     },

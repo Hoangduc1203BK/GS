@@ -1,6 +1,6 @@
 export const checkNameField = (field) => {
   switch (field) {
-    case "phone":
+    case "phoneNumber":
       return "Số Điện Thoại";
     case "address":
       return "Địa chỉ";
@@ -10,10 +10,23 @@ export const checkNameField = (field) => {
       return "Giới tính";
     case "subject":
       return "Môn";
-    case "code":
-      return "Mã";
-    case "birthday":
+    case "birthDay":
       return "Ngày sinh";
+    case "email":
+      return "Email";
+    case "major":
+      return "Chuyên ngành";
+    default:
+      break;
+  }
+};
+
+export const genderVNConvert = (key) => {
+  switch (key) {
+    case "male":
+      return "Nam";
+    case "female":
+      return "Nữ";
     default:
       break;
   }

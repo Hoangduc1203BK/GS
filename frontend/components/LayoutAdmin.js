@@ -68,12 +68,8 @@ export default function LayoutAdmin({
 					key: "infoStudent",
 				},
 				{
-					label: <Link href="/student/result">Kết quả học tập</Link>,
+					label: <Link href="/student/result">Quản lý danh sách lớp</Link>,
 					key: "resultStudent",
-				},
-				{
-					label: <Link href="/admin">Đăng ký lớp</Link>,
-					key: "regisClass",
 				},
 				{
 					label: <Link href="/student/suggest">Quản lý đề xuất</Link>,

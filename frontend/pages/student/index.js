@@ -3,18 +3,18 @@ import LayoutAdmin from "@/components/LayoutAdmin";
 import LayoutTimeTables from "@/components/TimeTableOfWeek";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
-import { MockDataInfo } from "@/common/mock";
 import { Button } from "antd";
 import PopupStudentSuggest from "@/components/popup/popupStudentSuggest";
 import PopupStudentFeedback from "@/components/popup/popupStudentFeedback";
 import PopupStudentTuitionFee from "@/components/popup/popupStudentTuitionFee";
-const Dashboard = () => {
+import { getMeInfo } from "@/api/address";
+const Dashboard = ({user}) => {
   
   const [openSugget, setOpenSuggest] = useState(false);
   const [openFeedback, setOpenFeedback] = useState(false);
   const [openTuitionFee, setOpenTuitionFee] = useState(false);
   const [schedule, setSchedule] = useState([]);
-  const [info, setInfo] = useState(MockDataInfo);
+  const [info, setInfo] = useState(user);
   useEffect(() => {
     setSchedule(
       [1, 3, 4, 5, 6, 9, 7, 10, 8].map((el) => {
@@ -30,6 +30,30 @@ const Dashboard = () => {
         };
       })
     );
+
+
+    const callUserDetail = async () =>  {
+      if(!user?.id){
+        let token = {} ;
+        if (typeof window !== "undefined") {
+          token = getCookie("token");
+        } else {
+          token = ctx?.req?.cookies?.token;
+        }
+        if (token) {
+          try {
+            let res = await getMeInfo(token)
+            let user = await res.json();
+            console.log(user);
+            setInfo(user)
+          } catch (error) {
+            console.log("call api error", error)
+          }
+        }
+      }
+    }
+
+    callUserDetail()
   }, []);
 
   return (
@@ -41,12 +65,12 @@ const Dashboard = () => {
         <InfoStuTea info={info || {}}>
           <div className="flex gap-2 w-full mt-3">
             <Button
-              type="primary"
-              className="w-1/2"
-              onClick={() => setOpenSuggest(true)}
-            >
-              Đề xuất
-            </Button>
+                type="primary"
+                className="w-1/2 !bg-green-600"
+                onClick={() => setOpenFeedback(true)}
+              >
+                Thư góp ý
+              </Button>
             <Button
               type="primary"
               className="w-1/2 !bg-violet-700"
@@ -54,16 +78,6 @@ const Dashboard = () => {
             >
               Học phí
             </Button>
-          </div>
-          <div className="flex gap-2 w-full mt-3">
-            <Button
-              type="primary"
-              className="w-1/2 !bg-green-600"
-              onClick={() => setOpenFeedback(true)}
-            >
-              Thư góp ý
-            </Button>
-            <div className="w-1/2"></div>
           </div>
         </InfoStuTea>
       </div>
