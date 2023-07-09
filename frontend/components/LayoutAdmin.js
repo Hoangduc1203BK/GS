@@ -62,17 +62,17 @@ export default function LayoutAdmin({
 			children: [
 				{
 					label: (
-						<Link href="/admin">Thông tin cá nhân</Link>
+						<Link href="/student">Thông tin cá nhân</Link>
 					),
 					key: "infoStudent",
 				},
 				{
-					label: <Link href="/admin">Thời khóa biểu</Link>,
-					key: "tkbStudent",
+					label: <Link href="/student/result">Quản lý danh sách lớp</Link>,
+					key: "resultStudent",
 				},
 				{
-					label: <Link href="/admin">Đăng ký lớp</Link>,
-					key: "regisClass",
+					label: <Link href="/student/suggest">Quản lý đề xuất</Link>,
+					key: "studentSuggest",
 				},
 			],
 		},
