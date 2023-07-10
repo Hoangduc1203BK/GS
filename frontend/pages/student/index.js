@@ -8,6 +8,8 @@ import PopupStudentSuggest from "@/components/popup/popupStudentSuggest";
 import PopupStudentFeedback from "@/components/popup/popupStudentFeedback";
 import PopupStudentTuitionFee from "@/components/popup/popupStudentTuitionFee";
 import { getMeInfo } from "@/api/address";
+import { getCookie, hasCookie } from "@/api/cookies";
+
 const Dashboard = ({user}) => {
   
   const [openSugget, setOpenSuggest] = useState(false);
