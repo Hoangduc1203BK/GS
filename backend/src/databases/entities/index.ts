@@ -12,3 +12,5 @@ export * from './exam';
 export * from './sub-exam';
 export * from './test-learning';
 export * from './proposals';
+export * from './/assigment';
+export * from './sub-assigment';

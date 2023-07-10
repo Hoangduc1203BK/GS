@@ -47,9 +47,16 @@ export class UserService {
       take: size,
     });
 
+    const all = await this.userRepos.find({
+      where: {
+        ...filter,
+      },
+      order: { ctime: 'ASC' },
+    });
+
     return {
       result: users,
-      ...paginate(users.length, Number(page), Number(size)),
+      ...paginate(users.length, Number(page), Number(size), all.length),
     };
   }
 

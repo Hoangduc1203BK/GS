@@ -20,9 +20,10 @@ export class DepartmentService {
 
     async listDepartment(dto: ListDepartmentDto) {
         const { page = DEFAULT_PAGING.PAGE, size = DEFAULT_PAGING.LIMIT} = dto;
-        const departments = await this.departmentRepos.find({order: {ctime: 'ASC'}, skip: (page-1) * size, take: size})
+        const departments = await this.departmentRepos.find({order: {ctime: 'ASC'}, skip: (page-1) * size, take: size});
+        const all = await this.departmentRepos.find({order: {ctime: 'ASC'}})
 
-        return {result: departments, ...paginate(departments.length, Number(page), Number(size))}
+        return {result: departments, ...paginate(departments.length, Number(page), Number(size), all.length)}
     }
     
 

@@ -78,5 +78,9 @@ export class TestLearning {
     @ManyToOne(() => TimeTable, c => c.testLearnings)
     @JoinColumn({ name: 'time_table_id', referencedColumnName: 'id' })
     timeTable: TimeTable;
+
+    @ManyToOne(() => Subject, s => s.testLearnings)
+    @JoinColumn({ name: 'subject_id', referencedColumnName: 'id' })
+    subject:Subject;
 }
 

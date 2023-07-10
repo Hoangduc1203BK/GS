@@ -7,6 +7,7 @@ import { Room } from './room';
 import { UserClass } from './user-class';
 import { Attendance } from './attendance';
 import { TestLearning } from './test-learning';
+import { Assigment } from './assigment';
 
 @Entity('class')
 export class Classes {
@@ -111,5 +112,10 @@ export class Classes {
 
     @OneToMany(() => Attendance, t => t.classes)
     attendances: Attendance[];
+
+
+    //assigment
+    @OneToMany(() => Assigment, a => a.classes)
+    assigments: Assigment[];
 }
 

@@ -64,7 +64,12 @@ export class ExamService {
             return doc;
         })
 
-        return {result: result, ...paginate(result.length, Number(page), Number(size))}
+        const all = await this.examRepos.find({
+            where: rest,
+            relations: ['student', 'subExams','subExams.subject', 'teacher', 'room'],
+        })
+
+        return {result: result, ...paginate(result.length, Number(page), Number(size), all.length)}
     }
 
     async getExam(id: number) {

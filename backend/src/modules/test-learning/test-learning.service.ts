@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Exam, TestLearning } from "src/databases/entities";
+import { Exam, Subject, TestLearning } from "src/databases/entities";
 import { Repository } from "typeorm";
 import { ClassService } from "../class/class.service";
 import { ListTestLearningDto } from "./dto/list-test-learning.dto";
@@ -11,6 +11,7 @@ import { UserService } from "../user";
 import { UpdateTestLearningDto } from "./dto/update-test-learning.dto";
 import { EXAM_RESULT, TEST_LEARNING_STATUS } from "src/common/constants";
 import { ExamService } from "../exam";
+import { SubjectService } from "../subject";
 
 @Injectable()
 export class TestLearningService {
@@ -34,16 +35,17 @@ export class TestLearningService {
 
         const testLearnings = await this.testLearningRepos.find({
             where: filter,
-            relations: ['student','timeTable', 'timeTable.room', 'timeTable.classes'],
+            relations: ['student','timeTable', 'timeTable.room', 'timeTable.classes', 'subject'],
             skip: (page - 1)* size,
             take: size,
         })
 
-        const result = testLearnings.map(testLearning => {
-            const { student, timeTable, ...rest } = testLearning;
+        const result = testLearnings.map(async (testLearning) => {
+            const { student, timeTable, subject, ...rest } = testLearning;
             const item = {
                 ...rest,
                 student: student.name,
+                subject: subject.name,
                 grade: student.grade,
                 phoneNumber: student.phoneNumber,
                 class: timeTable ? timeTable.classes.name : null,
@@ -57,25 +59,31 @@ export class TestLearningService {
 
             return item;
         })
+
+        const all = await this.testLearningRepos.find({
+            where: filter,
+            relations: ['student','timeTable', 'timeTable.room', 'timeTable.classes'],
+        })
         
-        return {result: result, ...paginate(result.length, Number(page), Number(size))};
+        return {result: result, ...paginate(result.length, Number(page), Number(size), all.length)};
     }
 
     async getTestLearning(id: number) {
         const testLearning = await this.testLearningRepos.findOne({
             where: {id},
-            relations: ['student','timeTable', 'timeTable.room', 'timeTable.classes']
+            relations: ['student','timeTable', 'timeTable.room', 'timeTable.classes', 'subject']
         })
 
         if(!testLearning) {
             throw new Error('Không tìm thấy lịch học thử của học sinh với mã đăng ký học thử là:'+id);
         }
 
-        const { timeTable, student, ...rest} = testLearning;
+        const { timeTable, student,subject, ...rest} = testLearning;
 
         if(timeTable) {
             const result = {
                 ...rest,
+                subject: subject.name,
                 student: student.name,
                 grade: student.grade,
                 phoneNumber: student.phoneNumber,
@@ -92,6 +100,7 @@ export class TestLearningService {
         }else {
             const result = {
                 ...rest,
+                subject: subject.name,
                 student: student.name,
                 grade: student.grade,
                 phoneNumber: student.phoneNumber,

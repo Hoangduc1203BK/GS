@@ -44,9 +44,16 @@ export class SubjectService {
       take: size,
     });
 
+    const all = await this.subjectRepos.find({
+      where: {
+        ...filter,
+      },
+      order: { ctime: 'ASC' },
+    });
+
     return {
       result: subjects,
-      ...paginate(subjects.length, Number(page), Number(size)),
+      ...paginate(subjects.length, Number(page), Number(size),all.length),
     };
   }
 

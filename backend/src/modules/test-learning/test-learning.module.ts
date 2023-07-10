@@ -5,11 +5,14 @@ import { TestLearningController } from "./test-learning.controller";
 import { TestLearningService } from "./test-learning.service";
 import { ClassModule } from "../class";
 import { UserModule } from "../user";
+import { Subject } from "rxjs";
+import { SubjectModule } from "../subject";
 @Module({
     imports: [
         TypeOrmModule.forFeature([TestLearning, Exam]),
         forwardRef(() => ClassModule),
         forwardRef(() => UserModule),
+        // forwardRef(() => SubjectModule),
     ],
     controllers: [TestLearningController],
     providers: [TestLearningService],

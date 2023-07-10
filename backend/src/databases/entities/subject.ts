@@ -2,6 +2,7 @@ import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, OneToMany, OneToO
 import { Department } from './department';
 import { Classes } from './class';
 import { SubExam } from './sub-exam';
+import { TestLearning } from './test-learning';
 
 @Entity('subjects')
 export class Subject {
@@ -80,5 +81,9 @@ export class Subject {
 
     @OneToMany(() => SubExam, se => se.subject)
     subExams: SubExam[];
+
+    //test-learning
+    @OneToMany(() => TestLearning, t => t.subject)
+    testLearnings: TestLearning[];
 }
 
