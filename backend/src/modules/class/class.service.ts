@@ -61,6 +61,14 @@ export class ClassService {
     return result;
   }
 
+  async listTimeTable(classId: string) {
+    const result = await this.timeRepos.find({
+      where: { classId: classId }
+    })
+
+    return result;
+  }
+
 
   async createRoom(data: any) {
     const result = await this.roomRepos.save(data);
@@ -209,10 +217,11 @@ export class ClassService {
       classes.shift();
 
       classes.reduce((init, curr) => {
-        const { id,start, end, date, room_name, ...rest } = curr;
+        const { id,start, end, date, room_name,time_id, ...rest } = curr;
         const item = result.find((el) => el.id == curr.id);
         if (!item) {
           result.push({
+            id: id,
             ...rest,
             time_tables: [
               {
@@ -473,6 +482,17 @@ export class ClassService {
   }
 
   //user-class
+  async proposalGetUserClass(userId:string, classId: string) {
+    const result = await this.userClassRepos.findOne({
+      where: {
+        userId: userId,
+        classId: classId,
+      }
+    })
+
+    return result;
+  }
+
   async getUserClass(id: number) {
     const result = await this.userClassRepos.findOne({
       where: {
@@ -494,7 +514,7 @@ export class ClassService {
 
   async listUserInClass(classId: string, type: string) {
     const classes = await this.getClass(classId);
-    const result = await this.userClassRepos.find({
+    let result = await this.userClassRepos.find({
       where: {
         classId: classId,
         type: type,
@@ -502,6 +522,8 @@ export class ClassService {
       },
       relations: ['user'],
     });
+    
+    result = result.filter(el => el.dtime == null)
 
     return result.map((el) => el['user']);
   }

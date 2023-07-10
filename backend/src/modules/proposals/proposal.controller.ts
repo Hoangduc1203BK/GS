@@ -31,6 +31,6 @@ export class ProposalController {
 
     @Patch('/:id')
     async updateProposal(@Param('id') id: number, @Body() dto: any) {
-
+        const result = await this.proposalService.updateProposal(id, dto);
     }
 }

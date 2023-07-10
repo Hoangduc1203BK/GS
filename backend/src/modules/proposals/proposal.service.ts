@@ -5,18 +5,45 @@ import { Repository } from "typeorm";
 import { ListProposalDto } from "./dto/list-proposal.dto";
 import { DEFAULT_PAGING } from "src/common/constants/paging";
 import { UserService } from "../user";
-import { PROPOSAL_STATUS, ROLE } from "src/common/constants";
+import { CLASS_TYPE, PROPOSAL_STATUS, PROPOSAL_TYPE, ROLE, USER_CLASS_TYPE } from "src/common/constants";
 import { CreateProposalDto } from "./dto/create-proposal.dto";
 import { ClassService } from "../class";
+import { ProposalStrategy } from "src/common/interfaces/proposals";
+import { TeacherRegisterClass } from "./teacher-register-class.service";
+import { TeacherTakeBrake } from "./teacher-take-break.service";
+import { StudentRegisterClass } from "./student-register-class.service";
+import { StudentTerminateClass } from "./student-terminate-class.service";
+import { UpdateProposalDto } from "./dto/update-proposal.dto";
+import { MailService } from "src/core/shared/services/mail/mail.service";
 
 
 @Injectable()
 export class ProposalService {
+    private proposalStrategy: ProposalStrategy
     constructor(
         @InjectRepository(Proposals) private readonly proposalRepos: Repository<Proposals>,
         private readonly userService: UserService,
         private readonly classService: ClassService,
+        private readonly mailService: MailService
     ) {}
+
+    setProposalStrategy(type: string) {
+        switch (type){
+            case PROPOSAL_TYPE.TEACHER_REGISTER_CLASS:
+                this.proposalStrategy = new TeacherRegisterClass(this.proposalRepos, this.userService, this.mailService);
+                break;
+            case PROPOSAL_TYPE.TEACHER_TAKE_BRAKE:
+                this.proposalStrategy = new TeacherTakeBrake();
+                break;
+            case PROPOSAL_TYPE.STUDENT_REGISTER_CLASS:
+                this.proposalStrategy = new StudentRegisterClass(this.proposalRepos,this.classService, this.mailService, this.userService);
+                break;
+            case PROPOSAL_TYPE.STUDENT_TERMINATE_CLASS:
+                this.proposalStrategy = new StudentTerminateClass(this.proposalRepos, this.classService, this.mailService, this.userService);
+            default:
+                break;
+        }
+    }
 
     async listProposal(dto: ListProposalDto) {
         const current = new Date();
@@ -74,9 +101,32 @@ export class ProposalService {
     }
 
     async createProposal(dto: CreateProposalDto) {
-        await this.userService.getUser(dto.userId);
+        const user = await this.userService.getUser(dto.userId);
         const { classId } = dto.subData; 
         await this.classService.getClass(classId);
+
+        if(user.role == ROLE.TEACHER && dto.type == PROPOSAL_TYPE.TEACHER_REGISTER_CLASS) {
+            const schedules = await this.classService.listTimeTable(dto.subData.classId);
+            const mapSchedules = schedules.map(el => {
+                return {
+                    date: el.date,
+                    roomId: el.roomId,
+                    start:(el.start).toString(),
+                    end: (el.end).toString(),
+                }
+            })
+            const listTeacherEmpty = await this.classService.listTeacherEmpty({schedules: mapSchedules});
+            const existUser = listTeacherEmpty.find(el => el.id == dto.userId);
+            if(!existUser) {
+                throw new Error('Lớp '+dto.subData.classId+' có lịch trùng với lịch dạy đang có nên không thể tạo đề xuất')
+            }
+        }else if(user.role == ROLE.USER && dto.type == PROPOSAL_TYPE.STUDENT_REGISTER_CLASS) {
+            const classes = await this.classService.getClass(dto.subData.classId);
+            const listUserInClass = await this.classService.listUserInClass(dto.subData.classId, USER_CLASS_TYPE.MAIN);
+            if(listUserInClass.length >= classes.numberStudent) {
+                throw new Error('Lớp có id:' + dto.subData.classId + ' đã đầy chỗ, vui lòng chọn đăng ký lớp khác')
+            }
+        }
 
         const doc = {
             ...dto,
@@ -88,5 +138,19 @@ export class ProposalService {
         return this.getProposal(result.id);
     }
 
-    async updateProposal() {}
+    async updateProposal(id: number, dto: UpdateProposalDto) {
+        const proposal = await this.proposalRepos.findOne({where: {id}});
+
+        if(!proposal) {
+            throw new Error("Không tìm thấy đề xuất với id:"+id);
+        }
+
+        if(proposal.status !=PROPOSAL_STATUS.PENDING) {
+            throw new Error('Đề xuất này có trạng thái:'+proposal.status+' và không thể sửa đổi');
+        }
+
+        this.setProposalStrategy(proposal.type);
+
+        await this.proposalStrategy.handleProposal(dto, proposal);
+    }
 }

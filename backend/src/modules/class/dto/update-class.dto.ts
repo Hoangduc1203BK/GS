@@ -13,7 +13,7 @@ export class UpdateClassDto {
     @ApiProperty({ required: true })
     @IsOptional()
 	@IsNotEmpty()
-	@IsNumberString()
+	@IsNumber()
 	numberStudent?: number;
 
     @ApiProperty({ required: true })
