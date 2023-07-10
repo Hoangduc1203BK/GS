@@ -122,7 +122,19 @@ export const updateExam = (id, params) => {
 };
 
 // test learning
+export const getListTestLearning = (params) => {
+	return axios.get("/test-learning", { params: params });
+};
 
 export const createTestLearning = (params) => {
 	return axios.post("/test-learning", params)
 }
+
+export const updateTestLearning = (id, params) => {
+	return axios.patch(`/test-learning/${id}`, params);
+};
+
+// class
+export const getListClass = (params) => {
+	return axios.get("/class", { params: params });
+};

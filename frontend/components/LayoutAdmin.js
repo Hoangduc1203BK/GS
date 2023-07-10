@@ -121,6 +121,10 @@ export default function LayoutAdmin({
 			icon: <FileProtectOutlined />,
 			children: [
 				{
+					label: <Link href="/admin">Quản lý đề xuất</Link>,
+					key: "recommend",
+				},
+				{
 					label: <Link href="/admin">Quản lý bộ môn</Link>,
 					key: "tkbCenter",
 				},
@@ -166,7 +170,7 @@ export default function LayoutAdmin({
 						},
 						{
 							label: (
-								<Link href="/admin">Danh sách học thử</Link>
+								<Link href="/admin/testLearning/listTestLearning">Danh sách học thử</Link>
 							),
 							key: "listLearning",
 						},

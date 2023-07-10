@@ -110,6 +110,6 @@ export const RESULT_EXAM = [
   {
     key: 1,
     label: "Đang học thử",
-    value: "test_learning"
+    value: "test"
   }
 ]
