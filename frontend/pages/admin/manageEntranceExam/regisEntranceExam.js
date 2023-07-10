@@ -120,7 +120,7 @@ const RegisEntranceExam = () => {
                 { required: true, message: "Đây là trường thông tin bắt buộc!" }
               ]}>
               <Select
-                placeholder="-- Chọn lớp --"
+                placeholder="-- Chọn khối --"
                 disabled={data?.name}
                 options={GRADE}
                 onSelect={handleSelectGrade}

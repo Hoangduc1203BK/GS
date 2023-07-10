@@ -78,14 +78,14 @@ export class ApiConfigService {
 		};
 	}
 
-	// getS3Config() {
-	// 	return {
-	// 		accessKeyId: this.getString('AWS_S3_ACCESS_KEY_ID'),
-	// 		secretAccessKey: this.getString('AWS__S3_SECRET_ACCESS_KEY'),
-	// 		region: this.getString('AWS__S3_REGION'),
-	// 		bucket: this.getString('AWS__S3_PUBLIC_BUCKET_NAME'),
-	// 	};
-	// }
+	getS3Config() {
+		return {
+			accessKeyId: this.getString('AWS_S3_ACCESS_KEY_ID'),
+			secretAccessKey: this.getString('AWS__S3_SECRET_ACCESS_KEY'),
+			region: this.getString('AWS__S3_REGION'),
+			bucket: this.getString('AWS__S3_PUBLIC_BUCKET_NAME'),
+		};
+	}
 
 	getAuthConfig() {
 		return {

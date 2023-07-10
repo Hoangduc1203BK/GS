@@ -5,7 +5,8 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { join } from "path";
 import { MailService } from "./services/mail/mail.service";
-const providers = [GeneratorService, ApiConfigService, MailService];
+import { UploadService } from "./services/upload.service";
+const providers = [GeneratorService, ApiConfigService, MailService, UploadService];
 @Global()
 @Module({
     imports: [

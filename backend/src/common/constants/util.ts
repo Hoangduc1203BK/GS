@@ -39,7 +39,7 @@ export enum ATTENDANCE_STATUS {
 export enum EXAM_RESULT {
     PENDING = 'pending',
     PASS = 'pass_exam',
-    TEST_LEARNING = 'test_learning',
+    TEST_LEARNING = 'test',
     FAIL = 'fail',
 }
 

@@ -64,7 +64,6 @@ export class Classes {
     })
     teacher?: string;
 
-    
 
     @Column({
 		name: 'created_at',
