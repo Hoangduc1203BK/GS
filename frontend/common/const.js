@@ -88,28 +88,58 @@ export const TYPE_SUGGEST_STUDENT = [
 export const GRADE = new Array(9).fill({}).map((item, index) => ({
   label: `Khối ${index + 1}`,
   value: `${index + 1}`,
-  key: index
-}))
+  key: index,
+}));
 
 export const RESULT_EXAM = [
   {
     key: 1,
     label: "Đang chờ",
-    value: "pending"
+    value: "pending",
   },
   {
     key: 1,
     label: "Đạt",
-    value: "pass_exam"
+    value: "pass_exam",
   },
   {
     key: 1,
     label: "Trượt",
-    value: "fail"
+    value: "fail",
   },
   {
     key: 1,
     label: "Đang học thử",
-    value: "test_learning"
-  }
-]
+    value: "test_learning",
+  },
+];
+
+export const PROPOSAL_STATUS = {
+  PENDING: "pending",
+  REJECTED: "rejected",
+  CANCELED: "canceled",
+  APPROVED: "approved",
+};
+
+export const PROPOSAL_TYPE = {
+  TEACHER_REGISTER_CLASS: "teacher_register_class",
+  STUDENT_REGISTER_CLASS: "student_register_class",
+  TEACHER_TAKE_BRAKE: "teacher_take_break",
+  STUDENT_TERMINATE_CLASS: "student_terminate_class",
+};
+
+export const SUTDENT_PROPOSAL_TYPE = [
+  {
+    label: "Thêm lớp",
+    value: "student_register_class",
+  },
+  {
+    label: "Thôi học",
+    value: "student_terminate_class",
+  },
+];
+
+
+export const FORMAT_DATE = {
+  YYYYMMDD: "yyyy-MM-dd"
+}

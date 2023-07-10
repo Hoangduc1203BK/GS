@@ -1,10 +1,19 @@
 import LayoutAdmin from "@/components/LayoutAdmin";
+import PopupStudentSuggest from "@/components/popup/popupSuggest";
 
 import { Button, Col, Form, Input, Row, Table } from "antd";
-const SutdentSuggest = () => {
+import { useState } from "react";
+
+const SutdentSuggest = ({user}) => {
   const [form] = Form.useForm();
+
+  const [idSelect, setIdSelect] = useState('10');
+  const [pageSize, setPageSize] = useState('');
+  const [openSuggest, setOpenSuggest] = useState(false)
+  const [page, setPage] = useState([]);
+
   const submitSearch = (values) => {
-    console.log(values, "valuesss");
+    console.log(user, "valuesss");
   };
   const dataSource = [
     {
@@ -57,6 +66,7 @@ const SutdentSuggest = () => {
 
   return (
     <div>
+      <PopupStudentSuggest open={openSuggest} setOpen={setOpenSuggest} info={user} />
       <Form form={form} onFinish={submitSearch}>
         <Row>
           <Col xs={24} lg={8}>
@@ -67,6 +77,10 @@ const SutdentSuggest = () => {
           <Col xs={24} lg={16} >
             <Button type="primary" className="ml-10" htmlType="submit">
               Tìm kiếm
+            </Button>
+
+            <Button type="primary" onClick={()=> setOpenSuggest(true)} className="ml-10" htmlType="submit">
+              Thêm đề xuất
             </Button>
           </Col>
         </Row>
@@ -83,7 +97,14 @@ const SutdentSuggest = () => {
           showTotal: (total, range) => (
             <span>{`${range[0]} - ${range[1]} / ${total}`}</span>
           ),
-          showSizeChanger: true,
+          // onChange:(page, pageSize)=>{
+          //   setPageSize(pageSize),
+          //   setPage(page)
+          // },
+          // total:100,
+          // showSizeChanger: true,
+          
+          pageSize:pageSize,
           pageSizeOptions: ["10", "20", "50"],
           defaultPageSize: 10,
           position: ["bottomRight"],
