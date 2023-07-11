@@ -86,7 +86,7 @@ export default function LayoutAdmin({
 			children: [
 				{
 					label: (
-						<Link href="/admin">Thông tin cá nhân</Link>
+						<Link href="/teacher">Thông tin cá nhân</Link>
 					),
 					key: "infoTeacher",
 				},
