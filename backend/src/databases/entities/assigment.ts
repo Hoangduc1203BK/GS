@@ -34,6 +34,14 @@ export class Assigment {
     description: string;
 
     @Column({
+        type: 'varchar',
+        length: '500',
+        name: 'file',
+        nullable: true,
+    })
+    file: string;
+
+    @Column({
         type: 'timestamp',
         name: 'deadline',
         nullable: false,
@@ -47,6 +55,14 @@ export class Assigment {
         nullable: false,
     })
     classId: string;
+
+    @Column({
+        type: 'varchar',
+        length: '6',
+        name: 'status',
+        nullable: false,
+    })
+    status: string;
 
     @Column({
 		name: 'created_at',

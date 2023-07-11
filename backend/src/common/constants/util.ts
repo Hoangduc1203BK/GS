@@ -64,3 +64,17 @@ export enum PROPOSAL_STATUS {
     CANCELED = 'canceled',
     APPROVED = 'approved'
 }
+
+
+export enum ASSIGMENT_STATUS {
+    ACTIVE = 'active',
+    DEACTIVE = 'deactive',
+}
+
+export enum SUB_ASSIGMENT_STATUS {
+    PENDING = 'pending',
+    TURN_IN = 'turn_in',
+    TURN_IN_LATE = 'turn_in_late',
+    PAST_DUE = 'past_due',
+    CANCELED = 'canceled'
+}

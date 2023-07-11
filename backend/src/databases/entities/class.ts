@@ -65,6 +65,15 @@ export class Classes {
     })
     teacher?: string;
 
+    @Column({
+        type: 'decimal',
+        precision: 10,
+        scale: 2,
+        name: 'teacher_rate',
+        nullable: true,
+    })
+    teacherRate: number;
+
 
     @Column({
 		name: 'created_at',

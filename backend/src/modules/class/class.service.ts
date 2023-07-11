@@ -20,7 +20,7 @@ import {
   UpdateClassDto,
 } from './dto';
 import { DEFAULT_PAGING } from 'src/common/constants/paging';
-import { CLASS_TYPE, ROLE } from 'src/common/constants';
+import { CLASS_TYPE, ROLE, USER_CLASS_TYPE } from 'src/common/constants';
 import { UserService } from '../user';
 import { paginate } from 'src/common/interfaces/paginate';
 import * as moment from 'moment';
@@ -536,7 +536,7 @@ export class ClassService {
         userId: userId,
         dtime: null,
       },
-      relations: ['classes'],
+      relations: ['classes','classes.timeTables', 'classes.user'],
     });
 
     return classes;
@@ -692,5 +692,14 @@ export class ClassService {
 
     const result = await this.attendanceRepos.query(qr)
     return result;
+  }
+
+  //thời khoá biểu
+  async listScheduleOfStudent(userId: string) {
+    const classes = await this.listClassOfUser(userId, USER_CLASS_TYPE.MAIN);
+    const listClass = classes.map(el => {
+      return el.classes;
+    })
+    
   }
 }

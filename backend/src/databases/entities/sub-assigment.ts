@@ -47,7 +47,7 @@ export class SubAssigment {
         name: 'point',
         nullable: true,
     })
-    point: string;
+    point: number;
 
     @Column({
         type: 'varchar',
@@ -56,6 +56,14 @@ export class SubAssigment {
         nullable: true,
     })
     feedback: string;
+
+    @Column({
+        type: 'varchar',
+        length: '500',
+        name: 'file',
+        nullable: true,
+    })
+    file: string;
 
     @Column({
 		name: 'created_at',
