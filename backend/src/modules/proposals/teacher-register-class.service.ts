@@ -7,6 +7,7 @@ import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 import { MailService } from "src/core/shared/services/mail/mail.service";
 import { UserService } from "../user";
+import { ClassService } from "../class";
 
 @Injectable()
 export class TeacherRegisterClass implements ProposalStrategy {
@@ -14,6 +15,7 @@ export class TeacherRegisterClass implements ProposalStrategy {
         @InjectRepository(Proposals) private readonly proposalRepos: Repository<Proposals>,
         private readonly userService: UserService,
         private readonly mailService: MailService,
+        private readonly classService: ClassService,
     ) { }
 
     async handleProposal(dto: UpdateProposalDto, proposal: Proposals) {
@@ -55,6 +57,8 @@ export class TeacherRegisterClass implements ProposalStrategy {
                 await this.proposalRepos.save({ id: p.id, ...item })
             }
         }
+
+        await this.classService.updateClass(subData.classId, {teacher: proposal.userId })
 
         const user = await this.userService.getUser(proposal.userId);
 

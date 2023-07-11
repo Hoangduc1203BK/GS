@@ -130,7 +130,7 @@ export class ClassService {
     } as any;
 
     let scheduleFilter = {
-      date: "'2','3','4','5','6'",
+      date: "'0','1','2','3','4','5','6'",
       start: 7.5,
       end: 21.5,
     } as any;
@@ -167,7 +167,7 @@ export class ClassService {
       scheduleFilter.end = end;
     }
 
-    let qr = ` select c.*,t.id as time_id, t."start" ,t."end" ,t."date" ,r."name" as room_name from "class" c, "time-tables" t, "rooms" r where c.id = t.class_id and t.room_id = r.id `;
+    let qr = ` select c.*,s.name as subject, s.grade as grade, t.id as time_id, t."start" ,t."end" ,t."date" ,r."name" as room_name from "class" c, "time-tables" t, "rooms" r, "subjects" s where c.id = t.class_id and t.room_id = r.id and c.subject_id=s.id`;
     let classArr = [];
 
     if (Object.keys(classFilter).length > 0) {
@@ -536,7 +536,7 @@ export class ClassService {
         userId: userId,
         dtime: null,
       },
-      relations: ['classes','classes.timeTables', 'classes.user', 'classes.timeTables.room'],
+      relations: ['classes','classes.subject', 'classes.timeTables', 'classes.user', 'classes.timeTables.room'],
     });
 
     return classes;
@@ -700,17 +700,27 @@ export class ClassService {
     const listClass = classes.map(el => {
       return {
         ...el.classes,
-        teacherName: el.user.name,
+        teacherName: el.classes.user ? el.classes.user.name : null,
       };
     })
 
-    const result = [];
+    const listMapClass = []  as any;
+    const dates = {
+      '0': [],
+      '1': [],
+      '2': [],
+      '3': [],
+      '4': [],
+      '5': [],
+      '6': []
+    } as any;
 
     for(const c of listClass) {
       const schedules = c.timeTables;
       for(const s of schedules) {
         const item = {
           class: c.name,
+          subject:c.subject.name,
           classId: c.id,
           teacher: c.teacherName,
           date: s.date,
@@ -718,8 +728,96 @@ export class ClassService {
           end: s.end,
           room: s.room.name,
         }
+        listMapClass.push(item);
       }
     }
-    
+
+    for(const classes of listMapClass) {
+      switch(classes.date){
+        case '0':
+          dates['0'].push(classes);
+          break;
+        case '1':
+          dates['1'].push(classes);
+          break;
+        case '2':
+          dates['2'].push(classes);
+          break;
+        case '3':
+          dates['3'].push(classes);
+          break;
+        case '4':
+          dates['4'].push(classes);
+          break;
+        case '5':
+          dates['5'].push(classes);
+          break;
+        case '6':
+          dates['6'].push(classes);
+          break;
+      }
+    }
+
+    return dates;
+  }
+
+  async listSchedulesOfTeacher(teacherId: string) {
+    const teacher = await this.userService.getUser(teacherId);
+    const listClass = await this.listClass({teacher: teacherId});
+    const listMapClass = []  as any;
+    const dates = {
+      '0': [],
+      '1': [],
+      '2': [],
+      '3': [],
+      '4': [],
+      '5': [],
+      '6': []
+    } as any;
+
+    for(const c of listClass) {
+      const schedules = c.time_tables;
+      for(const s of schedules) {
+        const item = {
+          class: c.name,
+          subject: c.subject,
+          classId: c.id,
+          teacher: teacher.name,
+          date: s.date,
+          start:s.start,
+          end: s.end,
+          room: s.room_name
+        }
+        listMapClass.push(item);
+      }
+    }
+
+    for(const classes of listMapClass) {
+      switch(classes.date){
+        case '0':
+          dates['0'].push(classes);
+          break;
+        case '1':
+          dates['1'].push(classes);
+          break;
+        case '2':
+          dates['2'].push(classes);
+          break;
+        case '3':
+          dates['3'].push(classes);
+          break;
+        case '4':
+          dates['4'].push(classes);
+          break;
+        case '5':
+          dates['5'].push(classes);
+          break;
+        case '6':
+          dates['6'].push(classes);
+          break;
+      }
+    }
+
+    return dates;
   }
 }
