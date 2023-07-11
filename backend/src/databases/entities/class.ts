@@ -28,6 +28,14 @@ export class Classes {
     name: string;
 
     @Column({
+        type: 'varchar',
+        length: '10',
+        name: 'start_date',
+        nullable: true,
+    })
+    startDate: string;
+
+    @Column({
         type: 'int',
         name: 'number_student',
         nullable: false,
