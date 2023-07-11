@@ -34,4 +34,16 @@ export class CreateClassDto {
 	@IsNotEmpty()
 	@IsArray()
 	schedules: Schedule[];
+
+	@ApiProperty({ required: true })
+    @IsOptional()
+	@IsNotEmpty()
+	@IsNumber()
+	teacherRate?: number;
+
+	@ApiProperty({ required: true })
+    @IsOptional()
+	@IsNotEmpty()
+	@IsString()
+	startDate?: string;
 }
