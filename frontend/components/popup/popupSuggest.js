@@ -80,7 +80,6 @@ export default function PopupStudentSuggest({ open, setOpen, info }) {
         setOpen(!open);
     } catch (error) {
         message.error('Tạo đề xuất Thất bại!')
-
     }
 
   };

@@ -16,6 +16,8 @@ export const checkNameField = (field) => {
       return "Email";
     case "major":
       return "Chuyên ngành";
+    case "grade":
+      return "Khối";
     default:
       break;
   }
@@ -110,10 +112,9 @@ export const RESULT_EXAM = [
   {
     key: 1,
     label: "Đang học thử",
-    value: "test"
-  }
-]
-
+    value: "test",
+  },
+];
 
 export const PROPOSAL_STATUS = {
   PENDING: "pending",
@@ -121,6 +122,25 @@ export const PROPOSAL_STATUS = {
   CANCELED: "canceled",
   APPROVED: "approved",
 };
+
+export const PROPOSAL_STATUS_LIST = [
+  {
+    label: "Chờ phê duyệt",
+    value: "pending",
+  },
+  {
+    label: "Từ chối",
+    value: "rejected",
+  },
+  {
+    label: "Hủy",
+    value: "canceled",
+  },
+  {
+    label: "Chấp thuận",
+    value: "approved",
+  },
+];
 
 export const PROPOSAL_TYPE = {
   TEACHER_REGISTER_CLASS: "teacher_register_class",
@@ -140,7 +160,6 @@ export const SUTDENT_PROPOSAL_TYPE = [
   },
 ];
 
-
 export const FORMAT_DATE = {
-  YYYYMMDD: "yyyy-MM-dd"
-}
+  YYYYMMDD: "YYYY-MM-DD",
+};

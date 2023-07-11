@@ -86,7 +86,7 @@ export default function LayoutAdmin({
 			children: [
 				{
 					label: (
-						<Link href="/admin">Thông tin cá nhân</Link>
+						<Link href="/teacher">Thông tin cá nhân</Link>
 					),
 					key: "infoTeacher",
 				},
@@ -188,7 +188,7 @@ export default function LayoutAdmin({
 						},
 						{
 							label: (
-								<Link href="/admin">Danh sách lớp</Link>
+								<Link href="/admin/manageClass/listClass">Danh sách lớp</Link>
 							),
 							key: "listClass",
 						},

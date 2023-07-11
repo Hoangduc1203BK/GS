@@ -1,6 +1,7 @@
 "use client";
 
-import { getListClassRoom, getListSubject, getListUser } from "@/api/address";
+import { getListClassRoom, getListSubject, getListUser, createClass } from "@/api/address";
+import { disabledDate } from "@/common/util";
 import LayoutAdmin from "@/components/LayoutAdmin";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { Button, Col, DatePicker, Divider, Empty, Form, Input, InputNumber, Row, Select, Space, Table, TimePicker, message } from "antd";
@@ -14,7 +15,7 @@ const CreateClass = () => {
   const [listClassRoom, setListClassRoom] = useState([]);
   const [dataAdd, setDataAdd] = useState({});
   const [submitPreview, setSubmitPreview] = useState(false);
-
+  const [disableDate, setDisableDate] = useState(false);
 
   const columns = [
     {
@@ -26,16 +27,16 @@ const CreateClass = () => {
       witdh: 40
     },
     {
-      title: "Phòng học",
+      title: "Thứ",
       render: (text, record) => {
-        return <div>{listClassRoom?.find(item => item.id === record?.roomId)?.name || ""}</div>;
+        return <div>Thứ {+record?.date > 0 ? +record?.date + 1 : 8}</div>;
       },
       align: "center",
     },
     {
-      title: "Ngày học",
+      title: "Phòng học",
       render: (text, record) => {
-        return <div>{record?.date}</div>;
+        return <div>{listClassRoom?.find(item => item.id === record?.roomId)?.name || ""}</div>;
       },
       align: "center",
     },
@@ -48,10 +49,11 @@ const CreateClass = () => {
     },
   ]
 
-  function createClass(values) {
+  function addTimeClass(values) {
     values.start = `${dayjs(values.start).hour().toString().padStart(2, '0')}:${dayjs(values.start).minute().toString().padStart(2, '0')}`
     values.end = `${dayjs(values.end).hour().toString().padStart(2, '0')}:${dayjs(values.end).minute().toString().padStart(2, '0')}`
-    values.date = dayjs(values.date).format("YYYY-MM-DD")
+
+    values.startDate = dayjs(values.startDate).format('YYYY-MM-DD')
     const schedule = {
       date: values.date,
       start: values.start,
@@ -59,21 +61,15 @@ const CreateClass = () => {
       roomId: values.roomId
     }
     if (Array.isArray(dataAdd?.schedules) && dataAdd?.schedules?.length > 0) {
-      const dataCheck = dataAdd?.schedules?.find(item => {
-        if (dayjs(item.date).isSame(dayjs(values.date), 'day')) {
-          if (dayjs(`${item.date} ${item.start}`).isSame(dayjs(`${values.date} ${values.start}`), 'hour')) {
-            return item
-          }
-        }
-      })
-      if (dataCheck) {
-        message.error("Trùng lịch đã tạo! Vui lòng thử lại")
-        return
+      if (!dayjs(values.startDate).isSame(dayjs(dataAdd.startDate), 'day')) {
+        dataAdd.schedules.splice(0, 1, schedule)
+        values.schedules = dataAdd.schedules
+      } else {
+        values.schedules = [
+          ...dataAdd.schedules,
+          schedule
+        ]
       }
-      values.schedules = [
-        ...dataAdd.schedules,
-        schedule
-      ]
     }
     else {
       values.schedules = [schedule]
@@ -82,9 +78,36 @@ const CreateClass = () => {
     delete values.start
     delete values.end
     delete values.roomId
+    console.log(values, 'valuesss');
     setDataAdd(values)
     message.success("Tạo thành công! Nhấn hoàn thành để lưu thông tin lớp!")
     form.resetFields(["date", "start", "end", "roomId"])
+    setDisableDate(false)
+  }
+
+  function handleChangeDayStart(date, dateString) {
+    const dayOfWeek = date.day()
+    form.setFieldsValue({
+      date: dayOfWeek > 0 ? dayOfWeek + "" : "7"
+    })
+    setDisableDate(true)
+  }
+
+  async function createClassFinal() {
+    console.log(dataAdd, 'dataaa');
+    createClass(dataAdd).then(
+      res => {
+        console.log(res?.data);
+        if (res?.data?.id) {
+          message.success(`Tạo thành công lớp ${dataAdd?.name}!`)
+          setDataAdd({})
+          setDisableDate(false)
+          form.resetFields()
+        } else {
+          message.error('Tạo lớp thất bại!')
+        }
+      }
+    ).catch(err => message.error("Có lỗi xảy ra!" + err))
   }
 
   useEffect(() => {
@@ -129,7 +152,7 @@ const CreateClass = () => {
                 name="validateOnly"
                 form={form}
                 layout="vertical"
-                onFinish={createClass}
+                onFinish={addTimeClass}
                 autoComplete="off"
               >
                 <Form.Item
@@ -197,6 +220,55 @@ const CreateClass = () => {
                     addonAfter="VNĐ" />
                 </Form.Item>
                 <Form.Item
+                  label="Chiết khấu"
+                  name="teacherRate"
+                  rules={[
+                    { required: true, message: "Đây là trường dữ liệu bắt buộc!" }
+                  ]}
+                >
+                  <InputNumber
+                    placeholder="-- Nhập --"
+                    min={0}
+                    style={{
+                      width: '100%'
+                    }}
+                    addonAfter="%" />
+                </Form.Item>
+                <Form.Item
+                  label="Ngày bắt đầu học"
+                  name="startDate"
+                  rules={[
+                    { required: true, message: "Đây là trường dữ liệu bắt buộc!" }
+                  ]}
+                >
+                  <DatePicker placeholder="-- Chọn --"
+                    style={{
+                      width: '100%'
+                    }}
+                    format="DD-MM-YYYY"
+                    disabledDate={disabledDate}
+                    onChange={handleChangeDayStart}
+                  />
+                </Form.Item>
+                <Form.Item name="date" label="Thứ"
+                  rules={[
+                    { required: true, message: "Đây là trường dữ liệu bắt buộc!" }
+                  ]}
+                >
+                  <Select
+                    placeholder="-- Chọn --"
+                    disabled={disableDate}
+                  >
+                    <Select.Option value="1">Thứ 2</Select.Option>
+                    <Select.Option value="2">Thứ 3</Select.Option>
+                    <Select.Option value="3">Thứ 4</Select.Option>
+                    <Select.Option value="4">Thứ 5</Select.Option>
+                    <Select.Option value="5">Thứ 6</Select.Option>
+                    <Select.Option value="6">Thứ 7</Select.Option>
+                    <Select.Option value="7">Chủ nhật</Select.Option>
+                  </Select>
+                </Form.Item>
+                <Form.Item
                   label="Phòng học"
                   name="roomId"
                   rules={[
@@ -210,20 +282,6 @@ const CreateClass = () => {
                       ))
                     }
                   </Select>
-                </Form.Item>
-                <Form.Item
-                  label="Ngày học"
-                  name="date"
-                  rules={[
-                    { required: true, message: "Đây là trường dữ liệu bắt buộc!" }
-                  ]}
-                >
-                  <DatePicker placeholder="-- Chọn --"
-                    style={{
-                      width: '100%'
-                    }}
-                    format="DD-MM-YYYY"
-                  />
                 </Form.Item>
                 <Form.Item
                   label="Thời gian bắt đầu buổi học"
@@ -298,7 +356,7 @@ const CreateClass = () => {
                 <Col xs={18} className="px-4">
                   <p>
                     {
-                      listTeacher?.find(item => item.id === dataAdd.teacherId)?.name || "Chưa có"
+                      listTeacher?.find(item => item.id === dataAdd.teacherId)?.name
                     }
                   </p>
                 </Col>
@@ -319,11 +377,18 @@ const CreateClass = () => {
                   <p>{dataAdd?.fee}</p>
                 </Col>
               </Row>
+              <Row className="border-2 border-t-0">
+                <Col xs={6} className="text-right bg-[#d7d7d7] py-2 px-4 border-r-2">
+                  <p className="font-semibold">Ngày học</p>
+                </Col>
+                <Col xs={18} className="px-4">
+                  <p>{dataAdd?.startDate}</p>
+                </Col>
+              </Row>
               <Table
                 locale={{
                   emptyText: <div style={{ marginTop: '20px' }}>{dataAdd?.schedules?.length === 0 ? <Empty description="Không có dữ liệu!" /> : null}</div>,
                 }}
-                scroll={{ y: 438 }}
                 size="middle"
                 style={{
                   margin: '20px 0px',
@@ -346,7 +411,7 @@ const CreateClass = () => {
                 }}
               />
               <div className="text-right">
-                <Button type="primary">Hoàn thành</Button>
+                <Button type="primary" onClick={createClassFinal}>Hoàn thành</Button>
               </div>
             </div>
           </Col>
