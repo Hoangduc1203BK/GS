@@ -188,7 +188,7 @@ export default function LayoutAdmin({
 						},
 						{
 							label: (
-								<Link href="/admin">Danh sách lớp</Link>
+								<Link href="/admin/manageClass/listClass">Danh sách lớp</Link>
 							),
 							key: "listClass",
 						},
