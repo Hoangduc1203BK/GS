@@ -536,7 +536,7 @@ export class ClassService {
         userId: userId,
         dtime: null,
       },
-      relations: ['classes','classes.timeTables', 'classes.user'],
+      relations: ['classes','classes.timeTables', 'classes.user', 'classes.timeTables.room'],
     });
 
     return classes;
@@ -698,8 +698,28 @@ export class ClassService {
   async listScheduleOfStudent(userId: string) {
     const classes = await this.listClassOfUser(userId, USER_CLASS_TYPE.MAIN);
     const listClass = classes.map(el => {
-      return el.classes;
+      return {
+        ...el.classes,
+        teacherName: el.user.name,
+      };
     })
+
+    const result = [];
+
+    for(const c of listClass) {
+      const schedules = c.timeTables;
+      for(const s of schedules) {
+        const item = {
+          class: c.name,
+          classId: c.id,
+          teacher: c.teacherName,
+          date: s.date,
+          start:s.start,
+          end: s.end,
+          room: s.room.name,
+        }
+      }
+    }
     
   }
 }

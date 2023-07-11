@@ -61,7 +61,12 @@ export class ProposalService {
         let paramArr = [` p."time" >= '${start}' `, ` p."time" <= '${end}' ` ];
         
         for(const [k,v] of Object.entries(rest)) {
-            paramArr.push(' p."' + k + `" = '` + v + `'`)
+            if(k  == "userId"){
+                paramArr.push(' p.user_id = ' + `'` + v + `'`)
+            }
+            else {
+                paramArr.push(' p."' + k + `" = '` + v + `'`)
+            }
         }
         
         let qr = 'select p.*, u.name as user, u.email as email from proposals p, users u where p.user_id=u.id';
