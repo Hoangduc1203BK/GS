@@ -33,3 +33,10 @@ export const setToken = (token) => {
     export function ApiCreateSuggest (data){
         return axios.post('/proposal', data);
     }
+
+    
+    export function ApiGetListSuggest (params){
+        return axios.get('/proposal', {
+            params: {...params}
+        });
+    }

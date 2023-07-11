@@ -8,7 +8,7 @@ const LearningOutcomes = ({user}) => {
   const items = [
     {
       key: "1",
-      label: `Danh sách lớp học`,
+      label: `Danh sách lớp`,
       children: <StudentsInClass info={user} />,
     },
     {

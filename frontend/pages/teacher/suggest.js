@@ -62,13 +62,8 @@ const SutdentSuggest = ({ user }) => {
     },
     {
       title: "Môn đề xuất",
-      render: (text, record, index) => {
-        return (
-          <div>
-            {record?.sub_data?.classId}
-          </div>
-        );
-      },
+      dataIndex: "sub_data.classId",
+      key: "sub_data.classId",
     },
     {
       title: "Ngày đề xuất",
