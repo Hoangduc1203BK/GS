@@ -172,7 +172,7 @@ export class ClassController {
     let result;
 
     if (role == ROLE.USER) {
-      result = await this.classService.listScheduleOfStudent('ST3145');
+    const  result = await this.classService.listScheduleOfStudent(user["id"]);
     } else if (role == ROLE.TEACHER) {
       result = await this.classService.listSchedulesOfTeacher(user["id"]);
     }
