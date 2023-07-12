@@ -167,7 +167,7 @@ export class ClassService {
       scheduleFilter.end = end;
     }
 
-    let qr = ` select c.*,s.name as subject, s.grade as grade, t.id as time_id, t."start" ,t."end" ,t."date" ,r."name" as room_name from "class" c, "time-tables" t, "rooms" r, "subjects" s where c.id = t.class_id and t.room_id = r.id and c.subject_id=s.id`;
+    let qr = ` select c.*,u.name as teacherName, s.name as subject, s.grade as grade, t.id as time_id, t."start" ,t."end" ,t."date" ,r."name" as room_name from "class" c, "time-tables" t, "rooms" r, "subjects" s, "users" u where c.id = t.class_id and t.room_id = r.id and c.subject_id=s.id and c.teacher=u.id`;
     let classArr = [];
 
     if (Object.keys(classFilter).length > 0) {
