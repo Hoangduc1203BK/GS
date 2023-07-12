@@ -78,3 +78,27 @@ export enum SUB_ASSIGMENT_STATUS {
     PAST_DUE = 'past_due',
     CANCELED = 'canceled'
 }
+
+export function getDayOfMonth(day: string) {
+    const today = new Date(); // Lấy ngày hiện tại
+    const currentDay = today.getDay();
+    const currentDate = today.getDate();
+    if(+day < +currentDay ) {
+      const offset = Number(currentDay) - Number(day);
+      const range = currentDate - offset;
+      if(range<0) {
+        const lastDay = new Date(today.getFullYear(), today.getMonth(),0).getDate();
+        return `${lastDay - Math.abs(range)}-${today.getMonth()}`;
+      }else if(range == 0) {
+        const lastDay = new Date(today.getFullYear(), today.getMonth(),0).getDate();
+        return `${lastDay}-${today.getMonth()}`
+      }else {
+        return `${range}-${today.getMonth()+1}`
+      }
+    }else if(+day == +currentDay) {
+      return `${currentDate}-${today.getMonth()+1}`
+    }else {
+      const offset = Number(day) - Number(currentDay);
+      return `${currentDate+offset}-${today.getMonth()+1}`
+    }
+  }
