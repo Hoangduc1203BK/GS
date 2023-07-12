@@ -135,6 +135,24 @@ export class ClassController {
     return result;
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('/student-empty')
+  async listClassEmptyOfStudent(@Req() req: Request, @Query('subjectId') subjectId: string) {
+    const user = req["user"]
+    const result = await this.classService.listEmptyClassOfStudent(user["id"], subjectId);
+    
+    return result;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/empty')
+  async listClassEmptyOfTeacher(@Req() req: Request) {
+    const user = req["user"];
+    const result = await this.classService.listClassEmptyOfTeacher(user["id"]);
+
+    return result;
+  }
+
   // user-class
   @Get('/:id/users')
   async listUserInClass(@Param('id') id: string, @Query('type') type: string) {

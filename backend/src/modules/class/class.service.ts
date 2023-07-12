@@ -9,7 +9,7 @@ import {
   TimeTable,
   UserClass,
 } from 'src/databases/entities';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, In, Repository } from 'typeorm';
 import {
   CreateAttendanceDto,
   CreateClassDto,
@@ -46,16 +46,16 @@ export class ClassService {
     private readonly generatorService: GeneratorService,
     @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
-  ) {}
+  ) { }
 
   async getTimeTable(id: number) {
     const result = await this.timeRepos.findOne({
-      where: {id},
-      relations: ['classes','room']
+      where: { id },
+      relations: ['classes', 'room']
     })
 
-    if(!result) {
-      throw new Error('Không tìm thấy lớp có lịch học với id là:'+id);
+    if (!result) {
+      throw new Error('Không tìm thấy lớp có lịch học với id là:' + id);
     }
 
     return result;
@@ -76,7 +76,7 @@ export class ClassService {
     return result;
   }
 
-  async updateRoom(id: number, data:any) {
+  async updateRoom(id: number, data: any) {
     const room = await this.getRoom(id);
 
     const doc = {
@@ -84,7 +84,7 @@ export class ClassService {
       ...data
     }
 
-    const result = await this.roomRepos.save({id: id, ...doc})
+    const result = await this.roomRepos.save({ id: id, ...doc })
 
     return result;
   }
@@ -107,7 +107,7 @@ export class ClassService {
 
   async listRoom() {
     const result = await this.roomRepos.find({
-      order: { id: 'ASC'}
+      order: { id: 'ASC' }
     });
 
     return result;
@@ -198,13 +198,13 @@ export class ClassService {
 
     let classes = await this.classRepos.query(qr);
     if (classes.length >= 1) {
-      const { start, end, date, room_name,time_id, ...rest } = classes[0];
+      const { start, end, date, room_name, time_id, ...rest } = classes[0];
       const result = [
         {
           ...rest,
           time_tables: [
             {
-              id:time_id,
+              id: time_id,
               start,
               end,
               date,
@@ -217,7 +217,7 @@ export class ClassService {
       classes.shift();
 
       classes.reduce((init, curr) => {
-        const { id,start, end, date, room_name,time_id, ...rest } = curr;
+        const { id, start, end, date, room_name, time_id, ...rest } = curr;
         const item = result.find((el) => el.id == curr.id);
         if (!item) {
           result.push({
@@ -225,7 +225,7 @@ export class ClassService {
             ...rest,
             time_tables: [
               {
-                id:time_id,
+                id: time_id,
                 start,
                 end,
                 date,
@@ -235,7 +235,7 @@ export class ClassService {
           });
         } else {
           item.time_tables.push({
-            id:time_id,
+            id: time_id,
             start,
             end,
             date,
@@ -253,14 +253,14 @@ export class ClassService {
   async getClass(id: string) {
     const classes = await this.classRepos.findOne({
       where: { id },
-      relations: ['subject','user'],
+      relations: ['subject', 'user'],
     });
 
     if (!classes) {
       throw new Error('Không tìm thấy lớp');
     }
-    
-    const timeTables= await this.timeRepos.find({where: { classId: id}});
+
+    const timeTables = await this.timeRepos.find({ where: { classId: id } });
 
     const result = {
       ...classes,
@@ -360,6 +360,7 @@ export class ClassService {
     return true;
   }
 
+  //lấy danh sách giáo viên có lịch trống 
   async listTeacherEmpty(dto: ListTeacherEmptyDto) {
     if (dto.schedules && dto.schedules.length > 0) {
       const listClassNotEmpty = [];
@@ -394,7 +395,7 @@ export class ClassService {
         role: ROLE.TEACHER
       } as any;
 
-      if(dto.departmentId) {
+      if (dto.departmentId) {
         filter.departmentId = dto.departmentId
       }
 
@@ -412,6 +413,36 @@ export class ClassService {
     } else {
       return [];
     }
+  }
+
+  //lấy danh sách các lớp trống của học sinh
+  async listEmptyClassOfStudent(userId: string, subjectId: string) {
+    let listClassOfUser = await this.userClassRepos.find({
+      where: { userId: userId }
+    })
+
+    listClassOfUser = listClassOfUser.filter(el => el.dtime == null);
+
+    const listClass = await this.listClass({ subjectId: subjectId });
+
+    const result = listClass.filter(el => !listClassOfUser.some(el1 => el1.classId == el.id));
+
+    return result;
+  }
+
+  //lấy danh sách các lớp trong bộ môn chưa có người dạy
+  async listClassEmptyOfTeacher(userId: string) {
+    const user = await this.userService.getUser(userId);
+    const departmentId = user.department.id;
+    const subjects = await this.subjectRepos.find({
+      where: { departmentId: departmentId }
+    })
+    const subjectIds = subjects.map(el => `'` + el.id + `'`);
+    const subjectParam = subjectIds.join(', ')
+    const qr = 'select c.*,  s."name" as subject, s.grade as  grade from class c, subjects s, "time-tables" t, "rooms" r where c.id = t.class_id and t.room_id = r.id and c.subject_id = s.id and c.subject_id IN(' + subjectParam + ') and c.teacher IS NULL'
+    const classes = await this.classRepos.query(qr);
+
+    return classes;
   }
 
   async createClass(dto: CreateClassDto) {
@@ -482,7 +513,7 @@ export class ClassService {
   }
 
   //user-class
-  async proposalGetUserClass(userId:string, classId: string) {
+  async proposalGetUserClass(userId: string, classId: string) {
     const result = await this.userClassRepos.findOne({
       where: {
         userId: userId,
@@ -522,7 +553,7 @@ export class ClassService {
       },
       relations: ['user'],
     });
-    
+
     result = result.filter(el => el.dtime == null)
 
     return result.map((el) => el['user']);
@@ -536,7 +567,7 @@ export class ClassService {
         userId: userId,
         dtime: null,
       },
-      relations: ['classes','classes.subject', 'classes.timeTables', 'classes.user', 'classes.timeTables.room'],
+      relations: ['classes', 'classes.subject', 'classes.timeTables', 'classes.user', 'classes.timeTables.room'],
     });
 
     return classes;
@@ -558,8 +589,8 @@ export class ClassService {
 
   //attendance
   async createAttendance(dto: CreateAttendanceDto) {
-    const {classId, teacherId, day, date, attendances} = dto;
-    const classes = await this.classRepos.findOne({where: {id: classId}});
+    const { classId, teacherId, day, date, attendances } = dto;
+    const classes = await this.classRepos.findOne({ where: { id: classId } });
     const teacher = await this.userService.getUser(teacherId);
     const id = this.generatorService.randomString(6);
     const doc = {
@@ -567,7 +598,7 @@ export class ClassService {
       classId: classId,
       day: day,
       date: date,
-      teacherId: teacherId 
+      teacherId: teacherId
     }
     let result = await this.attendanceRepos.save(doc);
     await this.datasource.manager.transaction(async (manager) => {
@@ -600,13 +631,13 @@ export class ClassService {
         date: date,
         day: day
       },
-    }) 
+    })
 
-    if(!attendance) {
+    if (!attendance) {
       throw new Error('Bảng điểm danh không tồn tại')
     }
 
-    const {attendances, ...rest} = dto;
+    const { attendances, ...rest } = dto;
 
     const doc = {
       ...attendance,
@@ -615,20 +646,20 @@ export class ClassService {
 
     const result = await this.attendanceRepos.save(doc);
 
-    if(attendances && attendances.length >0) {
+    if (attendances && attendances.length > 0) {
       await this.datasource.manager.transaction(async (manager) => {
-        const listSubAttendance = await this.subAttendanceRepos.find({where: {attendanceId: attendance.id}});
+        const listSubAttendance = await this.subAttendanceRepos.find({ where: { attendanceId: attendance.id } });
         await Promise.all(listSubAttendance.map(async (at) => {
           await this.deleteSubAttendance(at.id)
         }))
 
-        for(const at of dto.attendances) {
+        for (const at of dto.attendances) {
           const update = {
             studentId: at.id,
             attendanceId: attendance.id,
             status: at.status,
           }
-          await manager.save(SubAttendance,update);
+          await manager.save(SubAttendance, update);
         }
       })
     }
@@ -645,14 +676,14 @@ export class ClassService {
       relations: ['subAttendances', 'subAttendances.student']
     })
 
-    if(!result) {
+    if (!result) {
       throw new Error('Bảng điểm danh không tồn tại')
     }
 
-    const { subAttendances, ...rest} = result;
+    const { subAttendances, ...rest } = result;
 
     const teacher = await this.userService.getUser(result.teacherId)
-    const classes = await this.classRepos.findOne({where: {id: result.classId}});
+    const classes = await this.classRepos.findOne({ where: { id: result.classId } });
     const students = result.subAttendances.map(el => {
       return {
         studentId: el.student.id,
@@ -671,22 +702,22 @@ export class ClassService {
 
   async listAttendance(dto: ListAttendanceDto) {
     let paramsArr = [];
-    for(let [k,v] of Object.entries(dto)) {
-      if(k == 'start') {
-        paramsArr.push(" a.day >= '" + v + "'"  )
+    for (let [k, v] of Object.entries(dto)) {
+      if (k == 'start') {
+        paramsArr.push(" a.day >= '" + v + "'")
       }
-      else if(k == 'end') {
-        paramsArr.push(" a.day <= '" + v + "'"  )
+      else if (k == 'end') {
+        paramsArr.push(" a.day <= '" + v + "'")
       }
-      else if(k == 'classId') {
+      else if (k == 'classId') {
         paramsArr.push(` a.class_id = '` + v + "'")
-      }else if(k == 'teacher') {
+      } else if (k == 'teacher') {
         paramsArr.push(` a.teacher_of_day = '` + v + "'")
       }
     }
 
     let qr = 'select a.id, a.teacher_of_day as teacher_id,  u.name as teacher, a.class_id , c.name as class, a.date, a.day, a.created_at from attendance a, class c, users u where a.class_id = c.id and c.teacher=u.id ';
-    if(paramsArr.length>0) {
+    if (paramsArr.length > 0) {
       qr = qr + ' AND ' + paramsArr.join(' AND ')
     }
 
@@ -704,7 +735,7 @@ export class ClassService {
       };
     })
 
-    const listMapClass = []  as any;
+    const listMapClass = [] as any;
     const dates = {
       '0': [],
       '1': [],
@@ -715,16 +746,16 @@ export class ClassService {
       '6': []
     } as any;
 
-    for(const c of listClass) {
+    for (const c of listClass) {
       const schedules = c.timeTables;
-      for(const s of schedules) {
+      for (const s of schedules) {
         const item = {
           class: c.name,
-          subject:c.subject.name,
+          subject: c.subject.name,
           classId: c.id,
           teacher: c.teacherName,
           date: s.date,
-          start:s.start,
+          start: s.start,
           end: s.end,
           room: s.room.name,
         }
@@ -732,8 +763,8 @@ export class ClassService {
       }
     }
 
-    for(const classes of listMapClass) {
-      switch(classes.date){
+    for (const classes of listMapClass) {
+      switch (classes.date) {
         case '0':
           dates['0'].push(classes);
           break;
@@ -763,8 +794,8 @@ export class ClassService {
 
   async listSchedulesOfTeacher(teacherId: string) {
     const teacher = await this.userService.getUser(teacherId);
-    const listClass = await this.listClass({teacher: teacherId});
-    const listMapClass = []  as any;
+    const listClass = await this.listClass({ teacher: teacherId });
+    const listMapClass = [] as any;
     const dates = {
       '0': [],
       '1': [],
@@ -775,16 +806,16 @@ export class ClassService {
       '6': []
     } as any;
 
-    for(const c of listClass) {
+    for (const c of listClass) {
       const schedules = c.time_tables;
-      for(const s of schedules) {
+      for (const s of schedules) {
         const item = {
           class: c.name,
           subject: c.subject,
           classId: c.id,
           teacher: teacher.name,
           date: s.date,
-          start:s.start,
+          start: s.start,
           end: s.end,
           room: s.room_name
         }
@@ -792,8 +823,8 @@ export class ClassService {
       }
     }
 
-    for(const classes of listMapClass) {
-      switch(classes.date){
+    for (const classes of listMapClass) {
+      switch (classes.date) {
         case '0':
           dates['0'].push(classes);
           break;
