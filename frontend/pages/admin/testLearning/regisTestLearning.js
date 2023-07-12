@@ -2,7 +2,7 @@
 
 import { createExam, createTestLearning, createUser, getListExam, getListSubject } from "@/api/address";
 import { GRADE } from "@/common/const";
-import { disabledDate } from "@/common/util";
+import { disabledDate, validatePhone } from "@/common/util";
 import LayoutAdmin from "@/components/LayoutAdmin";
 import { Button, Col, DatePicker, Form, Input, Row, Select, Table, message } from "antd";
 import dayjs from "dayjs";
@@ -140,7 +140,15 @@ const RegisTestLearning = () => {
             <Form.Item
               name="phoneNumber"
               rules={[
-                { required: true, message: "Đây là trường thông tin bắt buộc!" }
+                { required: true, message: "Đây là trường thông tin bắt buộc!" },
+                () => ({
+                  validator(rule, value) {
+                    if (!value || validatePhone(value)) {
+                      return Promise.resolve()
+                    }
+                    return Promise.reject("Số điện thoại không đúng định dạng!")
+                  },
+                }),
               ]}
             >
               <Input placeholder="SĐT" />

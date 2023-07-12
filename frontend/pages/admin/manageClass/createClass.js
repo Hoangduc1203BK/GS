@@ -333,7 +333,7 @@ const CreateClass = () => {
                 <Col xs={6} className="text-right bg-[#d7d7d7] py-2 px-4 border-r-2">
                   <p className="font-semibold">Lớp</p>
                 </Col>
-                <Col xs={18} className="px-4">
+                <Col xs={18} className="px-4 flex items-center">
                   <p>{dataAdd?.name}</p>
                 </Col>
               </Row>
@@ -341,7 +341,7 @@ const CreateClass = () => {
                 <Col xs={6} className="text-right bg-[#d7d7d7] py-2 px-4 border-r-2">
                   <p className="font-semibold">Môn</p>
                 </Col>
-                <Col xs={18} className="px-4">
+                <Col xs={18} className="px-4 flex items-center">
                   <p>
                     {
                       listSubject?.find(item => item.id === dataAdd.subjectId)?.name
@@ -353,7 +353,7 @@ const CreateClass = () => {
                 <Col xs={6} className="text-right bg-[#d7d7d7] py-2 px-4 border-r-2">
                   <p className="font-semibold">Giáo viên dạy</p>
                 </Col>
-                <Col xs={18} className="px-4">
+                <Col xs={18} className="px-4 flex items-center">
                   <p>
                     {
                       listTeacher?.find(item => item.id === dataAdd.teacherId)?.name
@@ -365,7 +365,7 @@ const CreateClass = () => {
                 <Col xs={6} className="text-right bg-[#d7d7d7] py-2 px-4 border-r-2">
                   <p className="font-semibold">Sỹ số</p>
                 </Col>
-                <Col xs={18} className="px-4">
+                <Col xs={18} className="px-4 flex items-center">
                   <p>{dataAdd?.numberStudent}</p>
                 </Col>
               </Row>
@@ -373,7 +373,7 @@ const CreateClass = () => {
                 <Col xs={6} className="text-right bg-[#d7d7d7] py-2 px-4 border-r-2">
                   <p className="font-semibold">Học phí</p>
                 </Col>
-                <Col xs={18} className="px-4">
+                <Col xs={18} className="px-4 flex items-center">
                   <p>{dataAdd?.fee}</p>
                 </Col>
               </Row>
@@ -381,7 +381,7 @@ const CreateClass = () => {
                 <Col xs={6} className="text-right bg-[#d7d7d7] py-2 px-4 border-r-2">
                   <p className="font-semibold">Ngày học</p>
                 </Col>
-                <Col xs={18} className="px-4">
+                <Col xs={18} className="px-4 flex items-center">
                   <p>{dataAdd?.startDate}</p>
                 </Col>
               </Row>
