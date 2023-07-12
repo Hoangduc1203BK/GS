@@ -199,7 +199,7 @@ export class ClassService {
     let classes = await this.classRepos.query(qr);
     if (classes.length >= 1) {
       const { start, end, date, room_name, time_id, ...rest } = classes[0];
-      const result = [
+      let result = [
         {
           ...rest,
           time_tables: [
@@ -244,7 +244,19 @@ export class ClassService {
         }
       }, classes);
 
-      return result;
+      const result1 = [];
+      for(const c of result) {
+        const students = await this.userClassRepos.count({where: {classId: c.id}});
+
+        const item = {
+          ...c,
+          number: `${students}/${c.number_student}`
+        }
+
+        result1.push(item)
+      }
+
+      return result1;
     } else {
       return [];
     }
