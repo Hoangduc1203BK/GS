@@ -160,7 +160,7 @@ const ClassroomManagement = ({ user }) => {
             </Col>
           </Row>
         </Form>
-      </Modal >
+      </Modal>
       <Table
         title={defaultTitle}
         locale={{

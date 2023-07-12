@@ -12,26 +12,26 @@ export const setToken = (token) => {
 };
 axios.defaults.baseURL = "http://localhost:4000/api/v1";
 
-axios.interceptors.response.use(
-	(response) => {
-		if (response && response.status < 500) {
-			return response;
-		}
-		throw new Error(
-			response?.errors || "Response not handle"
-		);
-	},
-	(error) => {
-		const { response } = error;
-		if (response && [401, 403].includes(response.status)) {
-			if (typeof window !== "undefined")
-				window.localStorage?.removeItem("token");
-			deleteCookie("token");
-			window.location.href = "/login";
-		}
-		// throw error
-	}
-);
+// axios.interceptors.response.use(
+// 	(response) => {
+// 		if (response && response.status < 500) {
+// 			return response;
+// 		}
+// 		throw new Error(
+// 			response?.errors || "Response not handle"
+// 		);
+// 	},
+// 	(error) => {
+// 		const { response } = error;
+// 		if (response && [401, 403].includes(response.status)) {
+// 			if (typeof window !== "undefined")
+// 				window.localStorage?.removeItem("token");
+// 			deleteCookie("token");
+// 			window.location.href = "/login";
+// 		}
+// 		// throw error
+// 	}
+// );
 
 // axios.interceptors.request.use(
 // 	async (config) => {
@@ -141,4 +141,14 @@ export const getListClass = (params) => {
 
 export const createClass = (params) => {
 	return axios.post("/class", params)
+}
+
+export const getListUserInClass = (id) => {
+	return axios.get(`/class/${id}/users`);
+};
+
+// attendance
+
+export const getListAttendance = (params) => {
+	return axios.get(`/class/attendances`, { params: params })
 }
