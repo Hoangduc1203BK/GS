@@ -6,6 +6,7 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -20,16 +21,18 @@ import {
 } from './dto';
 import { ClassService } from './class.service';
 import { ListAttendanceDto } from './dto/list-attendance.dto';
-import { AttendanceGuard } from 'src/core/guards';
+import { AttendanceGuard, JwtAuthGuard } from 'src/core/guards';
 import { GeneratorService } from 'src/core/shared/services';
+import { Request, Response } from 'express';
+import { ROLE } from 'src/common/constants';
 
 @Controller('class')
 export class ClassController {
-  constructor(private readonly classService: ClassService) {}
+  constructor(private readonly classService: ClassService) { }
 
   //attendance
   @Get('/attendances')
-  async listAttendance(@Query() data:ListAttendanceDto) {
+  async listAttendance(@Query() data: ListAttendanceDto) {
     const result = await this.classService.listAttendance(data)
 
     return result;
@@ -88,7 +91,7 @@ export class ClassController {
   }
 
   @Patch('/room/:id')
-  async updateRoom(@Param('id') id: number,@Body() data:any) {
+  async updateRoom(@Param('id') id: number, @Body() data: any) {
     const result = await this.classService.updateRoom(id, data);
 
     return result;
@@ -128,6 +131,24 @@ export class ClassController {
   @Post('/teacher-empty')
   async listTeacherEmpty(@Body() data: ListTeacherEmptyDto) {
     const result = await this.classService.listTeacherEmpty(data);
+
+    return result;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/student-empty')
+  async listClassEmptyOfStudent(@Req() req: Request, @Query('subjectId') subjectId: string) {
+    const user = req["user"]
+    const result = await this.classService.listEmptyClassOfStudent(user["id"], subjectId);
+    
+    return result;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/empty')
+  async listClassEmptyOfTeacher(@Req() req: Request) {
+    const user = req["user"];
+    const result = await this.classService.listClassEmptyOfTeacher(user["id"]);
 
     return result;
   }
@@ -173,4 +194,21 @@ export class ClassController {
 
     return result;
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/schedules')
+  async listScheduleOfStudent(@Req() req: Request) {
+    const user = req["user"];
+    const role = user["role"];
+    let result;
+
+    if (role == ROLE.USER) {
+      result = await this.classService.listScheduleOfStudent(user["id"]);
+    } else if (role == ROLE.TEACHER) {
+      result = await this.classService.listSchedulesOfTeacher(user["id"]);
+    }
+
+    return result;
+  }
+
 }

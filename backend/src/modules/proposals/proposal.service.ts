@@ -30,7 +30,7 @@ export class ProposalService {
     setProposalStrategy(type: string) {
         switch (type){
             case PROPOSAL_TYPE.TEACHER_REGISTER_CLASS:
-                this.proposalStrategy = new TeacherRegisterClass(this.proposalRepos, this.userService, this.mailService);
+                this.proposalStrategy = new TeacherRegisterClass(this.proposalRepos, this.userService, this.mailService, this.classService);
                 break;
             case PROPOSAL_TYPE.TEACHER_TAKE_BRAKE:
                 this.proposalStrategy = new TeacherTakeBrake();
@@ -94,10 +94,16 @@ export class ProposalService {
             throw new Error('Không tìm thấy đề xuất với id:'+id);
         }
 
-        const {user, ...rest} = proposal;
+        const {user,subData, ...rest} = proposal;
+        const classes = await this.classService.getClass(proposal.subData.classId);
 
         const doc = {
-            ...rest, 
+            ...rest,
+            subData: {
+                ...subData,
+                className: classes.name,
+                subject: classes.subject.name,
+            },
             user: user.name,
             phoneNumber: user.phoneNumber,
         }
