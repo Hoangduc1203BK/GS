@@ -9,6 +9,7 @@ import PopupStudentFeedback from "@/components/popup/popupStudentFeedback";
 import PopupStudentTuitionFee from "@/components/popup/popupStudentTuitionFee";
 import { getMeInfo } from "@/api/address";
 import { getCookie, hasCookie } from "@/api/cookies";
+import { ApiGetListSchedule } from "@/api/student";
 
 const Dashboard = ({user}) => {
   
@@ -55,9 +56,15 @@ const Dashboard = ({user}) => {
       }
     }
 
-    callUserDetail()
+    callUserDetail();
+    getSchedule()
   }, []);
 
+
+  const getSchedule = async () =>{
+    const response = await ApiGetListSchedule();
+    console.log(response);
+  }
   return (
     <div className="flex">
        <PopupStudentSuggest open={openSugget} setOpen={setOpenSuggest} />

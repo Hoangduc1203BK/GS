@@ -91,7 +91,7 @@ export default function LayoutAdmin({
 					key: "infoTeacher",
 				},
 				{
-					label: <Link href="/admin">Thời khóa biểu</Link>,
+					label: <Link href="/teacher/class">Danh sách lớp học</Link>,
 					key: "tkbTeacher",
 				},
 				{

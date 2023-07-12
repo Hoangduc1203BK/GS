@@ -33,7 +33,6 @@ const Dashboard = ({user}) => {
       })
     );
 
-
     const callUserDetail = async () =>  {
       if(!user?.id){
         let token = {} ;
@@ -55,8 +54,15 @@ const Dashboard = ({user}) => {
       }
     }
 
-    callUserDetail()
+    callUserDetail();
+    getSchedule();
+
   }, []);
+
+  const getSchedule = async () =>{
+    const response = await ApiGetListSchedule();
+    console.log(response);
+  }
 
   return (
     <div className="flex">

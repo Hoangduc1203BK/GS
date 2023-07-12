@@ -12,7 +12,11 @@ import {
 import { Input } from "antd";
 import { useState } from "react";
 import { SUTDENT_PROPOSAL_TYPE, GRADE, FORMAT_DATE } from "@/common/const";
-import { ApiCreateSuggest, ApiGetListClass, ApiGetListSubject } from "@/api/student";
+import {
+  ApiCreateSuggest,
+  ApiGetListClassEmpty,
+  ApiGetListSubject,
+} from "@/api/student";
 import dayjs from "dayjs";
 
 const { TextArea } = Input;
@@ -40,48 +44,43 @@ export default function PopupStudentSuggest({ open, setOpen, info }) {
   };
 
   const getListClass = async (value) => {
-    const response = await ApiGetListClass({
+    console.log(value);
+    const response = await ApiGetListClassEmpty({
       subjectId: value,
-      type: "active",
     });
+    console.log(response);
     setClasses([...response.data]);
   };
 
   const changeInfoClass = (value) => {
     const timeTables = classes.find((el) => el.id === value)?.time_tables;
     const info = {
-      start: timeTables[0]?.start,
-      end: timeTables[0]?.end,
       room: timeTables[0]?.room_name,
     };
     setClassInfo(info);
-    form.setFieldValue({
-        ...form.getFieldValue,
-      start: info.start,
-      end: info.end,
+    form.setFieldsValue({
+      ...form.getFieldValue,
       room: info.room,
-
     });
   };
   const handleFinish = async (values) => {
-    console.log(dayjs(new Date).format(FORMAT_DATE.YYYYMMDD));
+    console.log(dayjs(new Date()).format(FORMAT_DATE.YYYYMMDD));
     const payload = {
-        "userId":info?.id,
-        "description": values.note,
-        "type": values.suggestType,
-        "time": dayjs(new Date).format(FORMAT_DATE.YYYYMMDD),
-        "subData":{
-            "classId": values.class
-        }
-    }
+      userId: info?.id,
+      description: values.note,
+      type: values.suggestType,
+      time: dayjs(new Date()).format(FORMAT_DATE.YYYYMMDD),
+      subData: {
+        classId: values.class,
+      },
+    };
     try {
-        await ApiCreateSuggest(payload);
-        message.success('Tạo đề xuất thành công!');
-        setOpen(!open);
+      await ApiCreateSuggest(payload);
+      message.success("Tạo đề xuất thành công!");
+      setOpen(!open);
     } catch (error) {
-        message.error('Tạo đề xuất Thất bại!')
+      message.error("Tạo đề xuất Thất bại!");
     }
-
   };
 
   return (
@@ -190,7 +189,7 @@ export default function PopupStudentSuggest({ open, setOpen, info }) {
               ))}
             </Select>
           </Form.Item>
-          {/* <Form.Item name="startTime" label="Giờ bắt đâu">
+          {/* <Form.Item name="start" label="Giờ bắt đâu">
             <TimePicker
               placeholder="--:--"
               format="HH:mm"
@@ -198,7 +197,7 @@ export default function PopupStudentSuggest({ open, setOpen, info }) {
               readOnly
             />
           </Form.Item>
-          <Form.Item name="endTime" label="Giờ kết thúc">
+          <Form.Item name="end" label="Giờ kết thúc">
             <TimePicker
               placeholder="--:--"
               format="HH:mm"
@@ -206,11 +205,23 @@ export default function PopupStudentSuggest({ open, setOpen, info }) {
               readOnly
             />
           </Form.Item> */}
-          {/* <Form.Item name="room" label="Phòng học">
+          <Form.Item
+            name="room"
+            label="Phòng học"
+            rules={[
+              { required: true, message: "Đây là trường dữ liệu bắt buộc!" },
+            ]}
+          >
             <Input type="text" readOnly></Input>
-          </Form.Item> */}
-          <Form.Item name="note" label="Ghi chú">
-            <Input.TextArea type="text" rows={4} ></Input.TextArea>
+          </Form.Item>
+          <Form.Item
+            name="note"
+            label="Ghi chú"
+            rules={[
+              { required: true, message: "Đây là trường dữ liệu bắt buộc!" },
+            ]}
+          >
+            <Input.TextArea type="text" rows={4}></Input.TextArea>
           </Form.Item>
           <Row gutter={[8, 8]} justify="center">
             <Col>
