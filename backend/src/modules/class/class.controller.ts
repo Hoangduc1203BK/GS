@@ -97,37 +97,6 @@ export class ClassController {
     return result;
   }
 
-  @Get('/')
-  async listClass(@Query() query: ListClassDto) {
-    const result = await this.classService.listClass(query);
-
-    return result;
-  }
-
-  @Get('/:id')
-  async getClass(@Param('id') id: string) {
-    const result = await this.classService.getClass(id);
-
-    return result;
-  }
-
-  @Post('/')
-  async createClass(@Body() createClassDto: CreateClassDto) {
-    const result = await this.classService.createClass(createClassDto);
-
-    return result;
-  }
-
-  @Patch('/:id')
-  async updateClass(
-    @Param('id') id: string,
-    @Body() updateClassDto: UpdateClassDto,
-  ) {
-    const result = await this.classService.updateClass(id, updateClassDto);
-
-    return result;
-  }
-
   @Post('/teacher-empty')
   async listTeacherEmpty(@Body() data: ListTeacherEmptyDto) {
     const result = await this.classService.listTeacherEmpty(data);
@@ -203,10 +172,42 @@ export class ClassController {
     let result;
 
     if (role == ROLE.USER) {
-      result = await this.classService.listScheduleOfStudent(user["id"]);
+      result = await this.classService.listScheduleOfStudent('ST3145');
     } else if (role == ROLE.TEACHER) {
       result = await this.classService.listSchedulesOfTeacher(user["id"]);
     }
+
+    return result;
+  }
+
+
+  @Get('/')
+  async listClass(@Query() query: ListClassDto) {
+    const result = await this.classService.listClass(query);
+
+    return result;
+  }
+
+  @Get('/:id')
+  async getClass(@Param('id') id: string) {
+    const result = await this.classService.getClass(id);
+
+    return result;
+  }
+
+  @Post('/')
+  async createClass(@Body() createClassDto: CreateClassDto) {
+    const result = await this.classService.createClass(createClassDto);
+
+    return result;
+  }
+
+  @Patch('/:id')
+  async updateClass(
+    @Param('id') id: string,
+    @Body() updateClassDto: UpdateClassDto,
+  ) {
+    const result = await this.classService.updateClass(id, updateClassDto);
 
     return result;
   }

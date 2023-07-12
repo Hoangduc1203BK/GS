@@ -20,7 +20,7 @@ import {
   UpdateClassDto,
 } from './dto';
 import { DEFAULT_PAGING } from 'src/common/constants/paging';
-import { CLASS_TYPE, ROLE, USER_CLASS_TYPE } from 'src/common/constants';
+import { CLASS_TYPE, ROLE, USER_CLASS_TYPE, getDayOfMonth } from 'src/common/constants';
 import { UserService } from '../user';
 import { paginate } from 'src/common/interfaces/paginate';
 import * as moment from 'moment';
@@ -167,7 +167,7 @@ export class ClassService {
       scheduleFilter.end = end;
     }
 
-    let qr = ` select c.*,u.name as teacherName, s.name as subject, s.grade as grade, t.id as time_id, t."start" ,t."end" ,t."date" ,r."name" as room_name from "class" c, "time-tables" t, "rooms" r, "subjects" s, "users" u where c.id = t.class_id and t.room_id = r.id and c.subject_id=s.id and c.teacher=u.id`;
+    let qr = ` select c.*, s.name as subject, s.grade as grade, t.id as time_id, t."start" ,t."end" ,t."date" ,r."name" as room_name from "class" c, "time-tables" t, "rooms" r, "subjects" s where c.id = t.class_id and t.room_id = r.id and c.subject_id=s.id`;
     let classArr = [];
 
     if (Object.keys(classFilter).length > 0) {
@@ -737,13 +737,34 @@ export class ClassService {
 
     const listMapClass = [] as any;
     const dates = {
-      '0': [],
-      '1': [],
-      '2': [],
-      '3': [],
-      '4': [],
-      '5': [],
-      '6': []
+      '0': {
+        day: getDayOfMonth('0'),
+        classes: []
+      },
+      '1': {
+        day: getDayOfMonth('1'),
+        classes: []
+      },
+      '2': {
+        day: getDayOfMonth('2'),
+        classes: []
+      },
+      '3': {
+        day: getDayOfMonth('3'),
+        classes: []
+      },
+      '4': {
+        day: getDayOfMonth('4'),
+        classes: []
+      },
+      '5': {
+        day: getDayOfMonth('5'),
+        classes: []
+      },
+      '6': {
+        day: getDayOfMonth('6'),
+        classes: []
+      }
     } as any;
 
     for (const c of listClass) {
@@ -766,25 +787,25 @@ export class ClassService {
     for (const classes of listMapClass) {
       switch (classes.date) {
         case '0':
-          dates['0'].push(classes);
+          dates['0'].classes.push(classes);
           break;
         case '1':
-          dates['1'].push(classes);
+          dates['1'].classes.push(classes);
           break;
         case '2':
-          dates['2'].push(classes);
+          dates['2'].classes.push(classes);
           break;
         case '3':
-          dates['3'].push(classes);
+          dates['3'].classes.push(classes);
           break;
         case '4':
-          dates['4'].push(classes);
+          dates['4'].classes.push(classes);
           break;
         case '5':
-          dates['5'].push(classes);
+          dates['5'].classes.push(classes);
           break;
         case '6':
-          dates['6'].push(classes);
+          dates['6'].classes.push(classes);
           break;
       }
     }
