@@ -149,7 +149,7 @@ export const PROPOSAL_TYPE = {
   STUDENT_TERMINATE_CLASS: "student_terminate_class",
 };
 
-export const SUTDENT_PROPOSAL_TYPE = [
+export const STUDENT_PROPOSAL_TYPE = [
   {
     label: "Thêm lớp",
     value: "student_register_class",
@@ -159,6 +159,18 @@ export const SUTDENT_PROPOSAL_TYPE = [
     value: "student_terminate_class",
   },
 ];
+
+export const TEACHER_PROPOSAL_TYPE = [
+  {
+    label: "Thêm lớp",
+    value: "teacher_register_class",
+  },
+  {
+    label: "Nghỉ dạy",
+    value: "teacher_take_break",
+  },
+];
+
 
 export const FORMAT_DATE = {
   YYYYMMDD: "YYYY-MM-DD",

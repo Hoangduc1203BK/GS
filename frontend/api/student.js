@@ -11,8 +11,10 @@ export const setToken = (token) => {
 	] = `Bearer ${token}`;
 };
 
-    export function ApiClassOfStudent(userId) {
-        return axios.get('/class/user/' + userId);
+    export function ApiClassOfStudent(userId, params) {
+        return axios.get('/class/user/' + userId, {
+            params
+        });
     }
     export function ApiStudentsInClass(classId) {
         return axios.get('/class/' + classId +'/users');
@@ -36,6 +38,12 @@ export const setToken = (token) => {
         });
     }
 
+    export function ApiGetListClassTeacherEmpty(params) {
+        return axios.get('/class/empty',{
+            params:params
+        });
+    }
+
     export function ApiCreateSuggest (data){
         return axios.post('/proposal', data);
     }
@@ -49,4 +57,8 @@ export const setToken = (token) => {
 
     export function ApiGetListSchedule (){
         return axios.get('/class/schedules');
+    }
+
+    export function ApiGetListClassWithTeacher (){
+        return axios.get('/class/list-class-of-teacher');
     }

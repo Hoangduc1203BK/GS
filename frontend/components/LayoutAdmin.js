@@ -99,8 +99,8 @@ export default function LayoutAdmin({
 					key: "regisTeach",
 				},
 				{
-					label: <Link href="/admin">Danh sách lớp</Link>,
-					key: "listClass",
+					label: <Link href="/teacher/suggest">Quản lý đề xuất</Link>,
+					key: "teacherSuggestClass",
 				},
 			],
 		},

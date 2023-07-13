@@ -1,14 +1,18 @@
-import { ApiGetListSuggest } from "@/api/student";
-import { PROPOSAL_STATUS_LIST, SUTDENT_PROPOSAL_TYPE } from "@/common/const";
+import { ApiGetListClass, ApiGetListSuggest } from "@/api/student";
+import { PROPOSAL_STATUS_LIST, STUDENT_PROPOSAL_TYPE } from "@/common/const";
 import LayoutAdmin from "@/components/LayoutAdmin";
 import PopupStudentSuggest from "@/components/popup/popupSuggest";
 
 import { Button, Col, Form, Input, Row, Select, Table, message } from "antd";
 import { useState, useEffect } from "react";
 
-const SutdentSuggest = ({ user }) => {
+const StudentSuggest = ({ user }) => {
   const [form] = Form.useForm();
   const [openSuggest, setOpenSuggest] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
+  const [isUpdate, setIsUpdate] = useState(false);
+
+  const [listClass, setListClass] = useState([]);
   const [tableParams, setTableParams] = useState({
     page: 1,
     size: 10,
@@ -20,32 +24,36 @@ const SutdentSuggest = ({ user }) => {
   });
 
   useEffect(() => {
-    getListSuggest();
-  }, []);
+    if (isUpdate) {
+      getListSuggest();
+    }
+  }, [isUpdate]);
 
   useEffect(() => {
     getListSuggest();
   }, [tableParams]);
 
-
   const getListSuggest = async () => {
     try {
+      setIsFetching(true);
       const formData = form.getFieldValue();
-      console.log(formData);
-
       const response = await ApiGetListSuggest({
         ...tableParams,
         ...formData,
         userId: user.id,
       });
       setSuggest({ result: [...response.data], total: response.total || 1 });
+      const classes = await ApiGetListClass({ type: "active" });
+      setListClass([...classes.data]);
+      setIsFetching(false);
     } catch (error) {
       message.error("Có lỗi xảy ra! Vui lòng thử lại");
+      setIsFetching(false);
     }
   };
 
   const submitSearch = (values) => {
-    getListSuggest()
+    getListSuggest();
   };
 
   const columns = [
@@ -56,7 +64,7 @@ const SutdentSuggest = ({ user }) => {
       },
     },
     {
-      title: "Học sinh",
+      title: "Người đề xuát",
       dataIndex: "user",
       key: "user",
     },
@@ -65,7 +73,7 @@ const SutdentSuggest = ({ user }) => {
       render: (text, record, index) => {
         return (
           <div>
-            {record?.sub_data?.classId}
+            {listClass.find((el) => el.id == record?.sub_data?.classId)?.name}
           </div>
         );
       },
@@ -85,7 +93,7 @@ const SutdentSuggest = ({ user }) => {
       render: (text, record, index) => {
         return (
           <div>
-            {SUTDENT_PROPOSAL_TYPE.find((el) => el.value === record.type)
+            {STUDENT_PROPOSAL_TYPE.find((el) => el.value === record.type)
               ?.label || ""}
           </div>
         );
@@ -118,30 +126,27 @@ const SutdentSuggest = ({ user }) => {
         open={openSuggest}
         setOpen={setOpenSuggest}
         info={user}
+        setUpdate={setIsUpdate}
       />
       <Form form={form} onFinish={submitSearch}>
         <Row>
-          <Col xs={24} lg={16} className="flex gap-5" >
+          <Col xs={24} lg={16} className="flex gap-5">
             <Form.Item name="type" label="Loại đề xuất" className="w-full">
               <Select placeholder="-- Chọn --">
-                {SUTDENT_PROPOSAL_TYPE.map((proposal, index) => (
-                  <>
-                    <Select.Option value={proposal.value} key={index}>
-                      {proposal.label}
-                    </Select.Option>
-                  </>
+                {STUDENT_PROPOSAL_TYPE.map((proposal, index) => (
+                  <Select.Option value={proposal.value} key={index}>
+                    {proposal.label}
+                  </Select.Option>
                 ))}
               </Select>
             </Form.Item>
 
             <Form.Item name="status" label="Trạng thái" className="w-full">
-              <Select placeholder="-- Chọn --" >
+              <Select placeholder="-- Chọn --">
                 {PROPOSAL_STATUS_LIST.map((proposal, index) => (
-                  <>
-                    <Select.Option value={proposal.value} key={index}>
-                      {proposal.label}
-                    </Select.Option>
-                  </>
+                  <Select.Option value={proposal.value} key={index}>
+                    {proposal.label}
+                  </Select.Option>
                 ))}
               </Select>
             </Form.Item>
@@ -153,7 +158,9 @@ const SutdentSuggest = ({ user }) => {
 
             <Button
               type="primary"
-              onClick={() => setOpenSuggest(true)}
+              onClick={() => {
+                setOpenSuggest(true), setIsUpdate(false);
+              }}
               className="ml-5"
               htmlType="text"
             >
@@ -167,6 +174,7 @@ const SutdentSuggest = ({ user }) => {
         dataSource={suggests?.result.map((x) => ({ ...x, key: x?.classroom }))}
         columns={columns}
         bordered
+        loading={isFetching}
         onChange={handleChangeTable}
         scroll={{ x: 1000 }}
         pagination={{
@@ -186,8 +194,8 @@ const SutdentSuggest = ({ user }) => {
   );
 };
 
-SutdentSuggest.getLayout = ({ page, pageProps }) => (
+StudentSuggest.getLayout = ({ page, pageProps }) => (
   <LayoutAdmin {...pageProps}>{page}</LayoutAdmin>
 );
 
-export default SutdentSuggest;
+export default StudentSuggest;
