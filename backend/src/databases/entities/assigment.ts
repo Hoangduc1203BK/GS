@@ -58,7 +58,7 @@ export class Assigment {
 
     @Column({
         type: 'varchar',
-        length: '6',
+        length: '10',
         name: 'status',
         nullable: false,
     })

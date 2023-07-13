@@ -7,6 +7,9 @@ import { DEFAULT_PAGING } from "src/common/constants/paging";
 import { paginate } from "src/common/interfaces/paginate";
 import { ClassService } from "../class";
 import { ASSIGMENT_STATUS, ROLE, SUB_ASSIGMENT_STATUS, USER_CLASS_TYPE } from "src/common/constants";
+import { ListAssigmenStudenttDto } from "./dto/list-assigment-for-student";
+import { GetSubAssigmentDto } from "./dto/get-sub-assigment.dto";
+
 @Injectable()
 export class AssigmentService{
     constructor(
@@ -34,6 +37,7 @@ export class AssigmentService{
         }else {
             result = await this.assigmentRepos.find({
                 relations: ['classes'],
+                order: {id: 'ASC'},
                 skip: (page - 1)*size,
                 take: size
             })
@@ -45,13 +49,13 @@ export class AssigmentService{
             const { classes, ...rest} = el;
             const item = {
                 ...rest,
-                className: classes.name,
+                class_name: classes.name,
             }
 
             return item;
         })
 
-        return { result: doc, ...paginate(doc, Number(page),Number(size), all.length)}
+        return { result: doc, ...paginate(doc.length, Number(page),Number(size), all.length)}
     }
 
     async getAssigment(id: number) {
@@ -84,6 +88,7 @@ export class AssigmentService{
         const doc = {
             ...dto,
             status: ASSIGMENT_STATUS.ACTIVE,
+            deadline: new Date(),
         }
         const assigment = await this.assigmentRepos.save(doc);
 
@@ -138,9 +143,9 @@ export class AssigmentService{
     async listSubAssigment() {
 
     }
-    async getSubAssigment(id: number) {
+    async getSubAssigment(dto: GetSubAssigmentDto) {
         const subAssigment = await this.subAssigmentRepos.findOne({
-            where: { id },
+            where: dto,
             relations: ['assigment', 'student']
         })
 
@@ -195,5 +200,18 @@ export class AssigmentService{
 
             await this.subAssigmentRepos.save({id: id, ...doc});
         }
+        
+        return this.getSubAssigment({id: id});
+    }
+
+    async listAssigmentForStudent(userId: string, query: ListAssigmenStudenttDto) {
+        await this.classService.getClass(query.classId);
+        const statusArr = query.status.split(',').map(el => `'`+el+`'`).join(',');
+        const qr = `
+        select a.*, c."name"  as class_name from assigments a, "sub-assigment" sa , "class" c where a.class_id = c.id and a.id = sa.assigment_id and a.class_id = '` + query.classId+ `' and sa.user_id='` + userId + `' and sa.status IN (`+ statusArr + `)`
+
+        const result = await this.assigmentRepos.query(qr);
+
+        return result;
     }
 }

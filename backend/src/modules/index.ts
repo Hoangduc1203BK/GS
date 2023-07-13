@@ -1,3 +1,4 @@
+import { AssigmentModule } from "./assigment";
 import { AuthModule } from "./auth/auth.module";
 import { ClassModule } from "./class";
 import { DepartmentModule } from "./department";
@@ -16,4 +17,5 @@ export const MODULES = [
     ExamModule,
     TestLearningModule,
     ProposalModule,
+    AssigmentModule,
 ]
