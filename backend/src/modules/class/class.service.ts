@@ -733,7 +733,24 @@ export class ClassService {
       qr = qr + ' AND ' + paramsArr.join(' AND ')
     }
 
-    const result = await this.attendanceRepos.query(qr)
+    const listAttendance = await this.attendanceRepos.query(qr);
+    const result = [];
+    for(const a of listAttendance) {
+      const countTrue = await this.subAttendanceRepos.count({where: {
+        attendanceId: a.id,
+        status: true
+      }})
+
+      const all = await this.subAttendanceRepos.count({where: {
+        attendanceId: a.id
+      }})
+
+      result.push({
+        ...a,
+        attend: `${countTrue}/${all}`
+      })
+    }
+
     return result;
   }
 
