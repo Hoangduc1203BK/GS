@@ -152,3 +152,12 @@ export const getListUserInClass = (id) => {
 export const getListAttendance = (params) => {
 	return axios.get(`/class/attendances`, { params: params })
 }
+export const getAttendance = (params) => {
+	return axios.get(`/class/attendance`, { params: params })
+}
+
+//department
+
+export const getListDepartment = (params) => {
+	return axios.get(`/department`, { params: params })
+}

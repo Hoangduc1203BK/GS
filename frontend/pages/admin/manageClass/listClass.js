@@ -1,8 +1,9 @@
 
-import { getListAttendance, getListClass, getListSubject, getListUser, getListUserInClass } from "@/api/address";
+import { getAttendance, getListAttendance, getListClass, getListSubject, getListUser, getListUserInClass } from "@/api/address";
 import LayoutAdmin from "@/components/LayoutAdmin";
-import { DeleteOutlined, EditOutlined, EyeOutlined, HistoryOutlined, ProfileOutlined, SnippetsOutlined } from "@ant-design/icons";
-import { Button, Col, Empty, Input, Row, Select, Space, Table, Tabs, Tooltip, Tour, message } from "antd";
+import { CheckCircleFilled, CloseCircleFilled, DeleteOutlined, EditOutlined, EyeOutlined, HistoryOutlined, ProfileOutlined, SnippetsOutlined } from "@ant-design/icons";
+import { Avatar, Button, Col, Empty, Input, List, Modal, Row, Select, Space, Table, Tabs, Tooltip, Tour, message } from "antd";
+import dayjs from "dayjs";
 import { useEffect, useRef, useState } from "react";
 
 const ListClass = () => {
@@ -94,7 +95,7 @@ const ListClass = () => {
     {
       title: "Thời gian điểm danh",
       render: (text, record) => {
-        return <div>{record?.day} - {record?.date < 7 ? `Thứ ${+record?.date + 1}` : 'Chủ Nhật'}</div>;
+        return <div> {record?.date < 7 ? `Thứ ${+record?.date + 1}` : 'Chủ Nhật'} : {dayjs(record?.day).format("DD-MM-YYYY")} </div>;
       },
       align: "center",
     },
@@ -102,6 +103,20 @@ const ListClass = () => {
       title: "Giáo viên",
       render: (text, record) => {
         return <div>{record?.teacher}</div>;
+      },
+      align: "center",
+    },
+    {
+      title: "Số lượng điểm danh",
+      render: (text, record) => {
+        return <div>{record?.attend}</div>;
+      },
+      align: "center",
+    },
+    {
+      title: "Thao tác",
+      render: (text, record) => {
+        return <div><Button type="primary" style={{ backgroundColor: 'aqua', color: 'black', fontWeight: '500' }} onClick={() => detailAttendance(record)} className="hover:-translate-y-0.5 duration-300 hover:scale-105">Chi tiết</Button></div>;
       },
       align: "center",
     },
@@ -117,6 +132,9 @@ const ListClass = () => {
   const [listTeacher, setListTeacher] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadingExpand, setLoadingExpand] = useState(false);
+  const [detailAttend, setDetailAttend] = useState([]);
+  const [modal, setModal] = useState(false);
+
   //table student
 
   const expandedRowRender = () => {
@@ -177,6 +195,15 @@ const ListClass = () => {
     />;
   };
 
+  async function detailAttendance(record) {
+    console.log(record, 'recorddd')
+    await getAttendance({ classId: record?.class_id, date: record?.date, day: record?.day }).then(
+      res => {
+        setDetailAttend(res?.data?.students)
+        setModal(true)
+      }
+    ).catch(err => message.error('Lấy dữ liệu chi tiết điểm danh không thành công!'))
+  }
 
   function handleChangeTab(key) {
     if (key === "2") {
@@ -236,9 +263,6 @@ const ListClass = () => {
     ).catch(err => console.log('get list class err' + err))
   }
 
-  async function clickRow() {
-    console.log('click click');
-  }
 
   useEffect(() => {
     getListSubject({ page: 1, size: 9999 }).then(
@@ -255,6 +279,47 @@ const ListClass = () => {
   }, []);
   return (
     <>
+      <Modal
+        open={modal}
+        title="Chi tiết điểm danh"
+        onCancel={() => {
+          setModal(false)
+          setDetailAttend([])
+        }}
+        okText="Xác nhận"
+        cancelText="Đóng"
+        onOk={() => {
+          setModal(false)
+          setDetailAttend([])
+        }}
+      >
+        <List
+          itemLayout="horizontal"
+          dataSource={detailAttend}
+          renderItem={(item, index) => (
+            <List.Item
+              key={item?.studentId}
+              className="hover:scale-105 duration-500 group hover:shadow-xl !px-4"
+              extra={
+                item?.status ? <CheckCircleFilled style={{
+                  color: 'green',
+                  fontSize: '18px'
+                }} />
+                  : <CloseCircleFilled style={{
+                    color: 'red',
+                    fontSize: '18px'
+                  }} />
+              }
+            >
+              <List.Item.Meta
+                avatar={<Avatar src={`https://xsgames.co/randomusers/avatar.php?g=pixel&key=${index}`} />}
+                title={<p className="group-hover:font-bold duration-500">{item.name}</p>}
+                description={<p className="group-hover:font-semibold">{item?.studentId}</p>}
+              />
+            </List.Item>
+          )}
+        />
+      </Modal>
       <Tabs
         onChange={handleChangeTab}
         defaultActiveKey="1"
@@ -273,7 +338,7 @@ const ListClass = () => {
               <p className="font-medium mb-2">Thông tin lớp học</p>
               <Row gutter={[8, 8]}>
                 <Col xs={24} md={12} className="grid grid-cols-4 ">
-                  <p className="flex items-center">Chọn lớp:</p>
+                  <p className="flex items-center">Chọn môn:</p>
                   <Select
                     className="col-span-3"
                     placeholder="-- Chọn -- "
