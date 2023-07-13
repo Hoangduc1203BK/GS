@@ -43,6 +43,12 @@ export class UpdateClassDto {
 	@ApiProperty({ required: true })
     @IsOptional()
 	@IsNotEmpty()
+	@IsString()
+	teacherOfDay?: string;
+
+	@ApiProperty({ required: true })
+    @IsOptional()
+	@IsNotEmpty()
 	@IsArray()
 	schedules?: Schedule[];
 }

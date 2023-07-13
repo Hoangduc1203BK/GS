@@ -97,6 +97,14 @@ export class User {
     @Column({
         type: 'varchar',
         length: '50',
+        name: 'student_school',
+        nullable: true,
+    })
+    studentSchool: string;
+
+    @Column({
+        type: 'varchar',
+        length: '50',
         name: 'grade',
         nullable: true,
     })
@@ -140,6 +148,14 @@ export class User {
         nullable: true,
     })
     experience: number;
+
+    @Column({
+        type: 'varchar',
+        length: '50',
+        name: 'teacher_school',
+        nullable: true,
+    })
+    teacherSchool: string;
 
     @Column({
 		name: 'created_at',
