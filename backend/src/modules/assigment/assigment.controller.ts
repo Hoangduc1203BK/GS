@@ -5,7 +5,7 @@ import { AssigmentService } from "./assigment.service";
 import { query } from "express";
 import { ListAssigmenStudenttDto } from "./dto/list-assigment-for-student";
 import { GetSubAssigmentDto } from "./dto/get-sub-assigment.dto";
-
+import { Request } from 'express';
 @Controller('assigments')
 export class AssigmentController{
     constructor(private readonly assigmentService: AssigmentService) {}
