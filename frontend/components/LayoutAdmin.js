@@ -135,11 +135,11 @@ export default function LayoutAdmin({
 							key: "departmentManage",
 						},
 						{
-							label: <Link href="/admin/departmentManage">Quản lý giáo viên</Link>,
+							label: <Link href="/admin/manageTeacher">Quản lý giáo viên</Link>,
 							key: "adminTeacherManage",
 						},
 						{
-							label: <Link href="/admin/departmentManage">Quản lý học sinh</Link>,
+							label: <Link href="/admin/manageStudent">Quản lý học sinh</Link>,
 							key: "adminStudentManage",
 						},
 						{
