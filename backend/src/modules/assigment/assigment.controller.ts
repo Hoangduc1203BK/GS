@@ -28,7 +28,8 @@ export class AssigmentController{
     @Patch('/sub-assigment/:id')
     async updateSubAssigment(@Req() req: Request,@Param('id') id: number, @Body() dto: UpdateSubAssigmentDto) {
         const user = req['user'];
-        const result = await this.assigmentService.updateSubAssigment(user, id, dto);
+        const role = user['role']
+        const result = await this.assigmentService.updateSubAssigment(role, id, dto);
 
         return result;
     }

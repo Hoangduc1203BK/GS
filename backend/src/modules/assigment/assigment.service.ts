@@ -156,7 +156,7 @@ export class AssigmentService{
         return subAssigment;
     }
 
-    async updateSubAssigment(user: User, id: number, dto: UpdateSubAssigmentDto) {
+    async updateSubAssigment(role: string, id: number, dto: UpdateSubAssigmentDto) {
         const subAssigment = await this.subAssigmentRepos.findOne({
             where: { id }
         })
@@ -172,7 +172,7 @@ export class AssigmentService{
             throw new Error("Assigment này đã bị huỷ, không thể cập nhật");
         }
 
-        if(user.role == ROLE.USER) {
+        if(role == ROLE.USER) {
             const current = new Date();
             const deadline = assigment.deadline;
             let doc = {
@@ -192,7 +192,7 @@ export class AssigmentService{
             }
 
             await this.subAssigmentRepos.save({id: id, ...doc});
-        }else if(user.role == ROLE.TEACHER) {
+        }else if(role == ROLE.TEACHER) {
             const doc = {
                 ...subAssigment,
                 ...dto
