@@ -36,6 +36,12 @@ export class ListClassDto {
 	@ApiProperty({ required: true })
     @IsOptional()
 	@IsNotEmpty()
+	@IsString()
+	teacherOfDay?: string;
+
+	@ApiProperty({ required: true })
+    @IsOptional()
+	@IsNotEmpty()
 	@IsNumberString()
 	roomId?: number;
 

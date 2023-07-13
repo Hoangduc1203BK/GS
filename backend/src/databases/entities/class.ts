@@ -74,6 +74,14 @@ export class Classes {
     teacher?: string;
 
     @Column({
+        type: 'varchar',
+        length: '6',
+        name: 'teacher_of_day',
+        nullable: true,
+    })
+    teacherOfDay?: string;
+
+    @Column({
         type: 'decimal',
         precision: 10,
         scale: 2,

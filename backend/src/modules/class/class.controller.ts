@@ -30,6 +30,15 @@ import { ROLE } from 'src/common/constants';
 export class ClassController {
   constructor(private readonly classService: ClassService) { }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('/list-class-of-teacher')
+  async listClassOfTeacher(@Req() req: Request) {
+    const user = req["user"];
+    const result = await this.classService.listClassOfTeacher(user["id"]);
+
+    return result;
+  }
+
   //attendance
   @Get('/attendances')
   async listAttendance(@Query() data: ListAttendanceDto) {
@@ -172,7 +181,7 @@ export class ClassController {
     let result;
 
     if (role == ROLE.USER) {
-    const  result = await this.classService.listScheduleOfStudent(user["id"]);
+      result = await this.classService.listScheduleOfStudent(user["id"]);
     } else if (role == ROLE.TEACHER) {
       result = await this.classService.listSchedulesOfTeacher(user["id"]);
     }

@@ -113,6 +113,17 @@ export class ClassService {
     return result;
   }
 
+  async listClassOfTeacher(userId: string) {
+    const listClassOfTeacher = await this.listClass({teacher: userId});
+    const listClassOfTeacherOfDay = await this.listClass({teacherOfDay: userId}); 
+    const difference = listClassOfTeacherOfDay.filter(el => !listClassOfTeacher.some((el1) => el1.id == el.id));
+
+    return [
+      ...listClassOfTeacher,
+      ...difference
+    ]
+  }
+
   async listClass(query: ListClassDto) {
     const {
       // page = DEFAULT_PAGING.PAGE,
@@ -120,6 +131,7 @@ export class ClassService {
       type = CLASS_TYPE.ACTIVE,
       subjectId,
       teacher,
+      teacherOfDay,
       roomId,
       date,
       start,
@@ -143,6 +155,11 @@ export class ClassService {
     if (teacher) {
       await this.userService.getUser(teacher);
       classFilter.teacher = "'" + teacher + "'";
+    }
+
+    if (teacherOfDay) {
+      await this.userService.getUser(teacher);
+      classFilter.teacher_of_day = "'" + teacherOfDay + "'";
     }
 
     if (type) {
