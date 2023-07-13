@@ -23,8 +23,9 @@ export default function StudentsInClass({ info }) {
 
   const fetchDataStudents = async (expanded, value) => {
     if (expanded) {
+      const classId = value.classId
       setIsFetchStudent(true);
-      const studentInClass = await ApiStudentsInClass(value.classId);
+      const studentInClass = await ApiStudentsInClass(classId);
       setStudents([...studentInClass.data]);
       setIsFetchStudent(false);
     } else {
@@ -38,7 +39,14 @@ export default function StudentsInClass({ info }) {
     }
   }, [info]);
 
-  const expandedRowRender = () => {
+  const expandedRowRender = (value) => {
+
+    let data = [];
+    const classId = value.classId
+    ApiStudentsInClass(classId).then(res=> {
+      data = [...res.data]
+    });
+
     const columns = [
       {
         title: "STT",
@@ -80,10 +88,13 @@ export default function StudentsInClass({ info }) {
       {
         title: "Tùy chọn",
         render: (text, record, index) => {
-          return <div>
-            <Button className="hover:!bg-sky-600 bg-sky-500 text-white hover:!text-white">Nhận xét</Button>
-            <Button className="hover:!bg-indigo-600 bg-indigo-500 text-white hover:!text-white">Điểm danh</Button>
-          </div>;
+          return (
+            <div>
+              <Button className="hover:!bg-sky-600 bg-sky-500 text-white hover:!text-white">
+                Nhận xét
+              </Button>
+            </div>
+          );
         },
       },
     ];
@@ -91,7 +102,7 @@ export default function StudentsInClass({ info }) {
     return (
       <Table
         columns={columns}
-        dataSource={students?.map((x, indx) => ({ ...x, key: indx + 1 }))}
+        dataSource={data?.map((x, indx) => ({ ...x, key: indx + 1 }))}
         pagination={false}
         loading={isFetchStudent}
       />
@@ -108,25 +119,25 @@ export default function StudentsInClass({ info }) {
     {
       title: "Tên lớp",
       render: (text, record, index) => {
-        return <div>{record.classes.name}</div>;
+        return <div>{record.classes?.name}</div>;
       },
     },
     {
       title: "Mã môn học",
       render: (text, record, index) => {
-        return <div>{record.classes.subjectId}</div>;
+        return <div>{record.classes?.subjectId}</div>;
       },
     },
     {
       title: "Ngày bắt đầu",
       render: (text, record, index) => {
-        return <div>{record.classes.startDate}</div>;
+        return <div>{record.classes?.startDate}</div>;
       },
     },
     {
       title: "Giáo viên",
       render: (text, record, index) => {
-        return <div>{record.classes.user.name}</div>;
+        return <div>{record.classes?.user?.name}</div>;
       },
     },
     {
@@ -146,9 +157,16 @@ export default function StudentsInClass({ info }) {
     {
       title: "Tùy chọn",
       render: (text, record, index) => {
-        return <div>
-          <Button className="hover:!bg-indigo-600 bg-indigo-500 text-white hover:!text-white">lịch sử Điểm danh</Button>
-        </div>;
+        return (
+          <div>
+            <Button className="hover:!bg-sky-600 bg-sky-500 text-white hover:!text-white">
+              Điểm danh
+            </Button>
+            <Button className="hover:!bg-indigo-600 bg-indigo-500 text-white hover:!text-white">
+              Lịch sử điểm danh
+            </Button>
+          </div>
+        );
       },
     },
   ];

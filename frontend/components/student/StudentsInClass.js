@@ -40,7 +40,18 @@ export default function StudentsInClass({ info }) {
     }
   }, [info]);
 
-  const expandedRowRender = () => {
+  const expandedRowRender = (value) => {
+    
+    let data = [];
+    let loading = true
+    const classId = value.classId
+    const res =  ApiStudentsInClass(classId).then( res=> {
+      
+    });
+    data = res.data;
+    loading = false
+
+    console.log(data);
     const columns = [
       {
         title: "STT",
@@ -101,24 +112,24 @@ export default function StudentsInClass({ info }) {
     {
       title: "Tên lớp",
       render: (text, record, index) => {
-        return <div>{record.classes.name}</div>;
+        return <div>{record.classes?.name}</div>;
       },
     },
     {
       title: "Mã môn học",
       render: (text, record, index) => {
-        return <div>{record.classes.subjectId}</div>;
+        return <div>{record.classes?.subjectId}</div>;
       },
     },
     {      title: "Ngày bắt đầu",
       render: (text, record, index) => {
-        return <div>{record.classes.startDate}</div>;
+        return <div>{record.classes?.startDate}</div>;
       },
   },
     {
       title: "Giáo viên",
       render: (text, record, index) => {
-        return <div>{record.classes.user.name}</div>;
+        return <div>{record.classes?.user?.name}</div>;
       },
     },
     {
@@ -128,7 +139,7 @@ export default function StudentsInClass({ info }) {
           <div>
             {record.classes.timeTables.map((el,idx) => (
               <div key={idx}>
-                Từ {el.start}h đến {el.end}h - Phòng {el.room.name}
+                Từ {el.start}h đến {el.end}h Thứ {el.date} - Phòng {el.room.name}
               </div>
             ))}
           </div>
