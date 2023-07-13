@@ -9,7 +9,7 @@ import {
   TimeTable,
   UserClass,
 } from 'src/databases/entities';
-import { DataSource, In, Repository } from 'typeorm';
+import { DataSource, In, IsNull, Repository } from 'typeorm';
 import {
   CreateAttendanceDto,
   CreateClassDto,
@@ -263,8 +263,7 @@ export class ClassService {
 
       const result1 = [];
       for(const c of result) {
-        const students = await this.userClassRepos.count({where: {classId: c.id}});
-
+        let students = await this.userClassRepos.count({where: {classId: c.id, dtime: IsNull()}});
         const item = {
           ...c,
           number: `${students}/${c.number_student}`

@@ -24,9 +24,10 @@ export class TeacherRegisterClass implements ProposalStrategy {
                 await this.approved(proposal);
                 break;
             case PROPOSAL_STATUS.REJECTED:
-                await this.rejected(proposal)
+                await this.rejected(proposal);
                 break;
             case PROPOSAL_STATUS.CANCELED:
+                await this.canceled(proposal);
                 break;
         }
     }

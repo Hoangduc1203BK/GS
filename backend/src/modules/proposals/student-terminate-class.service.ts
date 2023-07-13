@@ -24,9 +24,10 @@ export class StudentTerminateClass implements ProposalStrategy {
                 await this.approved(proposal);
                 break;
             case PROPOSAL_STATUS.REJECTED:
-                await this.rejected(proposal)
+                await this.rejected(proposal);
                 break;
             case PROPOSAL_STATUS.CANCELED:
+                await this.canceled(proposal);
                 break;
         }
     }
@@ -57,7 +58,7 @@ export class StudentTerminateClass implements ProposalStrategy {
             'Kết quả xét duyệt đề xuất',
             './proposal',
             {
-                name: 'đăng ký học lớp',
+                name: 'xin nghỉ học',
                 status: PROPOSAL_STATUS.APPROVED,
                 description: 'Học sinh ' + user.name+ ' đã xin nghỉ tại lớp:' + classes.name + ' .'
             }

@@ -10,8 +10,8 @@ export interface STUDENT_REGISTER_CLASS {
 }
 
 export interface TEACHER_TAKE_BRAKE {
-    classId?: string,
-    sub_teacher_id?: string,
+    classId: string,
+    subTeacherId?: string,
 }
 
 export interface STUDENT_TERMINATE_CLASS {
@@ -19,5 +19,5 @@ export interface STUDENT_TERMINATE_CLASS {
 }
 
 export interface ProposalStrategy {
-   handleProposal(dto: UpdateProposalDto, proposal: Proposals): Promise<void>
+   handleProposal(dto: UpdateProposalDto, proposal: Proposals, subData?:any): Promise<void>
 }

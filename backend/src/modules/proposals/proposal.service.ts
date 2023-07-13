@@ -33,7 +33,7 @@ export class ProposalService {
                 this.proposalStrategy = new TeacherRegisterClass(this.proposalRepos, this.userService, this.mailService, this.classService);
                 break;
             case PROPOSAL_TYPE.TEACHER_TAKE_BRAKE:
-                this.proposalStrategy = new TeacherTakeBrake();
+                this.proposalStrategy = new TeacherTakeBrake(this.proposalRepos, this.userService, this.mailService, this.classService);
                 break;
             case PROPOSAL_TYPE.STUDENT_REGISTER_CLASS:
                 this.proposalStrategy = new StudentRegisterClass(this.proposalRepos,this.classService, this.mailService, this.userService);
@@ -162,6 +162,10 @@ export class ProposalService {
 
         this.setProposalStrategy(proposal.type);
 
-        await this.proposalStrategy.handleProposal(dto, proposal);
+        if(proposal.type == PROPOSAL_TYPE.TEACHER_TAKE_BRAKE) {
+            await this.proposalStrategy.handleProposal(dto, proposal,dto.subData);
+        }else {
+            await this.proposalStrategy.handleProposal(dto, proposal);
+        }
     }
 }
