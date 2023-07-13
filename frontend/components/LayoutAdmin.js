@@ -67,8 +67,8 @@ export default function LayoutAdmin({
 					key: "infoStudent",
 				},
 				{
-					label: <Link href="/student/result">Quản lý danh sách lớp</Link>,
-					key: "resultStudent",
+					label: <Link href="/student/class">Quản lý danh sách lớp</Link>,
+					key: "classStudent",
 				},
 				{
 					label: <Link href="/student/suggest">Quản lý đề xuất</Link>,
@@ -91,7 +91,7 @@ export default function LayoutAdmin({
 					key: "infoTeacher",
 				},
 				{
-					label: <Link href="/admin">Thời khóa biểu</Link>,
+					label: <Link href="/teacher/class">Danh sách lớp học</Link>,
 					key: "tkbTeacher",
 				},
 				{

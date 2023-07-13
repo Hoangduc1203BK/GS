@@ -30,6 +30,12 @@ export const setToken = (token) => {
         });
     }
 
+    export function ApiGetListClassEmpty(params) {
+        return axios.get('/class/student-empty',{
+            params:params
+        });
+    }
+
     export function ApiCreateSuggest (data){
         return axios.post('/proposal', data);
     }
@@ -39,4 +45,8 @@ export const setToken = (token) => {
         return axios.get('/proposal', {
             params: {...params}
         });
+    }
+
+    export function ApiGetListSchedule (){
+        return axios.get('/class/schedules');
     }

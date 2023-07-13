@@ -9,6 +9,7 @@ import PopupStudentFeedback from "@/components/popup/popupStudentFeedback";
 import PopupStudentTuitionFee from "@/components/popup/popupStudentTuitionFee";
 import { getMeInfo } from "@/api/address";
 import { getCookie, hasCookie } from "@/api/cookies";
+import { ApiGetListSchedule } from "@/api/student";
 
 const Dashboard = ({user}) => {
   
@@ -18,20 +19,20 @@ const Dashboard = ({user}) => {
   const [schedule, setSchedule] = useState([]);
   const [info, setInfo] = useState(user);
   useEffect(() => {
-    setSchedule(
-      [1, 3, 4, 5, 6, 9, 7].map((el) => {
-        return {
-          id: el,
-          startDate: dayjs().format("YYYY-MM-DD"),
-          startTime: dayjs().format("HH:mm"),
-          subject: "toán",
-          teachet: " Lê Thị Phương ",
-          room: "Phòng 101",
-          time: "2 tiếng",
-          session: "Buổi 4",
-        };
-      })
-    );
+    // setSchedule(
+    //   [1, 3, 4, 5, 6, 9, 7].map((el) => {
+    //     return {
+    //       id: el,
+    //       startDate: dayjs().format("YYYY-MM-DD"),
+    //       startTime: dayjs().format("HH:mm"),
+    //       subject: "toán",
+    //       teachet: " Lê Thị Phương ",
+    //       room: "Phòng 101",
+    //       time: "2 tiếng",
+    //       session: "Buổi 4",
+    //     };
+    //   })
+    // );
 
 
     const callUserDetail = async () =>  {
@@ -55,9 +56,18 @@ const Dashboard = ({user}) => {
       }
     }
 
-    callUserDetail()
+    callUserDetail();
+    getSchedule()
   }, []);
 
+
+  const getSchedule = async () =>{
+    const response = await ApiGetListSchedule();
+    setSchedule(
+      Object.entries(response.data).map(([key,value])=> value)
+    )
+    console.log(Object.entries(response.data).map(([key,value])=> value));
+  }
   return (
     <div className="flex">
        <PopupStudentSuggest open={openSugget} setOpen={setOpenSuggest} />
