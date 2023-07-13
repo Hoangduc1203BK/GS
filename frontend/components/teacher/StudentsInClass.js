@@ -1,13 +1,13 @@
 import { ApiClassOfStudent, ApiStudentsInClass } from "@/api/student";
 import { genderVNConvert } from "@/common/const";
 import { TeamOutlined } from "@ant-design/icons";
-import { Table, message } from "antd";
+import { Button, Table, message } from "antd";
 import { useEffect, useState } from "react";
 
 export default function StudentsInClass({ info }) {
   const [classes, setClasses] = useState([]);
   const [students, setStudents] = useState([]);
-  const [isFetchStudent, setIsFetchStudent] = useState(false)
+  const [isFetchStudent, setIsFetchStudent] = useState(false);
   // const []
 
   const fetchDataClass = async () => {
@@ -22,16 +22,15 @@ export default function StudentsInClass({ info }) {
   };
 
   const fetchDataStudents = async (expanded, value) => {
-      if (expanded) {
-        setIsFetchStudent(true)
-        const studentInClass = await ApiStudentsInClass(value.classId);
-        setStudents([...studentInClass.data]);
-        setIsFetchStudent(false)
-      }
-      else{
-        setStudents([]);
-
-      }
+    if (expanded) {
+      const classId = value.classId
+      setIsFetchStudent(true);
+      const studentInClass = await ApiStudentsInClass(classId);
+      setStudents([...studentInClass.data]);
+      setIsFetchStudent(false);
+    } else {
+      setStudents([]);
+    }
   };
 
   useEffect(() => {
@@ -41,17 +40,13 @@ export default function StudentsInClass({ info }) {
   }, [info]);
 
   const expandedRowRender = (value) => {
-    
-    let data = [];
-    let loading = true
-    const classId = value.classId
-    const res =  ApiStudentsInClass(classId).then( res=> {
-      
-    });
-    data = res.data;
-    loading = false
 
-    console.log(data);
+    let data = [];
+    const classId = value.classId
+    ApiStudentsInClass(classId).then(res=> {
+      data = [...res.data]
+    });
+
     const columns = [
       {
         title: "STT",
@@ -90,12 +85,24 @@ export default function StudentsInClass({ info }) {
         dataIndex: "phoneNumber",
         key: "phoneNumber",
       },
+      {
+        title: "Tùy chọn",
+        render: (text, record, index) => {
+          return (
+            <div>
+              <Button className="hover:!bg-sky-600 bg-sky-500 text-white hover:!text-white">
+                Nhận xét
+              </Button>
+            </div>
+          );
+        },
+      },
     ];
 
     return (
       <Table
         columns={columns}
-        dataSource={students?.map((x, indx) => ({ ...x, key: indx + 1 }))}
+        dataSource={data?.map((x, indx) => ({ ...x, key: indx + 1 }))}
         pagination={false}
         loading={isFetchStudent}
       />
@@ -121,11 +128,12 @@ export default function StudentsInClass({ info }) {
         return <div>{record.classes?.subjectId}</div>;
       },
     },
-    {      title: "Ngày bắt đầu",
+    {
+      title: "Ngày bắt đầu",
       render: (text, record, index) => {
         return <div>{record.classes?.startDate}</div>;
       },
-  },
+    },
     {
       title: "Giáo viên",
       render: (text, record, index) => {
@@ -137,11 +145,26 @@ export default function StudentsInClass({ info }) {
       render: (text, record, index) => {
         return (
           <div>
-            {record.classes.timeTables.map((el,idx) => (
+            {record.classes.timeTables.map((el, idx) => (
               <div key={idx}>
-                Từ {el.start}h đến {el.end}h Thứ {el.date} - Phòng {el.room.name}
+                Từ {el.start}h đến {el.end}h - Phòng {el.room.name}
               </div>
             ))}
+          </div>
+        );
+      },
+    },
+    {
+      title: "Tùy chọn",
+      render: (text, record, index) => {
+        return (
+          <div>
+            <Button className="hover:!bg-sky-600 bg-sky-500 text-white hover:!text-white">
+              Điểm danh
+            </Button>
+            <Button className="hover:!bg-indigo-600 bg-indigo-500 text-white hover:!text-white">
+              Lịch sử điểm danh
+            </Button>
           </div>
         );
       },

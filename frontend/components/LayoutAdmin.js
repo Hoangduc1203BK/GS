@@ -67,8 +67,8 @@ export default function LayoutAdmin({
 					key: "infoStudent",
 				},
 				{
-					label: <Link href="/student/result">Quản lý danh sách lớp</Link>,
-					key: "resultStudent",
+					label: <Link href="/student/class">Quản lý danh sách lớp</Link>,
+					key: "classStudent",
 				},
 				{
 					label: <Link href="/student/suggest">Quản lý đề xuất</Link>,
@@ -91,7 +91,7 @@ export default function LayoutAdmin({
 					key: "infoTeacher",
 				},
 				{
-					label: <Link href="/admin">Thời khóa biểu</Link>,
+					label: <Link href="/teacher/class">Danh sách lớp học</Link>,
 					key: "tkbTeacher",
 				},
 				{
@@ -121,18 +121,32 @@ export default function LayoutAdmin({
 			icon: <FileProtectOutlined />,
 			children: [
 				{
-					label: <Link href="/admin">Quản lý đề xuất</Link>,
-					key: "recommend",
-				},
-				{
-					label: <Link href="/admin">Quản lý bộ môn</Link>,
-					key: "tkbCenter",
-				},
-				{
 					label: (
 						<Link href="/admin/classroom">Quản lý phòng học</Link>
 					),
 					key: "classroomManagement",
+				},
+				{
+					label: "Quản lý chung",
+					key: "manageSumary",
+					children: [
+						{
+							label: <Link href="/admin/departmentManage">Quản lý bộ môn</Link>,
+							key: "departmentManage",
+						},
+						{
+							label: <Link href="/admin/departmentManage">Quản lý giáo viên</Link>,
+							key: "adminTeacherManage",
+						},
+						{
+							label: <Link href="/admin/departmentManage">Quản lý học sinh</Link>,
+							key: "adminStudentManage",
+						},
+						{
+							label: <Link href="/admin">Quản lý đề xuất</Link>,
+							key: "recommend",
+						},
+					]
 				},
 				{
 					label: "Thi đầu vào",
