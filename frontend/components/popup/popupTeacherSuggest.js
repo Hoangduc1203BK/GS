@@ -12,15 +12,15 @@ import {
 } from "antd";
 import { useState } from "react";
 import {
-  STUDENT_PROPOSAL_TYPE,
+  TEACHER_PROPOSAL_TYPE,
   GRADE,
   FORMAT_DATE,
   PROPOSAL_TYPE,
 } from "@/common/const";
 import {
-  ApiClassOfStudent,
   ApiCreateSuggest,
-  ApiGetListClassEmpty,
+  ApiGetListClassTeacherEmpty,
+  ApiGetListClass,
   ApiGetListSubject,
 } from "@/api/student";
 import dayjs from "dayjs";
@@ -35,11 +35,6 @@ export default function PopupStudentSuggest({
   const [form] = Form.useForm();
   const [subjects, setSubjects] = useState([]);
   const [classes, setClasses] = useState([]);
-  const [classInfo, setClassInfo] = useState({
-    start: "",
-    end: "",
-    room: "",
-  });
 
   const getListSubject = async (value) => {
     const response = await ApiGetListSubject({ grade: value });
@@ -60,32 +55,20 @@ export default function PopupStudentSuggest({
       class: "",
       room: "",
     });
-    if (field.suggestType === PROPOSAL_TYPE.STUDENT_REGISTER_CLASS) {
-      response = await ApiGetListClassEmpty({
+    if (field.suggestType === PROPOSAL_TYPE.TEACHER_REGISTER_CLASS) {
+      response = await ApiGetListClassTeacherEmpty({
         subjectId: value,
       });
-    } else if (field.suggestType === PROPOSAL_TYPE.STUDENT_TERMINATE_CLASS) {
-      response = await ApiClassOfStudent(info.id, {
+    } else if (field.suggestType === PROPOSAL_TYPE.TEACHER_TAKE_BRAKE) {
+      response = await ApiGetListClass({
         subjectId: value,
+        teacher: info?.id,
       });
     }
-    setClasses([...response.data]);
+    setClasses([...response?.data]);
+    console.log(field);
   };
 
-  const changeInfoClass = (value) => {
-    const field = form.getFieldsValue();
-
-    const classInfo = classes.find((el) => el.id === value);
-    console.log(classInfo);
-    setClassInfo(info);
-    form.setFieldsValue({
-      ...form.getFieldValue,
-      room:
-        field.suggestType === PROPOSAL_TYPE.STUDENT_REGISTER_CLASS
-          ? classInfo?.time_tables[0]?.room_name
-          : classInfo?.classes?.timeTables[0]?.room?.name,
-    });
-  };
   const handleFinish = async (values) => {
     const payload = {
       userId: info?.id,
@@ -115,7 +98,6 @@ export default function PopupStudentSuggest({
       room: "",
     });
   };
-
   return (
     <>
       <Modal
@@ -161,11 +143,8 @@ export default function PopupStudentSuggest({
               { required: true, message: "Đây là trường dữ liệu bắt buộc!" },
             ]}
           >
-            <Select
-              placeholder="-- Chọn --"
-              onChange={() => handleChaneSuggestType()}
-            >
-              {STUDENT_PROPOSAL_TYPE.map((proposal, index) => (
+            <Select placeholder="-- Chọn --" onChange={handleChaneSuggestType}>
+              {TEACHER_PROPOSAL_TYPE.map((proposal, index) => (
                 <Select.Option value={proposal.value} key={index}>
                   {proposal.label}
                 </Select.Option>
@@ -209,22 +188,15 @@ export default function PopupStudentSuggest({
               { required: true, message: "Đây là trường dữ liệu bắt buộc!" },
             ]}
           >
-            <Select placeholder="-- Chọn --" onChange={changeInfoClass}>
+            <Select
+              placeholder="-- Chọn --"
+            >
               {classes?.map((subject, index) => (
                 <Select.Option value={subject?.id} key={index}>
                   {subject?.name}
                 </Select.Option>
               ))}
             </Select>
-          </Form.Item>
-          <Form.Item
-            name="room"
-            label="Phòng học"
-            rules={[
-              { required: true, message: "Đây là trường dữ liệu bắt buộc!" },
-            ]}
-          >
-            <Input type="text" readOnly></Input>
           </Form.Item>
           <Form.Item
             name="note"

@@ -78,14 +78,14 @@ const Dashboard = ({user}) => {
                 className="w-1/2 !bg-green-600"
                 onClick={() => setOpenFeedback(true)}
               >
-                Thư góp ý
+                Bảng chấm công
               </Button>
             <Button
               type="primary"
               className="w-1/2 !bg-violet-700"
               onClick={() => setOpenTuitionFee(true)}
             >
-              Học phí
+              Tiền lương
             </Button>
           </div>
         </InfoStuTea>

@@ -5,9 +5,12 @@ import dayjs from "dayjs";
 export default function LayoutTimeTables({ schedule }) {
   return (
     <div>
-      <div className="rounded-md mt-3	border-solid border-black border-2 p-4">
+      <div className="mt-3 p-4">
         {schedule.map((el, index) => (
-          <div className="mb-2" key={index}>
+          <div
+            className="mb-3 border-solid border-black border-2 py-1 px-2 rounded-md shadow-md"
+            key={index}
+          >
             <div>
               <b>
                 {index === 6 ? "Chủ nhật" : "Thứ " + (index + 2)} - Ngày{" "}
@@ -15,13 +18,13 @@ export default function LayoutTimeTables({ schedule }) {
               </b>
             </div>
 
-            {el.classes ? (
+            {el.classes?.length ? (
               el.classes?.map((e, idx) => (
                 <div className="flex items-center" key={idx}>
-                  <div className="w-1/5 text-xs">
+                  <div className="w-3/12 text-xs">
                     Từ {e.start}h đến {e.end}h
                   </div>
-                  <div className="w-3/5">
+                  <div className="w-7/12">
                     <div>
                       <b>Môn {e.subject}</b>
                     </div>
@@ -30,14 +33,16 @@ export default function LayoutTimeTables({ schedule }) {
                       Giáo viên: {e.teacher} - {e.room}{" "}
                     </div>
                   </div>
-                  <div className="w-1/5 text-end">
-                    <div>{e.session}</div>
-                    <div className="text-xs">{e.time}</div>
+                  <div className="w-2/12 text-end">
+                    <div> Buổi {idx + 1}</div>
+                    <div className="text-xs">2 tiếng</div>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="flex items-center justify-center">Chưa Có lớp</div>
+              <div className="flex items-center justify-center font-bold">
+                Chưa Có lớp
+              </div>
             )}
           </div>
         ))}
