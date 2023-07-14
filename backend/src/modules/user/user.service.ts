@@ -103,7 +103,9 @@ export class UserService {
     if (dto.departmentId) {
       department = await this.departmentService.getDepartment(dto.departmentId);
     }
-    const user = await this.getUser(id);
+    const user = await this.userRepos.find({
+      where: { id }
+    });
     const doc = {
       ...user,
       ...dto,
@@ -114,14 +116,8 @@ export class UserService {
       doc.password = hashPassword
     }
     
-    const result = await this.userRepos.save({ id: id, ...doc });
-    if (department && department.id) {
-      return {
-        ...result,
-        department: department,
-      };
-    }
+    await this.userRepos.save({ id: id, ...doc });
 
-    return result;
+    return this.getUser(id);
   }
 }
