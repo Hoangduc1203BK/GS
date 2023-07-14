@@ -82,7 +82,7 @@ export class CreateUserDto {
     @ApiProperty({ required: false })
     @IsOptional()
 	@IsNotEmpty()
-	@IsNumberString()
+	@IsNumber()
 	experience?: number;
 
     @ApiProperty({ required: false })
