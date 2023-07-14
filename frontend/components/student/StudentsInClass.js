@@ -8,30 +8,38 @@ export default function StudentsInClass({ info }) {
   const [classes, setClasses] = useState([]);
   const [students, setStudents] = useState([]);
   const [isFetchStudent, setIsFetchStudent] = useState(false)
-  // const []
+  const [expandedKey, setExpandedKey] = useState([]);
 
   const fetchDataClass = async () => {
     try {
       if (info?.id) {
         const classOfStudent = await ApiClassOfStudent(info.id);
-        setClasses([...classOfStudent?.data]);
+        setClasses(classOfStudent?.data?.map((i, index) => ({ ...i, key: i?.id, number: index + 1 })));
       }
     } catch (error) {
       message.error("Có lỗi xảy ra! Vui lòng thử lại.");
     }
   };
 
-  const fetchDataStudents = async (expanded, value) => {
+  const fetchDataStudents = async (expanded, record) => {
+    try {
       if (expanded) {
         setIsFetchStudent(true)
-        const studentInClass = await ApiStudentsInClass(value.classId);
-        setStudents([...studentInClass.data]);
+        const studentInClass = await ApiStudentsInClass(record.classId);
+        setStudents(studentInClass?.data?.map((i, index) => ({ ...i, key: i?.id, number: index + 1, gender: i?.gender == 'female' ? "Nữ" : "Nam" })));
         setIsFetchStudent(false)
+        setExpandedKey([record?.key])
       }
       else{
         setStudents([]);
-
+        setExpandedKey([])
+        setIsFetchStudent(false)
       }
+    } catch (error) {
+      console.log(error);
+      message.error("Lấy dữ liệu học sinh thất bại!")
+    }
+      
   };
 
   useEffect(() => {
@@ -40,18 +48,7 @@ export default function StudentsInClass({ info }) {
     }
   }, [info]);
 
-  const expandedRowRender = (value) => {
-    
-    let data = [];
-    let loading = true
-    const classId = value.classId
-    const res =  ApiStudentsInClass(classId).then( res=> {
-      
-    });
-    data = res.data;
-    loading = false
-
-    console.log(data);
+  const expandedRowRender = () => {
     const columns = [
       {
         title: "STT",
@@ -159,9 +156,9 @@ export default function StudentsInClass({ info }) {
         columns={columns}
         expandable={{
           expandedRowRender,
-          defaultExpandedRowKeys: ["0"],
-          onExpand: (expanded, value) => {
-            fetchDataStudents(expanded, value);
+          expandedRowKeys: expandedKey,
+          onExpand: (expanded, record) => {
+            fetchDataStudents(expanded, record);
           },
         }}
         bordered

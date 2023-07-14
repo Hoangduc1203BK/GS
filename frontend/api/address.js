@@ -108,6 +108,13 @@ export const getListSubject = (params) => {
 	return axios.get("/subject", { params: params });
 };
 
+export const createSubject = (params) => {
+	return axios.post("/subject", params)
+}
+
+export const updateSubject = (id, params) => {
+	return axios.patch(`/subject/${id}`, params);
+};
 // exam
 export const getListExam = (params) => {
 	return axios.get("/exam", { params: params });
@@ -161,3 +168,11 @@ export const getAttendance = (params) => {
 export const getListDepartment = (params) => {
 	return axios.get(`/department`, { params: params })
 }
+
+export const createDepartment = (params) => {
+	return axios.post("/department", params)
+}
+
+export const updateDepartment = (id, params) => {
+	return axios.patch(`/department/${id}`, params);
+};

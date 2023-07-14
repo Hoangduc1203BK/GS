@@ -36,7 +36,7 @@ const Dashboard = ({user}) => {
 
 
     const callUserDetail = async () =>  {
-      if(!user?.id){
+      
         let token = {} ;
         if (typeof window !== "undefined") {
           token = getCookie("token");
@@ -53,7 +53,7 @@ const Dashboard = ({user}) => {
             console.log("call api error", error)
           }
         }
-      }
+      
     }
 
     callUserDetail();
