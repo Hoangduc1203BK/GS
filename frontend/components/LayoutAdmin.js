@@ -143,7 +143,7 @@ export default function LayoutAdmin({
 							key: "adminStudentManage",
 						},
 						{
-							label: <Link href="/admin">Quản lý đề xuất</Link>,
+							label: <Link href="/admin/recommendManage">Quản lý đề xuất</Link>,
 							key: "recommend",
 						},
 					]

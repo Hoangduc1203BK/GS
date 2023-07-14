@@ -1,13 +1,105 @@
+import { createUser, getListDepartment, updateUser } from "@/api/address"
 import { GRADE } from "@/common/const"
-import { Button, Card, Col, DatePicker, Divider, Form, Input, InputNumber, Row, Select, Switch } from "antd"
+import { validatePhone } from "@/common/util"
+import { Button, Card, Col, DatePicker, Divider, Form, Input, InputNumber, Row, Select, Switch, message } from "antd"
+import dayjs from "dayjs"
 import Image from "next/image"
+import { useEffect, useState } from "react"
 
 const logoMale = require("../public/userMale.png")
 const logoFemale = require("../public/userFemale.png")
 
-const AddEditTs = ({ checkEdit, dataMe }) => {
-
+const AddEditTs = ({ checkEdit, dataEdit, mode, handleOpenForm }) => {
   const [form] = Form.useForm()
+
+  const valueForm = {
+    name: Form.useWatch('name', form),
+    email: Form.useWatch('email', form),
+    birthDay: Form.useWatch('birthDay', form),
+    phoneNumber: Form.useWatch('phoneNumber', form),
+    gender: Form.useWatch('gender', form),
+    address: Form.useWatch('address', form),
+    departmentId: Form.useWatch('departmentId', form),
+    teacher_school: Form.useWatch('teacherSchool', form),
+    student_school: Form.useWatch('studentSchool', form),
+    grade: Form.useWatch('grade', form),
+  }
+
+  const [listDepartment, setListDepartment] = useState([]);
+  const [checkedGraduated, setCheckedGraduated] = useState(false);
+
+  async function onFinish(values) {
+    values.birthDay = dayjs(values.birthDay).format('YYYY-MM-DD')
+    if (mode === 1) {
+      values.graduated = checkedGraduated
+      values.role = 'teacher'
+    } else {
+      values.role = 'user'
+    }
+    if (checkEdit) {
+      updateUser(dataEdit?.id, values).then(
+        res => {
+          if (res?.data?.id) {
+            message.success(`Cập nhật thông tin ${mode === 1 ? "giáo viên" : "học sinh"} thành công!`)
+            form.resetFields()
+            handleOpenForm(false, false)
+          } else message.error(`Cập nhật thông tin ${mode === 1 ? "giáo viên" : "học sinh"} thất bại`)
+        }
+      ).catch(err => message.error("Có lỗi xảy ra! " + err))
+    } else {
+      createUser(values).then(
+        res => {
+          if (res?.data?.id) {
+            message.success(`Thêm mới ${mode === 1 ? "giáo viên" : "học sinh"} thành công!`)
+            form.resetFields()
+            handleOpenForm(false, false)
+          } else message.error(`Thêm mới ${mode === 1 ? "giáo viên" : "học sinh"} thất bại`)
+        }
+      ).catch(err => message.error("Có lỗi xảy ra! " + err))
+    }
+  }
+  console.log(dataEdit);
+  useEffect(() => {
+    if (checkEdit) {
+      if (mode == 1) {
+        form.setFieldsValue({
+          name: dataEdit?.name,
+          email: dataEdit?.email,
+          phoneNumber: dataEdit?.phoneNumber,
+          birthDay: dayjs(dataEdit?.birthDay),
+          gender: dataEdit?.gender,
+          address: dataEdit?.address,
+          departmentId: dataEdit?.departmentId,
+          major: dataEdit?.major,
+          teacherSchool: dataEdit?.teacherSchool,
+          experience: dataEdit?.experience,
+          degree: dataEdit?.degree,
+        })
+        setCheckedGraduated(dataEdit?.graduated)
+      }
+      else {
+        form.setFieldsValue({
+          name: dataEdit?.name,
+          email: dataEdit?.email,
+          phoneNumber: dataEdit?.phoneNumber,
+          birthDay: dayjs(dataEdit?.birthDay),
+          gender: dataEdit?.gender,
+          address: dataEdit?.address,
+          grade: dataEdit?.grade,
+          studentSchool: dataEdit?.studentSchool,
+          parentPhoneNumber: dataEdit?.parentPhoneNumber,
+        })
+      }
+    }
+  }, [checkEdit, dataEdit]);
+
+  useEffect(() => {
+    getListDepartment().then(
+      res => {
+        setListDepartment(res?.data?.result);
+      }
+    ).catch(err => console.log(err, 'errr'))
+  }, []);
 
   return (
     <>
@@ -18,53 +110,49 @@ const AddEditTs = ({ checkEdit, dataMe }) => {
             title={<>
               <Row gutter={[8, 8]}>
                 <Col xs={14}>
-                  <p className="uppercase text-sm font-bold">Trường {dataMe?.role === 'teacher' ? dataMe?.teacher_school : dataMe?.student_school}</p>
+                  <p className="uppercase text-sm font-bold">Trường {mode === 1 ? valueForm.teacher_school : valueForm.student_school}</p>
                 </Col>
                 <Col xs={10} className="text-center">
-                  <p className="uppercase text-sm font-bold">Thông tin {`${dataMe?.role === 'teacher' ? "giáo viên" : "sinh viên"}`}</p>
-                  <p className="text-xs">{`${dataMe?.role === 'teacher' ? "Teacher" : "Student"}`} card</p>
+                  <p className="uppercase text-sm font-bold">Thông tin {`${mode === 1 ? "giáo viên" : "sinh viên"}`}</p>
+                  <p className="text-xs">{`${mode === 1 ? "Teacher" : "Student"}`} card</p>
                 </Col>
               </Row>
             </>}
             headStyle={{
               borderBottom: '2px solid #cd1818'
             }}
-          // style={{
-          //     width: 600,
-          // }}
           >
             <Row gutter={[8, 8]}>
               <Col xs={16}>
                 <div className="mb-2">
                   <p className="text-[9px]">Họ tên / Name</p>
-                  <p className="uppercase text-base font-bold">{dataMe?.name || ""}</p>
+                  <p className="uppercase text-base font-bold">{valueForm.name}</p>
                 </div>
                 <div className="mb-2">
                   <p className="text-[9px]">Ngày sinh / Date of Birth</p>
-                  <p className="text-sm font-medium">{dataMe?.birthDay || ""}</p>
+                  <p className="text-sm font-medium">{valueForm.birthDay ? dayjs(valueForm.birthDay).format('DD-MM-YYYY') : ""}</p>
                 </div>
                 <div className="mb-2">
                   <p className="text-[9px]">Giới tính</p>
-                  <p className="text-sm font-medium">{dataMe?.gender == "female" ? "Nữ" : "Nam"}</p>
+                  <p className="text-sm font-medium">{valueForm.gender == 'male' ? "Nam" : "Nữ"}</p>
                 </div>
                 <div className="mb-2">
                   <p className="text-[9px]">Email</p>
-                  <p className="text-sm font-medium">{dataMe?.email || ""}</p>
+                  <p className="text-sm font-medium">{valueForm.email}</p>
                 </div>
                 <div className="mb-2">
                   <p className="text-[9px]">SĐT</p>
-                  <p className="text-sm font-medium">{dataMe?.parentPhoneNumber || dataMe?.phoneNumber || ""}</p>
+                  <p className="text-sm font-medium">{valueForm.phoneNumber}</p>
                 </div>
                 <div className="mb-2">
-                  <p className="text-[9px]">{`${dataMe?.role === 'teacher' ? "Bộ môn" : "Khối"}`}</p>
-                  <p className="text-sm font-medium">{`${dataMe?.role === 'teacher' ? dataMe?.departmentId : "Khối " + (dataMe?.grade || "...")}`}</p>
+                  <p className="text-[9px]">{`${mode === 1 ? "Bộ môn" : "Khối"}`}</p>
+                  <p className="text-sm font-medium">{`${mode === 1 ? listDepartment?.find(i => i.id === valueForm?.departmentId)?.name || "" : "Khối " + (valueForm?.grade || "...")}`}</p>
                 </div>
               </Col>
               <Col xs={8}>
-                <Image src={dataMe?.gender == 'male' ? logoMale : logoFemale} alt="Logo user" />
-                <p className="text-[9px] text-center">{`${dataMe?.role === 'teacher' ? "MGV" : "MSSV"}`} / ID No</p>
-                <p className="text-sm font-medium text-center">{dataMe?.id || ""} </p>
-
+                <Image src={valueForm?.gender == 'male' ? logoMale : logoFemale} alt="Logo user" />
+                <p className="text-[9px] text-center">{`${mode === 1 ? "MGV" : "MSSV"}`} / ID No</p>
+                <p className="text-sm font-medium text-center">{dataEdit?.id || ""} </p>
               </Col>
             </Row>
           </Card>
@@ -78,9 +166,9 @@ const AddEditTs = ({ checkEdit, dataMe }) => {
           <Form
             form={form}
             layout="vertical"
-
+            onFinish={onFinish}
           >
-            <p className="font-medium text-lg mb-2">Thông tin {dataMe?.role == 'teacher' ? "giáo viên" : "học sinh"}</p>
+            <p className="font-medium text-lg mb-2">Thông tin {mode === 1 ? "giáo viên" : "học sinh"}</p>
             <Row gutter={[8, 8]}>
               <Col xs={24} md={12}>
                 <Form.Item label="Họ và tên" name="name" rules={[{ required: true, message: "Đây là trường dữ liệu bắt buộc!" }]}>
@@ -92,7 +180,10 @@ const AddEditTs = ({ checkEdit, dataMe }) => {
                 <Form.Item label="Giới tính" name="gender" rules={[{ required: true, message: "Đây là trường dữ liệu bắt buộc!" }]}>
                   <Select
                     placeholder="-- Chọn --"
-                  ></Select>
+                  >
+                    <Select.Option value="female">Nữ</Select.Option>
+                    <Select.Option value="male">Nam</Select.Option>
+                  </Select>
                 </Form.Item>
               </Col>
               <Col xs={24} md={12}>
@@ -118,17 +209,21 @@ const AddEditTs = ({ checkEdit, dataMe }) => {
             <Row gutter={[8, 8]}>
               <Col xs={24} md={12}>
                 {
-                  dataMe?.role == 'teacher' ?
+                  mode === 1 ?
                     <>
                       <Form.Item label="Bộ môn" name="departmentId" rules={[{ required: true, message: "Đây là trường dữ liệu bắt buộc!" }]}>
                         <Select
                           placeholder="-- Chọn --"
                         >
-                          <Select.Option>bo mon 1</Select.Option>
+                          {
+                            listDepartment?.map(i => (
+                              <Select.Option key={i.id} value={i.id}>{i?.name}</Select.Option>
+                            ))
+                          }
                         </Select>
                       </Form.Item>
-                      <Form.Item label="Tốt nghiệp" name="graduated">
-                        <Switch defaultChecked />
+                      <Form.Item label="Tốt nghiệp">
+                        <Switch checked={checkedGraduated} onChange={(checked) => setCheckedGraduated(checked)} />
                       </Form.Item>
                       <Form.Item label="Chuyên ngành" name="major">
                         <Input placeholder="Nhập chuyên ngành" />
@@ -165,9 +260,8 @@ const AddEditTs = ({ checkEdit, dataMe }) => {
               </Col>
               <Col xs={24} md={12}>
                 {
-                  dataMe?.role == 'teacher' ?
+                  mode == 1 ?
                     <>
-
                       <Form.Item label="Degree" name="degree">
                         <Input placeholder="Nhập degree" />
                       </Form.Item>
@@ -192,7 +286,7 @@ const AddEditTs = ({ checkEdit, dataMe }) => {
                 <Button htmlType="submit" type="primary">Xác nhận</Button>
               </Col>
               <Col>
-                <Button>Hủy</Button>
+                <Button onClick={() => handleOpenForm(false, false)}>Hủy</Button>
               </Col>
             </Row>
           </Form>
