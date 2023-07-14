@@ -14,3 +14,4 @@ export * from './test-learning';
 export * from './proposals';
 export * from './/assigment';
 export * from './sub-assigment';
+export * from './feedback';

@@ -220,4 +220,7 @@ export class User {
     //proposals
     @OneToMany(() => Proposals, p => p.user)
     proposals: Proposals[];
+
+    //feedback
+    
 }

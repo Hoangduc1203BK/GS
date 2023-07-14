@@ -167,5 +167,7 @@ export class ProposalService {
         }else {
             await this.proposalStrategy.handleProposal(dto, proposal);
         }
+
+        return true;
     }
 }
