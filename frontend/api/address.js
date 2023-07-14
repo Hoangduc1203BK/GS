@@ -101,7 +101,13 @@ export const getListUser = (params) => {
 export const createUser = (params) => {
 	return axios.post("/user", params);
 };
+export const updateUser = (id, params) => {
+	return axios.patch(`/user/${id}`, params);
+};
 
+export const getListTeacherEmpty = (params) => {
+	return axios.post("/class/teacher-empty", params);
+};
 
 // subject
 export const getListSubject = (params) => {
@@ -146,6 +152,10 @@ export const getListClass = (params) => {
 	return axios.get("/class", { params: params });
 };
 
+export const getClass = (id) => {
+	return axios.get(`/class/${id}`);
+};
+
 export const createClass = (params) => {
 	return axios.post("/class", params)
 }
@@ -175,4 +185,16 @@ export const createDepartment = (params) => {
 
 export const updateDepartment = (id, params) => {
 	return axios.patch(`/department/${id}`, params);
+};
+
+//proposal
+
+
+export const getListProposal = (params) => {
+	return axios.get(`/proposal`, { params: params })
+}
+
+
+export const updateProposal = (id, params) => {
+	return axios.patch(`/proposal/${id}`, params);
 };

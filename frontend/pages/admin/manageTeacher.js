@@ -1,8 +1,9 @@
 import { getListDepartment, getListUser } from "@/api/address";
 import AddEditTs from "@/components/AddEditTS";
 import LayoutAdmin from "@/components/LayoutAdmin";
-import { PlusCircleOutlined } from "@ant-design/icons";
+import { PlusCircleOutlined, ScheduleOutlined } from "@ant-design/icons";
 import { Button, Empty, Space, Table, Tooltip } from "antd";
+import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 
 const ManageTeacher = () => {
@@ -26,7 +27,7 @@ const ManageTeacher = () => {
     {
       title: "Ngày sinh",
       render: (text, record) => {
-        return <div> {record?.birthDay} </div>;
+        return <div> {dayjs(record?.birthDay).format('DD-MM-YYYY')} </div>;
       },
       align: "center",
     },
@@ -54,7 +55,7 @@ const ManageTeacher = () => {
     {
       title: "Trường",
       render: (text, record) => {
-        return <div> {record?.teacher_school} </div>;
+        return <div> {record?.teacherSchool} </div>;
       },
       align: "center",
     },
@@ -63,12 +64,12 @@ const ManageTeacher = () => {
       render: (text, record) => {
         return <div >
           <Space size="small">
-            <Tooltip title="Chỉnh sửa">
-              {/* <GroupOutlined style={{
-                color: "#b9db84"
+            <Tooltip title="Chi tiết">
+              <ScheduleOutlined style={{
+                color: "orange"
               }} className="text-base cursor-pointer"
-                onClick={() => showModal(0, true, true, record)}
-              /> */}
+                onClick={() => handleOpenForm(true, true, record)}
+              />
             </Tooltip>
           </Space>
         </div>;
@@ -86,6 +87,21 @@ const ManageTeacher = () => {
   const [total, setTotal] = useState('');
 
   const [listTeacher, setListTeacher] = useState([]);
+  const [check, setCheck] = useState({
+    open: false,
+    checkEdit: false
+  });
+  const [dataEdit, setDataEdit] = useState({});
+  function handleOpenForm(open, edit, record) {
+    setCheck({
+      open: open,
+      checkEdit: edit
+    })
+    if (!open) {
+      setRecall(!recall)
+    }
+    if (edit) setDataEdit(record)
+  }
 
   function handleChangeTable(pag) {
     setTableParams({
@@ -112,40 +128,46 @@ const ManageTeacher = () => {
   }, []);
   return (
     <>
-      <p className="font-medium text-lg mb-4">Danh sách giáo viên</p>
-      <div className="text-right">
-        <Button type="primary" icon={<PlusCircleOutlined />}>Thêm mới giáo viên</Button>
-      </div>
-      <Table
-        locale={{
-          emptyText: <div style={{ marginTop: '20px' }}>{listTeacher?.length === 0 ? <Empty description="Không có dữ liệu!" /> : null}</div>,
-        }}
-        // title={titleTable}
-        size="middle"
-        style={{
-          margin: '20px 0px',
-          width: '100%'
-        }}
-        dataSource={listTeacher?.map(i => ({ ...i, key: i?.id }))}
-        columns={columns}
-        bordered
-        onChange={handleChangeTable}
-        pagination={{
-          hideOnSinglePage: true,
-          locale: { items_per_page: "/ trang" },
-          total: total,
-          showTotal: (total, range) => (
-            <span>{`${range[0]} - ${range[1]} / ${total}`}</span>
-          ),
-          current: tableParams?.page,
-          pageSize: tableParams.size,
-          showSizeChanger: true,
-          pageSizeOptions: ["10", "20", "50"],
-          defaultPageSize: 10,
-          position: ["bottomRight"],
-        }}
-      />
-      <AddEditTs dataMe={listTeacher[0]} />
+
+      {
+        check.open ? <AddEditTs dataEdit={dataEdit} checkEdit={check.checkEdit} mode={1} handleOpenForm={handleOpenForm} />
+          :
+          <>
+            <p className="font-medium text-lg mb-4">Danh sách giáo viên</p>
+            <div className="text-right">
+              <Button type="primary" icon={<PlusCircleOutlined />} onClick={() => handleOpenForm(true, false)}>Thêm mới giáo viên</Button>
+            </div>
+            <Table
+              locale={{
+                emptyText: <div style={{ marginTop: '20px' }}>{listTeacher?.length === 0 ? <Empty description="Không có dữ liệu!" /> : null}</div>,
+              }}
+              // title={titleTable}
+              size="middle"
+              style={{
+                margin: '20px 0px',
+                width: '100%'
+              }}
+              dataSource={listTeacher?.map(i => ({ ...i, key: i?.id }))}
+              columns={columns}
+              bordered
+              onChange={handleChangeTable}
+              pagination={{
+                hideOnSinglePage: true,
+                locale: { items_per_page: "/ trang" },
+                total: total,
+                showTotal: (total, range) => (
+                  <span>{`${range[0]} - ${range[1]} / ${total}`}</span>
+                ),
+                current: tableParams?.page,
+                pageSize: tableParams.size,
+                showSizeChanger: true,
+                pageSizeOptions: ["10", "20", "50"],
+                defaultPageSize: 10,
+                position: ["bottomRight"],
+              }}
+            />
+          </>
+      }
     </>
   )
 }
