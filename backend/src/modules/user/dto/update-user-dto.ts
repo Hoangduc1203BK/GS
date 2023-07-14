@@ -56,6 +56,12 @@ export class UpdateUserDto {
 	@IsString()
 	grade?: string;
 
+    @ApiProperty({ required: false })
+    @IsOptional()
+	@IsNotEmpty()
+	@IsString()
+	studentSchool?: string;
+
 // attribute of teacher
     @ApiProperty({ required: false })
     @IsOptional()
@@ -86,4 +92,10 @@ export class UpdateUserDto {
 	@IsNotEmpty()
 	@IsString()
 	departmentId?: string;
+
+    @ApiProperty({ required: false })
+    @IsOptional()
+	@IsNotEmpty()
+	@IsString()
+	teacherSchool?: string;
 }
