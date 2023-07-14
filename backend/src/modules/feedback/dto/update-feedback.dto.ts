@@ -1,25 +1,20 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, IsNumber, IsEnum, IsNumberString, IsOptional } from 'class-validator';
 import { FEEDBACK_TYPE, PROPOSAL_STATUS, PROPOSAL_TYPE } from 'src/common/constants';
+import { STUDENT_REGISTER_CLASS, STUDENT_TERMINATE_CLASS, TEACHER_REGISTER_CLASS, TEACHER_TAKE_BRAKE } from 'src/common/interfaces/proposals';
 
-export class ListFeedbackDto {
-	@ApiProperty({ required: true })
+export class UpdateFeedbackDto {
+    @ApiProperty({ required: true })
     @IsOptional()
 	@IsNotEmpty()
-	@IsNumberString()
-	page?: number;
-
-	@ApiProperty({ required: true })
-    @IsOptional()
-	@IsNotEmpty()
-	@IsNumberString()
-	size?: number;
+	@IsString()
+    from?: string;
 
     @ApiProperty({ required: true })
     @IsOptional()
 	@IsNotEmpty()
 	@IsString()
-	from?: string;
+    to?: string;
 
     @ApiProperty({ required: true })
     @IsOptional()
@@ -31,11 +26,11 @@ export class ListFeedbackDto {
     @IsOptional()
 	@IsNotEmpty()
     @IsString()
-	to?: string;
+	classId?: string;
 
     @ApiProperty({ required: true })
     @IsOptional()
 	@IsNotEmpty()
     @IsString()
-	classId?: string;
+	feedback?: string;
 }

@@ -79,6 +79,10 @@ export enum SUB_ASSIGMENT_STATUS {
     CANCELED = 'canceled'
 }
 
+export enum FEEDBACK_TYPE {
+    STUDENT = 'student',
+    TEACHER = 'teacher',
+}
 export function getDayOfMonth(day: string) {
     const today = new Date(); // Lấy ngày hiện tại
     const currentDay = today.getDay();
