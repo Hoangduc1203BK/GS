@@ -75,14 +75,14 @@ export class Feedback {
 		this.mtime = new Date();
 	}
 
-    //teacher
-    @ManyToOne(() => User, u => u.exams)
+    // //teacher
+    @ManyToOne(() => User, u => u.feedbackFroms)
     @JoinColumn({name: 'from', referencedColumnName: 'id'})
     fromUser: User;
 
     //student
-    @ManyToOne(() => User, u => u.exams)
-    @JoinColumn({name: 'from', referencedColumnName: 'id'})
+    @ManyToOne(() => User, u => u.feedbackTos)
+    @JoinColumn({name: 'to', referencedColumnName: 'id'})
     toUser: User;
 
     @ManyToOne(() => Classes, c => c.feedbacks)

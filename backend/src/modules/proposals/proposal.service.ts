@@ -87,7 +87,7 @@ export class ProposalService {
             where: {
                 id: id
             },
-            relations: ['user']
+            relations: ['user','user.department']
         })
 
         if(!proposal) {
@@ -106,6 +106,7 @@ export class ProposalService {
             },
             user: user.name,
             phoneNumber: user.phoneNumber,
+            departmentId: user.department.id,
         }
 
         return doc;

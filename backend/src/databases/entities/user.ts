@@ -8,6 +8,7 @@ import { SubAttendance } from './sub-attendance';
 import { Exam } from './exam';
 import { TestLearning } from './test-learning';
 import { Proposals } from './proposals';
+import { Feedback } from './feedback';
 
 @Entity('users')
 export class User {
@@ -222,5 +223,9 @@ export class User {
     proposals: Proposals[];
 
     //feedback
-    
+    @OneToMany(() => Feedback, f => f.fromUser)
+    feedbackFroms: Feedback[];
+
+    @OneToMany(() => Feedback, f => f.fromUser)
+    feedbackTos: Feedback[];
 }
