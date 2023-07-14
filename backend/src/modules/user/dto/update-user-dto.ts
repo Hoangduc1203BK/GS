@@ -78,7 +78,7 @@ export class UpdateUserDto {
     @ApiProperty({ required: false })
     @IsOptional()
 	@IsNotEmpty()
-	@IsNumberString()
+	@IsNumber()
 	experience?: number;
 
     @ApiProperty({ required: false })
