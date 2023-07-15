@@ -174,4 +174,5 @@ export const TEACHER_PROPOSAL_TYPE = [
 
 export const FORMAT_DATE = {
   YYYYMMDD: "YYYY-MM-DD",
+  ddmmyyyy: "DD/MM/YYYY"
 };

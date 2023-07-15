@@ -1,70 +1,53 @@
-import { DatabaseFilled } from "@ant-design/icons";
-import { Table } from "antd";
+import {
+  CheckOutlined,
+  DatabaseFilled,
+  TwitterOutlined,
+} from "@ant-design/icons";
+import { Table, Tag } from "antd";
+import DetailTranscript from "./DetailTranscript";
+import { useState } from "react";
 
 export default function Transcript({}) {
-  const dataSource = [
-    {
-      key: "1",
-      name: "Mike",
-      age: 32,
-      address: "10 Downing Street",
-    },
-    {
-      key: "2",
-      name: "John",
-      age: 42,
-      address: "10 Downing Street",
-    },
-  ];
+  const [idDeteil, setIdDetail] = useState("");
+  const [isDetail, setIsDetail] = useState(false);
 
-  const columns = [
-    {
-      title: "Tháng",
-      render: (text, record, index) => {
-        return <div>{index + 1}</div>;
-      },
-    },
-    {
-      title: "Toán",
-      dataIndex: "name",
-      key: "name",
-    },
-    {
-      title: "Văn",
-      dataIndex: "age",
-      key: "age",
-    },
-    {
-      title: "Anh",
-      dataIndex: "address",
-      key: "address",
-    },
-  ];
+  const handleClickDetail = () => {
+    setIsDetail(true)
+  }
 
   return (
     <div>
-      <div className="text-2xl font-bold mt-1 mb-5">
-        <DatabaseFilled /> Bài tập
-      </div>
-      <Table
-        size="middle"
-        dataSource={dataSource?.map((x) => ({ ...x, key: x?.classroom }))}
-        columns={columns}
-        bordered
-        scroll={{ x: 1000 }}
-        pagination={{
-          locale: { items_per_page: "/ trang" },
-          // total: listResult?.length,
-          showTotal: (total, range) => (
-            <span>{`${range[0]} - ${range[1]} / ${total}`}</span>
-          ),
-          showSizeChanger: true,
-          pageSizeOptions: ["10", "20", "50"],
-          defaultPageSize: 10,
-          position: ["bottomRight"],
-        }}
-      />
-      ;
+      {isDetail ? (
+        <div className="transaction-detail">
+          <DetailTranscript setShowDetail={setIsDetail} />
+        </div>
+      ) : (
+        <div className="transaction-list  ml-3">
+          <div className="text-2xl font-bold mt-1 mb-5">
+            <DatabaseFilled /> Quản lý bài tập
+          </div>
+          <div className="mt-4 p-4">
+            <div className="flex gap-5 text-xl mb-3">
+              <div className="font-bold">Ngày 11 tháng 4 năm 2023</div>
+              <div className=" text-slate-400">Thứ 4</div>
+            </div>
+
+            <div onClick={handleClickDetail} className="border-[1px] flex justify-between items-center py-3 px-4 bg-gray-100 cursor-pointer hover:scale-105 transition duration-700 ease-in-out hover:border-2 border-solid border-slate-300	 rounded-md shadow-md">
+              <div>
+                <div className="font-bold">
+                  Tuần 11:Tiêu đề bài tập hôm nay là
+                </div>
+                <div>Đã gửi và lúc 14:20</div>
+              </div>
+              <div>
+                <Tag color="success" icon={<CheckOutlined />}>
+                  Đã hoàn thành
+                </Tag>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

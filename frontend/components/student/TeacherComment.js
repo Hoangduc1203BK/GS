@@ -1,35 +1,38 @@
+import { FORMAT_DATE } from "@/common/const";
 import { MessageOutlined } from "@ant-design/icons";
 import { Table } from "antd";
+import dayjs from "dayjs";
 
 export default function TeacherComment({}) {
-  const dataSource = [
-    {
-      subject: "Toán",
-      comment: "Có tuy duy tốt về hình học, cần phát huy thêm",
-      teacher: "Lê Văn t",
-    },
-    {
-      subject: "Văn",
-      comment: "Có tuy duy tốt về hình học, cần phát huy thêm",
-      teacher: "Lê Văn t",
-    },
-  ];
 
   const columns = [
     {
-      title: "Môn",
-      dataIndex: "subject",
-      key: "subject",
+      title: "STT",
+      render: (text, record, index) => {
+        return <div>{index + 1}</div>;
+      },
+      align: "center",
     },
     {
-      title: "Người nhận xét",
-      dataIndex: "teacher",
-      key: "teacher",
+      title: "Tên lớp",
+      dataIndex: "className",
+      key: "className",
     },
     {
-      title: "Nhận xét của giáo viên",
-      dataIndex: "comment",
-      key: "comment",
+      title: "Người gửi",
+      dataIndex: "fromUser",
+      key: "fromUser",
+    },
+    {
+      title: "Ngày",
+      render: (text, record, index) => {
+        return <div>{dayjs(record?.createAt).format(FORMAT_DATE.ddmmyyyy)}</div>;
+      },
+    },
+    {
+      title: "Nội dung",
+      dataIndex: "feedback",
+      key: "feedback",
     },
   ];
 

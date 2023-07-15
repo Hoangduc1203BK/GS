@@ -5,6 +5,7 @@ import { TeamOutlined } from "@ant-design/icons";
 import { Button, Table, message } from "antd";
 import { useEffect, useState } from "react";
 import PopupCommentStudent from "../popup/popupCommentStudent";
+import PopupFeedbacks from "../popup/popupFeedbacks";
 
 export default function StudentsInClass({ info }) {
   const [classes, setClasses] = useState([]);
@@ -14,11 +15,18 @@ export default function StudentsInClass({ info }) {
   const [expandedKey, setExpandedKey] = useState([]);
   const [listTeacher, setListTeacher] = useState([]);
   const [isOpenComment, setIsOpenComment] = useState(false);
+  const [isOpenListFeedback, setIsOpenListFeedback] = useState(false);
+
   const [studentComment, setStudentComment] = useState({});
 
   const handleCommentStudent = (record) => {
     setStudentComment(record);
     setIsOpenComment(!isOpenComment);
+  };
+
+  const handleOpenListFeedback = (record) => {
+    setStudentComment(record);
+    setIsOpenListFeedback(!isOpenListFeedback);
   };
 
   const fetchDataClass = async () => {
@@ -43,7 +51,6 @@ export default function StudentsInClass({ info }) {
     try {
       if (expanded) {
         setIsFetchStudent(true);
-        console.log(record);
         const studentInClass = await ApiStudentsInClass(record.id);
         setStudents(
           studentInClass?.data?.map((i, index) => ({
@@ -121,6 +128,9 @@ export default function StudentsInClass({ info }) {
                 className="hover:!bg-sky-600 bg-sky-500 text-white hover:!text-white"
               >
                 Nhận xét
+              </Button>
+              <Button  onClick={() => handleOpenListFeedback(record)}  className="hover:!bg-indigo-600 bg-indigo-500 text-white hover:!text-white">
+                Lịch sử
               </Button>
             </div>
           );
@@ -225,9 +235,18 @@ export default function StudentsInClass({ info }) {
   return (
     <div>
       <PopupCommentStudent
-        info={studentComment}
+        info={info}
+        student={studentComment}
         setOpen={setIsOpenComment}
         open={isOpenComment}
+        classId={expandedKey}
+      />
+      <PopupFeedbacks
+        info={info}
+        student={studentComment}
+        setOpen={setIsOpenListFeedback}
+        open={isOpenListFeedback}
+        classId={expandedKey}
       />
       <div className="text-2xl font-bold mt-1 mb-5">
         <TeamOutlined /> Danh sách lớp học
