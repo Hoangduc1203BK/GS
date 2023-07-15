@@ -69,7 +69,7 @@ export class ProposalService {
             }
         }
         
-        let qr = 'select p.*, u.name as user, u.email as email from proposals p, users u where p.user_id=u.id';
+        let qr = 'select p.*, u.name as user, u.email as email, d.id as department_id from proposals p, users u, departments d where p.user_id=u.id and u.department_id=d.id';
         if(paramArr.length >0) {
             qr = qr + ' AND ' + paramArr.join(' AND ')
         }
@@ -87,7 +87,7 @@ export class ProposalService {
             where: {
                 id: id
             },
-            relations: ['user']
+            relations: ['user','user.department']
         })
 
         if(!proposal) {
@@ -106,6 +106,7 @@ export class ProposalService {
             },
             user: user.name,
             phoneNumber: user.phoneNumber,
+            departmentId: user.department.id,
         }
 
         return doc;
