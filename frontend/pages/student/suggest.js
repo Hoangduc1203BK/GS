@@ -4,7 +4,17 @@ import LayoutAdmin from "@/components/LayoutAdmin";
 import PopupStudentSuggest from "@/components/popup/popupSuggest";
 import { DatabaseFilled, PullRequestOutlined } from "@ant-design/icons";
 
-import { Button, Col, Form, Input, Row, Select, Table, message } from "antd";
+import {
+  Button,
+  Col,
+  Form,
+  Input,
+  Row,
+  Select,
+  Table,
+  Tabs,
+  message,
+} from "antd";
 import { useState, useEffect } from "react";
 
 const StudentSuggest = ({ user }) => {
@@ -132,84 +142,94 @@ const StudentSuggest = ({ user }) => {
       size: pagination.pageSize,
     });
   }
+  const items = [
+    {
+      key: "1",
+      label: `Quản lý đề xuất`,
+      children: (
+        <div>
+          <PopupStudentSuggest
+            open={openSuggest}
+            setOpen={setOpenSuggest}
+            info={user}
+            setUpdate={setIsUpdate}
+          />
+          <div className="text-2xl font-bold mt-1 mb-5">
+            <PullRequestOutlined /> Quản lý đề xuất
+          </div>
+          <Form form={form} onFinish={submitSearch}>
+            <Row>
+              <Col xs={24} lg={16} className="flex gap-5">
+                <Form.Item name="type" label="Loại đề xuất" className="w-full">
+                  <Select placeholder="-- Chọn --">
+                    <Select.Option value="">-- Chọn --</Select.Option>
+                    {STUDENT_PROPOSAL_TYPE.map((proposal, index) => (
+                      <Select.Option value={proposal.value} key={index}>
+                        {proposal.label}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
 
-  return (
-    <div>
-      <PopupStudentSuggest
-        open={openSuggest}
-        setOpen={setOpenSuggest}
-        info={user}
-        setUpdate={setIsUpdate}
-      />
-      <div className="text-2xl font-bold mt-1 mb-5">
-        <PullRequestOutlined /> Quản lý đề xuất
-      </div>
-      <Form form={form} onFinish={submitSearch}>
-        <Row>
-          <Col xs={24} lg={16} className="flex gap-5">
-            <Form.Item name="type" label="Loại đề xuất" className="w-full">
-              <Select placeholder="-- Chọn --">
-                <Select.Option value="">-- Chọn --</Select.Option>
-                {STUDENT_PROPOSAL_TYPE.map((proposal, index) => (
-                  <Select.Option value={proposal.value} key={index}>
-                    {proposal.label}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
+                <Form.Item name="status" label="Trạng thái" className="w-full">
+                  <Select placeholder="-- Chọn --">
+                    <Select.Option value="">-- Chọn --</Select.Option>
+                    {PROPOSAL_STATUS_LIST.map((proposal, index) => (
+                      <Select.Option value={proposal.value} key={index}>
+                        {proposal.label}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={24} lg={8}>
+                <Button type="primary" className="ml-5" htmlType="submit">
+                  Tìm kiếm
+                </Button>
 
-            <Form.Item name="status" label="Trạng thái" className="w-full">
-              <Select placeholder="-- Chọn --">
-                <Select.Option value="">-- Chọn --</Select.Option>
-                {PROPOSAL_STATUS_LIST.map((proposal, index) => (
-                  <Select.Option value={proposal.value} key={index}>
-                    {proposal.label}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col xs={24} lg={8}>
-            <Button type="primary" className="ml-5" htmlType="submit">
-              Tìm kiếm
-            </Button>
+                <Button
+                  type="primary"
+                  onClick={() => {
+                    setOpenSuggest(true), setIsUpdate(false);
+                  }}
+                  className="ml-5"
+                  htmlType="text"
+                >
+                  Thêm đề xuất
+                </Button>
+              </Col>
+            </Row>
+          </Form>
+          <Table
+            size="middle"
+            dataSource={suggests?.result.map((x) => ({
+              ...x,
+              key: x?.classroom,
+            }))}
+            columns={columns}
+            bordered
+            loading={isFetching}
+            onChange={handleChangeTable}
+            scroll={{ x: 1000 }}
+            pagination={{
+              locale: { items_per_page: "/ trang" },
+              total: suggests?.total,
+              showTotal: (total, range) => (
+                <span>{`${range[0]} - ${range[1]} / ${total}`}</span>
+              ),
+              showSizeChanger: true,
+              pageSizeOptions: ["10", "20", "50"],
+              defaultPageSize: 10,
+              position: ["bottomRight"],
+            }}
+          />
+          ;
+        </div>
+      ),
+    },
+  ];
 
-            <Button
-              type="primary"
-              onClick={() => {
-                setOpenSuggest(true), setIsUpdate(false);
-              }}
-              className="ml-5"
-              htmlType="text"
-            >
-              Thêm đề xuất
-            </Button>
-          </Col>
-        </Row>
-      </Form>
-      <Table
-        size="middle"
-        dataSource={suggests?.result.map((x) => ({ ...x, key: x?.classroom }))}
-        columns={columns}
-        bordered
-        loading={isFetching}
-        onChange={handleChangeTable}
-        scroll={{ x: 1000 }}
-        pagination={{
-          locale: { items_per_page: "/ trang" },
-          total: suggests?.total,
-          showTotal: (total, range) => (
-            <span>{`${range[0]} - ${range[1]} / ${total}`}</span>
-          ),
-          showSizeChanger: true,
-          pageSizeOptions: ["10", "20", "50"],
-          defaultPageSize: 10,
-          position: ["bottomRight"],
-        }}
-      />
-      ;
-    </div>
-  );
+  return <Tabs defaultActiveKey="1" items={items} />;
 };
 
 StudentSuggest.getLayout = ({ page, pageProps }) => (

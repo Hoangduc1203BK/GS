@@ -5,46 +5,45 @@ import { Button, Col, Form, Row, Select, Table, message } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 
-export default function TeacherComment({info}) {
+export default function TeacherComment({ info }) {
   const [form] = Form.useForm();
 
-  const [feedbacks, setFeedback] = useState([])
-  const [classes, setClasses] = useState([])
-  const [isFetching, setFetching] = useState(false)
+  const [feedbacks, setFeedback] = useState([]);
+  const [classes, setClasses] = useState([]);
+  const [isFetching, setFetching] = useState(false);
 
-
-  useEffect(()=>{
+  useEffect(() => {
     fetchFeedbacks();
-    fetchListClass()
-  },[])
+    fetchListClass();
+  }, []);
 
   const fetchListClass = async () => {
-    const res = await  ApiClassOfStudent(info?.id);
-    setClasses([...res.data])
+    const res = await ApiClassOfStudent(info?.id);
+    setClasses([...res.data]);
     console.log(res.data);
-  }
+  };
 
   const fetchFeedbacks = async (classId) => {
     try {
-      setFetching(true)
-      const params = {
+      setFetching(true);
+      let params = {
         to: info?.id,
-        classId
+      };
+      if (classId) {
+        params["classId"] = classId;
       }
       const res = await ApiGetFeedbacks(params);
       setFeedback(res.data);
-      setFetching(false)
-
+      setFetching(false);
     } catch (error) {
       message.error("Xem lịch sử nhận xét thất bại! Vui lòng thử lại");
-      setFetching(false)
+      setFetching(false);
     }
-  }
+  };
 
   const submitSearch = (values) => {
     fetchFeedbacks(values.classId);
   };
-
 
   const columns = [
     {
@@ -67,7 +66,9 @@ export default function TeacherComment({info}) {
     {
       title: "Ngày",
       render: (text, record, index) => {
-        return <div>{dayjs(record?.createAt).format(FORMAT_DATE.ddmmyyyy)}</div>;
+        return (
+          <div>{dayjs(record?.createAt).format(FORMAT_DATE.ddmmyyyy)}</div>
+        );
       },
     },
     {
@@ -87,9 +88,7 @@ export default function TeacherComment({info}) {
           <Col xs={24} lg={16} className="flex gap-5">
             <Form.Item name="classId" label="Loại đề xuất" className="w-full">
               <Select placeholder="-- Chọn --">
-                  <Select.Option value="">
-                    -- Chọn --
-                  </Select.Option>
+                <Select.Option value="">-- Chọn --</Select.Option>
                 {classes.map((info, index) => (
                   <Select.Option value={info?.classId} key={index}>
                     {info?.classes.name}
@@ -111,7 +110,7 @@ export default function TeacherComment({info}) {
         columns={columns}
         bordered
         scroll={{ x: 1000 }}
-        pagination={null}
+        pagination={false}
         loading={isFetching}
       />
       ;

@@ -5,20 +5,21 @@ const { TextArea } = Input;
 export default function PopupCommentStudent({ open, setOpen, info, student, classId }) {
   const [form] = Form.useForm();
 
-  const handleFinish = (values) => {
+  const handleFinish = async (values) => {
     try {
-      console.log(values);
       const payload = {
-        form: info?.id,
+        from:  info?.id,
         to: student?.id,
         type: "teacher",
         feedback: values.feedback,
         classId : classId[0]
       };
-      ApiCreateFeedback(payload);
+      await ApiCreateFeedback(payload);
       setOpen(!open);
+      form.resetFields()
       message.success("Nhận xét học sinh thành công!");
     } catch (error) {
+      console.log(error);
       message.error("Nhận xét thất bại! Vui lòng thử lại");
     }
   };
