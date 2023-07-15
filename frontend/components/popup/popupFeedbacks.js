@@ -30,7 +30,6 @@ export default function PopupFeedbacks({
         classId: classId[0],
       };
       const response = await ApiGetFeedbacks(params);
-      console.log(response.data);
       setFeedback([...response.data]);
       setFetching(false);
     } catch (error) {

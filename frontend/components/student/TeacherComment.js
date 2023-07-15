@@ -20,7 +20,6 @@ export default function TeacherComment({ info }) {
   const fetchListClass = async () => {
     const res = await ApiClassOfStudent(info?.id);
     setClasses([...res.data]);
-    console.log(res.data);
   };
 
   const fetchFeedbacks = async (classId) => {
