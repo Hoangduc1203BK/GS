@@ -106,7 +106,7 @@ export class ProposalService {
             },
             user: user.name,
             phoneNumber: user.phoneNumber,
-            departmentId: user.department.id,
+            departmentId: user.role == ROLE.TEACHER ? user.department.id : null,
         }
 
         return doc;
@@ -146,6 +146,7 @@ export class ProposalService {
         }
 
         const result = await this.proposalRepos.save(doc);
+        console.log(result)
 
         return this.getProposal(result.id);
     }

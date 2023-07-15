@@ -593,7 +593,7 @@ export class ClassService {
     const classes = await this.userClassRepos.find({
       where: {
         userId: userId,
-        dtime: null,
+        dtime: IsNull(),
       },
       relations: ['classes', 'classes.subject', 'classes.timeTables', 'classes.user', 'classes.timeTables.room'],
     });
