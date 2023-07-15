@@ -44,7 +44,7 @@ export default function Transcript({}) {
   return (
     <div>
       <div className="text-2xl font-bold mt-1 mb-5">
-        <DatabaseFilled /> Bảng điểm
+        <DatabaseFilled /> Bài tập
       </div>
       <Table
         size="middle"

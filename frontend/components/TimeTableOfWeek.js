@@ -8,7 +8,7 @@ export default function LayoutTimeTables({ schedule }) {
       <div className="mt-3 p-4">
         {schedule.map((el, index) => (
           <div
-            className="mb-3 border-solid border-black border-2 py-1 px-2 rounded-md shadow-md"
+            className="mb-3 cursor-pointer hover:scale-105  transition duration-700 ease-in-out hover:border-2 border-solid border-black border-[1px] py-1 px-2 rounded-md shadow-md"
             key={index}
           >
             <div>

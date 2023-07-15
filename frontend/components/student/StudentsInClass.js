@@ -130,18 +130,22 @@ export default function StudentsInClass({ info }) {
       },
     },
     {
-      title: "Lịch dạy",
-      render: (text, record, index) => {
+      title: "Lịch học",
+      render: (text, record) => {
         return (
-          <div>
-            {record.classes.timeTables.map((el,idx) => (
-              <div key={idx}>
-                Từ {el.start}h đến {el.end}h Thứ {el.date} - Phòng {el.room.name}
-              </div>
-            ))}
+          <div className="text-left">
+            {record?.classes?.timeTables
+              ?.map(
+                (item) =>
+                  `Thứ ${+item?.date + 1} ( ${item?.start} : ${item?.end} ) - ${
+                    item?.room?.name
+                  }`
+              )
+              ?.join(", ")}
           </div>
         );
       },
+      align: "center",
     },
   ];
 

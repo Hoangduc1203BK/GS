@@ -13,7 +13,7 @@ const LearningOutcomes = ({user}) => {
     },
     {
       key: "2",
-      label: `Bảng điểm`,
+      label: `Quản lý bài tập`,
       children: <Transcript />,
     },
     {
