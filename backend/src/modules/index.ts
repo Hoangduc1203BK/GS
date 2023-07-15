@@ -1,4 +1,3 @@
-import { Feedback } from "src/databases/entities";
 import { AssigmentModule } from "./assigment";
 import { AuthModule } from "./auth/auth.module";
 import { ClassModule } from "./class";
@@ -8,6 +7,7 @@ import { ProposalModule } from "./proposals";
 import { SubjectModule } from "./subject";
 import { TestLearningModule } from "./test-learning";
 import { UserModule } from "./user";
+import { FeedbackModule } from "./feedback";
 
 export const MODULES = [
     UserModule,
@@ -19,5 +19,5 @@ export const MODULES = [
     TestLearningModule,
     ProposalModule,
     AssigmentModule,
-    Feedback,
+    FeedbackModule,
 ]

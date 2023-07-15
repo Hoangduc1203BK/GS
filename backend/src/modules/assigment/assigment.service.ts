@@ -88,7 +88,7 @@ export class AssigmentService{
         const doc = {
             ...dto,
             status: ASSIGMENT_STATUS.ACTIVE,
-            deadline: new Date(),
+            deadline: dto.deadline,
         }
         const assigment = await this.assigmentRepos.save(doc);
 

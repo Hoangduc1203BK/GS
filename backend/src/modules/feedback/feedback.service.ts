@@ -21,11 +21,7 @@ export class FeedbackService {
         const { page = DEFAULT_PAGING.PAGE, size = DEFAULT_PAGING.LIMIT, ...rest } = dto;
         let filter = {} as any;
         for (const [k, v] of Object.entries(rest)) {
-            if (k == 'classId') {
-                filter["class_id"] = v;
-            } else {
-                filter[k] = v;
-            }
+            filter[k]=v
         }
 
         let feedbacks = await this.feedbackRepos.find({
