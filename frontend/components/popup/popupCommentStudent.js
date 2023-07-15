@@ -1,19 +1,27 @@
-import {
-  Button,
-  Col,
-  Form,
-  Modal,
-  Row,
-  message,
-  Input,
-} from "antd";
+import { ApiCreateFeedback } from "@/api/student";
+import { Button, Col, Form, Modal, Row, message, Input } from "antd";
 
 const { TextArea } = Input;
-export default function PopupCommentStudent({ open, setOpen, info }) {
+export default function PopupCommentStudent({ open, setOpen, info, student, classId }) {
   const [form] = Form.useForm();
 
-  const handleFinish = () => {
-    setOpen(!open);
+  const handleFinish = async (values) => {
+    try {
+      const payload = {
+        from:  info?.id,
+        to: student?.id,
+        type: "teacher",
+        feedback: values.feedback,
+        classId : classId[0]
+      };
+      await ApiCreateFeedback(payload);
+      setOpen(!open);
+      form.resetFields()
+      message.success("Nhận xét học sinh thành công!");
+    } catch (error) {
+      console.log(error);
+      message.error("Nhận xét thất bại! Vui lòng thử lại");
+    }
   };
 
   return (
@@ -35,7 +43,7 @@ export default function PopupCommentStudent({ open, setOpen, info }) {
           onFinish={handleFinish}
         >
           <Form.Item
-            initialValue={info?.id}
+            initialValue={student?.id}
             name="id"
             label="Mã học sinh"
             rules={[
@@ -45,7 +53,7 @@ export default function PopupCommentStudent({ open, setOpen, info }) {
             <Input type="text" readOnly></Input>
           </Form.Item>
           <Form.Item
-            initialValue={info?.name}
+            initialValue={student?.name}
             name="name"
             label="Họ và tên"
             rules={[
@@ -56,7 +64,7 @@ export default function PopupCommentStudent({ open, setOpen, info }) {
           </Form.Item>
 
           <Form.Item
-            name="comment"
+            name="feedback"
             label="Nhận xét"
             rules={[
               { required: true, message: "Đây là trường dữ liệu bắt buộc!" },
@@ -68,7 +76,7 @@ export default function PopupCommentStudent({ open, setOpen, info }) {
             <Col>
               <Button
                 onClick={() => {
-                    setOpen(!open);
+                  setOpen(!open);
                   form.resetFields();
                 }}
               >

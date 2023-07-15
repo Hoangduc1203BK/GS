@@ -19,22 +19,6 @@ const Dashboard = ({user}) => {
   const [schedule, setSchedule] = useState([]);
   const [info, setInfo] = useState(user);
   useEffect(() => {
-    // setSchedule(
-    //   [1, 3, 4, 5, 6, 9, 7].map((el) => {
-    //     return {
-    //       id: el,
-    //       startDate: dayjs().format("YYYY-MM-DD"),
-    //       startTime: dayjs().format("HH:mm"),
-    //       subject: "toán",
-    //       teachet: " Lê Thị Phương ",
-    //       room: "Phòng 101",
-    //       time: "2 tiếng",
-    //       session: "Buổi 4",
-    //     };
-    //   })
-    // );
-
-
     const callUserDetail = async () =>  {
       
         let token = {} ;
@@ -47,7 +31,6 @@ const Dashboard = ({user}) => {
           try {
             let res = await getMeInfo(token)
             let user = await res.json();
-            console.log(user);
             setInfo(user)
           } catch (error) {
             console.log("call api error", error)

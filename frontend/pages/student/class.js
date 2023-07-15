@@ -13,13 +13,13 @@ const LearningOutcomes = ({user}) => {
     },
     {
       key: "2",
-      label: `Bảng điểm`,
+      label: `Quản lý bài tập`,
       children: <Transcript />,
     },
     {
       key: "3",
       label: `Nhận xét của giáo viên`,
-      children: <TeacherComment />,
+      children: <TeacherComment info={user} />,
     },
   ];
   return <Tabs defaultActiveKey="1" items={items} />;
