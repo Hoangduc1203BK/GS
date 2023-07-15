@@ -2,6 +2,7 @@ import { ApiGetListClass, ApiGetListSuggest } from "@/api/student";
 import { PROPOSAL_STATUS_LIST, TEACHER_PROPOSAL_TYPE } from "@/common/const";
 import LayoutAdmin from "@/components/LayoutAdmin";
 import PopupTeacherSuggest from "@/components/popup/popupTeacherSuggest";
+import { DatabaseFilled } from "@ant-design/icons";
 
 import { Button, Col, Form, Input, Row, Select, Table, message } from "antd";
 import { useState, useEffect } from "react";
@@ -35,11 +36,18 @@ const TeacherSuggest = ({ user }) => {
     try {
       setIsFetching(true);
       const formData = form.getFieldValue();
-      const response = await ApiGetListSuggest({
+      let params = {
         ...tableParams,
-        ...formData,
         userId: user.id,
-      });
+      };
+
+      if (formData.type) {
+        params["type"] = formData.type;
+      }
+      if (formData.status) {
+        params["type"] = formData.status;
+      }
+      const response = await ApiGetListSuggest(params);
       setSuggest({ result: [...response.data], total: response.total || 1 });
       const classes = await ApiGetListClass({ type: "active" });
       setListClass([...classes.data]);
@@ -127,11 +135,15 @@ const TeacherSuggest = ({ user }) => {
         info={user}
         setUpdate={setIsUpdate}
       />
+      <div className="text-2xl font-bold mt-1 mb-5">
+        <PullRequestOutlined /> Quản lý đề xuất
+      </div>
       <Form form={form} onFinish={submitSearch}>
         <Row>
           <Col xs={24} lg={16} className="flex gap-5">
             <Form.Item name="type" label="Loại đề xuất" className="w-full">
               <Select placeholder="-- Chọn --">
+                <Select.Option value="">-- Chọn --</Select.Option>
                 {TEACHER_PROPOSAL_TYPE.map((proposal, index) => (
                   <Select.Option value={proposal.value} key={index}>
                     {proposal.label}
@@ -142,6 +154,7 @@ const TeacherSuggest = ({ user }) => {
 
             <Form.Item name="status" label="Trạng thái" className="w-full">
               <Select placeholder="-- Chọn --">
+                <Select.Option value="">-- Chọn --</Select.Option>
                 {PROPOSAL_STATUS_LIST.map((proposal, index) => (
                   <Select.Option value={proposal.value} key={index}>
                     {proposal.label}

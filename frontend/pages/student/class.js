@@ -19,7 +19,7 @@ const LearningOutcomes = ({user}) => {
     {
       key: "3",
       label: `Nhận xét của giáo viên`,
-      children: <TeacherComment />,
+      children: <TeacherComment info={user} />,
     },
   ];
   return <Tabs defaultActiveKey="1" items={items} />;
