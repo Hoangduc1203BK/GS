@@ -26,6 +26,10 @@ export function ApiGetListClass(params) {
   });
 }
 
+export function ApiGetDetailClass(id) {
+  return axios.get("/class/" + id);
+}
+
 export function ApiGetListClassEmpty(params) {
   return axios.get("/class/student-empty", {
     params: params,
@@ -62,4 +66,38 @@ export function ApiCreateFeedback(payload) {
 
 export function ApiGetFeedbacks(params) {
   return axios.get("/feedback", { params });
+}
+
+export function ApiCreateHomework(payload) {
+  return axios.post("/assigments", payload);
+}
+
+export function ApiUpdateHomework(id,payload) {
+  return axios.patch(`/assigments/${id}`, payload);
+}
+
+export function ApiGetAssignments (params){
+  return axios.get('/assigments',{
+    params
+  })
+}
+
+export function ApiGetAssignmentDetail (id){
+  return axios.get('/assigments/'+id);
+}
+
+export function ApiGetStudentAssignments (params){
+  return axios.get('/assigments/student',{
+    params
+  })
+}
+
+export function ApiGetDetailSubAssignments (params){
+  return axios.get('/assigments/sub-assigment',{
+    params
+  })
+}
+
+export function ApiUpdateSubAssignments (id, payload){
+  return axios.patch('/assigments/sub-assigment/'+ id, payload);
 }

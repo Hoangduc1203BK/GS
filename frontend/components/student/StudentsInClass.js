@@ -1,7 +1,8 @@
 import { ApiClassOfStudent, ApiStudentsInClass } from "@/api/student";
 import { genderVNConvert } from "@/common/const";
 import { TeamOutlined } from "@ant-design/icons";
-import { Table, message } from "antd";
+import { Button, Table, message } from "antd";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 export default function StudentsInClass({ info }) {
@@ -9,6 +10,7 @@ export default function StudentsInClass({ info }) {
   const [students, setStudents] = useState([]);
   const [isFetchStudent, setIsFetchStudent] = useState(false)
   const [expandedKey, setExpandedKey] = useState([]);
+  const router = useRouter()
 
   const fetchDataClass = async () => {
     try {
@@ -146,6 +148,12 @@ export default function StudentsInClass({ info }) {
         );
       },
       align: "center",
+    },
+    {
+      title: "Tùy chọn",
+      render: (text, record, index) => {
+        return <Button type="primary" onClick={  ()=>router.push(`/student/homework/${record.classId}`)}>Bài tập</Button>;
+      },
     },
   ];
 

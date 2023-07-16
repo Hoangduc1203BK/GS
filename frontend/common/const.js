@@ -1,3 +1,5 @@
+import { CheckOutlined, CloseOutlined, ExclamationOutlined, IssuesCloseOutlined, WarningOutlined } from "@ant-design/icons";
+
 export const checkNameField = (field) => {
   switch (field) {
     case "phoneNumber":
@@ -171,8 +173,64 @@ export const TEACHER_PROPOSAL_TYPE = [
   },
 ];
 
-
 export const FORMAT_DATE = {
   YYYYMMDD: "YYYY-MM-DD",
-  ddmmyyyy: "DD/MM/YYYY"
+  ddmmyyyy: "DD/MM/YYYY",
+  YYYYMMDDHHMM: "YYYY-MM-DD HH:mm",
+  DATE : "Ngày DD/MM/YYYY",
+  SPECSIALDATE: "YYYY/MM/DD Lúc HH:mm"
 };
+
+export const SUB_ASSIGMENT_STATUS = {
+  PENDING: "pending",
+  TURN_IN: "turn_in",
+  TURN_IN_LATE: "turn_in_late",
+  PAST_DUE: "past_due",
+  CANCELED: "canceled",
+};
+
+export const SUB_ASSIGMENT_STATUS_LIST = [
+  {
+    label: "Chưa hoàn thành",
+    value: "pending",
+    color: "processing",
+    icon: <CloseOutlined />
+  },
+  {
+    label: "Hoàn thành",
+    value: "turn_in",
+    color: "success",
+    icon: <CheckOutlined />
+  },
+  {
+    label: "Nộp muộn",
+    value: "turn_in_late",
+    color: "warning",
+    icon:  <WarningOutlined />
+
+  },
+  {
+    label: "Quá hạn",
+    value: "past_due",
+    color: "error",
+    icon: <IssuesCloseOutlined />
+
+  },
+  {
+    label: "Hủy",
+    value: "canceled",
+    color: "",
+    icon: <ExclamationOutlined />
+  },
+];
+
+export const STATUS_ASIGGMENT = [
+  {
+    value: "active",
+    label: "",
+  },
+  {
+    value: "deactive",
+    label: "",
+  },
+];

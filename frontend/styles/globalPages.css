@@ -38,3 +38,17 @@ body {
 .custom-table table tr th{
   text-align: left;
 }
+
+.w-subtraction-100 {
+	width: calc(100% - 100px) !important;
+}
+
+.required-cus::before {
+	display: inline-block;
+    margin-inline-end: 4px;
+    color: #ff4d4f;
+    font-size: 14px;
+    font-family: SimSun,sans-serif;
+    line-height: 1;
+    content: "*";
+}
