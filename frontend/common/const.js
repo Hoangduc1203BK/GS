@@ -171,8 +171,50 @@ export const TEACHER_PROPOSAL_TYPE = [
   },
 ];
 
-
 export const FORMAT_DATE = {
   YYYYMMDD: "YYYY-MM-DD",
-  ddmmyyyy: "DD/MM/YYYY"
+  ddmmyyyy: "DD/MM/YYYY",
+  YYYYMMDDHHMM: "YYYY-MM-DD HH:mm",
 };
+
+export const SUB_ASSIGMENT_STATUS = {
+  PENDING: "pending",
+  TURN_IN: "turn_in",
+  TURN_IN_LATE: "turn_in_late",
+  PAST_DUE: "past_due",
+  CANCELED: "canceled",
+};
+
+export const SUB_ASSIGMENT_STATUS_LIST = [
+  {
+    label: "Chưa hoàn thành",
+    value: "pending",
+  },
+  {
+    label: "Hoàn thành",
+    value: "turn_in",
+  },
+  {
+    label: "Nộp muộn",
+    value: "turn_in_late",
+  },
+  {
+    label: "Quá hạn",
+    value: "past_due",
+  },
+  {
+    label: "Hủy",
+    value: "canceled",
+  },
+];
+
+export const STATUS_ASIGGMENT = [
+  {
+    value: "active",
+    label: "",
+  },
+  {
+    value: "deactive",
+    label: "",
+  },
+];

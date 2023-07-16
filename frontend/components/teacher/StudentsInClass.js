@@ -6,6 +6,7 @@ import { Button, Table, message } from "antd";
 import { useEffect, useState } from "react";
 import PopupCommentStudent from "../popup/popupCommentStudent";
 import PopupFeedbacks from "../popup/popupFeedbacks";
+import { useRouter } from "next/router";
 
 export default function StudentsInClass({ info }) {
   const [classes, setClasses] = useState([]);
@@ -17,6 +18,7 @@ export default function StudentsInClass({ info }) {
   const [isOpenComment, setIsOpenComment] = useState(false);
   const [isOpenListFeedback, setIsOpenListFeedback] = useState(false);
 
+  const router = useRouter()
   const [studentComment, setStudentComment] = useState({});
 
   const handleCommentStudent = (record) => {
@@ -219,12 +221,15 @@ export default function StudentsInClass({ info }) {
       title: "Tùy chọn",
       render: (text, record, index) => {
         return (
-          <div>
-            <Button className="hover:!bg-sky-600 bg-sky-500 text-white hover:!text-white">
+          <div className="block w-[125px]">
+            <Button className="hover:!bg-sky-600 w-[125px] bg-sky-500 text-white hover:!text-white">
               Điểm danh
             </Button>
-            <Button className="hover:!bg-indigo-600 bg-indigo-500 text-white hover:!text-white">
+            <Button className="hover:!bg-indigo-600 w-[125px] bg-indigo-500 text-white hover:!text-white">
               Lịch sử
+            </Button>
+            <Button onClick={  ()=>router.push(`/teacher/class/homework/${record.id}`)} className="hover:!bg-green-600 w-[125px] bg-green-500 text-white hover:!text-white">
+              Bài tập
             </Button>
           </div>
         );

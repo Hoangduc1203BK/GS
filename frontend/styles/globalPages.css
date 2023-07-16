@@ -38,3 +38,7 @@ body {
 .custom-table table tr th{
   text-align: left;
 }
+
+.w-subtraction-100 {
+	width: calc(100% - 100px) !important;
+}
