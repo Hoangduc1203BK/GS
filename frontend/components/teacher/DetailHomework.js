@@ -1,10 +1,11 @@
 import { ApiGetAssignmentDetail, ApiGetDetailClass } from "@/api/student";
 import { FORMAT_DATE, SUB_ASSIGMENT_STATUS_LIST } from "@/common/const";
 import { LeftOutlined } from "@ant-design/icons";
-import { Table, message } from "antd";
+import { Button, Table, message } from "antd";
 import dayjs from "dayjs";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import PopupCheckPoint from "../popup/popupCheckPoint";
 
 export default function TeacherDetailHomework({ info, setIsDetail, idDetail }) {
   const router = useRouter();
@@ -12,10 +13,14 @@ export default function TeacherDetailHomework({ info, setIsDetail, idDetail }) {
   const [subAssigments, setSubAssigments] = useState();
   const [classDetail, setClassDetail] = useState();
   const [isFetchClass, setIsFetchClass] = useState(false);
-
+  const [isOpenPoint, setIsOpenPoint] = useState(false);
+  const [assigment, setAssigment] = useState();
   useEffect(() => {
-    getDetailAssignment();
-  }, [idDetail]);
+    if(!isOpenPoint){
+        getDetailAssignment();
+
+    }
+  }, [idDetail,isOpenPoint]);
 
   const getDetailAssignment = async () => {
     try {
@@ -64,21 +69,43 @@ export default function TeacherDetailHomework({ info, setIsDetail, idDetail }) {
       key: "point",
     },
     {
-        title: "Trạng thái",
-        render: (text, record, index) => {
-          return (
-            <div>
-              {
-                SUB_ASSIGMENT_STATUS_LIST.find((el) => el.value == record.status)
-                  .label
-              }
-            </div>
-          );
-        },
+      title: "Trạng thái",
+      render: (text, record, index) => {
+        return (
+          <div>
+            {
+              SUB_ASSIGMENT_STATUS_LIST.find((el) => el.value == record.status)
+                .label
+            }
+          </div>
+        );
       },
+    },
+    {
+      title: "Tùy chọn",
+      render: (text, record, index) => {
+        return (
+          <Button onClick={() => handleCheckPoint(record)} type="primary">
+            Chấm điểm
+          </Button>
+        );
+      },
+    },
   ];
+
+  const handleCheckPoint = (detail) => {
+    setIsOpenPoint(true);
+    setAssigment(detail);
+  };
+
   return (
     <div>
+      <PopupCheckPoint
+        setOpen={setIsOpenPoint}
+        open={isOpenPoint}
+        assigment={assigment}
+      />
+
       <div
         onClick={handleBackListHomework}
         className="text-xl flex items-center cursor-pointer text-[#1677ff]"

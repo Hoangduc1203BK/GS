@@ -85,3 +85,19 @@ export function ApiGetAssignments (params){
 export function ApiGetAssignmentDetail (id){
   return axios.get('/assigments/'+id);
 }
+
+export function ApiGetStudentAssignments (params){
+  return axios.get('/assigments/student',{
+    params
+  })
+}
+
+export function ApiGetDetailSubAssignments (params){
+  return axios.get('/assigments/sub-assigment',{
+    params
+  })
+}
+
+export function ApiUpdateSubAssignments (id, payload){
+  return axios.patch('/assigments/sub-assigment/'+ id, payload);
+}

@@ -1,4 +1,9 @@
 import {
+  ApiGetDetailSubAssignments,
+  ApiUpdateSubAssignments,
+} from "@/api/student";
+import { FORMAT_DATE, SUB_ASSIGMENT_STATUS_LIST } from "@/common/const";
+import {
   ArrowDownOutlined,
   CloseOutlined,
   CloudUploadOutlined,
@@ -6,11 +11,36 @@ import {
   FilePdfOutlined,
   LeftOutlined,
 } from "@ant-design/icons";
-import { Button } from "antd";
-import { useState } from "react";
+import { Button, Select, Tag, message } from "antd";
+import dayjs from "dayjs";
+import { useEffect, useState } from "react";
 
-export default function DetailTranscript({setShowDetail}) {
+export default function DetailTranscript({ setShowDetail, detail }) {
   const [isDragging, setIsDragging] = useState(false);
+
+  const [detailSubAssigment, setDetailSubAssigment] = useState();
+
+  const [fileAssigment, setFileAssigment] = useState({
+    name: "",
+    file: undefined,
+  });
+
+  useEffect(() => {
+    if (detail?.id) {
+      const getDetail = async () => {
+        const res = (
+          await ApiGetDetailSubAssignments({
+            assigmentId: detail?.id,
+          })
+        ).data;
+        setDetailSubAssigment({ ...res });
+        setFileAssigment({
+          name: res?.file,
+        });
+      };
+      getDetail();
+    }
+  }, [detail]);
 
   const handleDragEnter = (event) => {
     event.preventDefault();
@@ -30,115 +60,146 @@ export default function DetailTranscript({setShowDetail}) {
   const handleDrop = (event) => {
     event.preventDefault();
     setIsDragging(false);
-
-    // Xử lý file đã kéo và thả ở đây
-    const files = event.dataTransfer.files;
-    // handleFiles(files);
-    console.log(files);
+    const files = event.dataTransfer.files[0];
+    console.log(files,'file');
+    setFileAssigment({
+      file: files,
+      name: files.name,
+    });
   };
 
   const handleBackListWord = () => {
-    setShowDetail(false)
+    setShowDetail(false);
+  };
+
+  const showStatusAssigment = () => {
+    return SUB_ASSIGMENT_STATUS_LIST.find(
+      (el) => el.value == detailSubAssigment?.status
+    );
+  };
+
+  const handleChangeFile = (ev) => {
+    const files = ev.target.files[0];
+    setFileAssigment({
+      file: files,
+      name: files.name,
+    });
+  };
+
+  const handleCompletedAssigment = async () => {
+    try {
+      await ApiUpdateSubAssignments(detailSubAssigment?.id, {
+        dile: fileAssigment.file,
+      });
+    } catch (error) {
+      console.log(error);
+      message.error("Nọp bài thất bại! Vui lòng thử lại.");
+    }
+  };
+
+  const handleDeleteFile = () => {
+    setFileAssigment({
+      file: undefined,
+      name: '',
+    });
   }
 
   return (
     <div className="mt-3 ml-3">
       <div className=" flex items-center justify-between">
-        <div onClick={handleBackListWord} className="text-xl flex items-center cursor-pointer text-[#1677ff]">
+        <div
+          onClick={handleBackListWord}
+          className="text-xl flex items-center cursor-pointer text-[#1677ff]"
+        >
           <LeftOutlined className="flex items-center" />{" "}
           <div className="mb-[5px]">Trở lại</div>
         </div>
         <div className="flex items-center gap-4">
-          {false ? (
-            <div className="text-slate-400 flex gap-1 items-center">
-              <CloseOutlined className="flex items-center" />
-              <div className="mb-[3px]">Chưa hoàn thành</div>
-            </div>
-          ) : (
-            <div className="text-green-400 flex gap-1 items-center">
-              <CloseOutlined className="flex items-center" />
-              <div className="mb-[3px]">
-                Đã hoàn thành ngày 17/4/2023 lúc 11:06
-              </div>
-            </div>
-          )}
-
-          <Button type="primary">Hoàn thành</Button>
+          <Tag
+            color={showStatusAssigment()?.color}
+            icon={showStatusAssigment()?.icon}
+          >
+            {showStatusAssigment()?.label}
+          </Tag>
+          <Button onClick={() => handleCompletedAssigment()} type="primary">
+            Hoàn thành
+          </Button>
         </div>
       </div>
       <div className="mt-5 flex gap-4">
         <div className="w-2/3 ">
           <div className="title">
-            <div className="text-2xl font-bold">
-              Tiêu đề bài kiểm tra là gì?
-            </div>
+            <div className="text-2xl font-bold">{detail?.title}</div>
             <div className="text-slate-400">
-              Kỳ hạn cuối ngày 17/5/2023 lúc 11:00
+              Kỳ hạn cuối ngày{" "}
+              {dayjs(detail?.deadline).format(FORMAT_DATE.SPECSIALDATE)}
             </div>
           </div>
 
           <div className="content mt-5">
             <div className="font-medium">Nội dung</div>
-            <i className="text-lg">Nội dung bài tập là</i>
-            <div>
-              <i>Nội dung hướng dẫn là?</i>
-            </div>
+            <i className="text-lg"> {detail?.description}</i>
           </div>
 
           <div className="content mt-5">
             <div className="font-medium">Bài tập</div>
 
-            <div
-              onDragEnter={handleDragEnter}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-              className="mt-3 border-[1px] flex justify-center items-center py-3 px-4 bg-gray-100 border-solid border-slate-300 rounded-md shadow-md"
-            >
-              <input
-                id="upload-file-home-work"
-                type="file"
-                className="hidden"
-              />
-              {isDragging ? (
-                <div className="h-[125px] flex justify-center items-center ">
-                  <div className="text-center">
-                    <ArrowDownOutlined className="text-[50px]" />
-                    <div className="font-bold text-base">
+            {fileAssigment.name ? (
+              <div className="mt-3 border-[1px] text-base flex justify-between items-center py-3 px-4 bg-gray-100 border-solid border-slate-300 rounded-md shadow-md">
+                <div className="flex gap-3 items-center cursor-pointer hover:scale-105 transition duration-700 ease-in-out ">
+                  <FilePdfOutlined />
+                  <u className="fileName">{fileAssigment.name}</u>
+                </div>
+                <div onClick={handleDeleteFile} className="cursor-pointer hover:scale-125 transition duration-700 ease-in-out">
+                  <DeleteOutlined />
+                </div>
+              </div>
+            ) : (
+              <div
+                onDragEnter={handleDragEnter}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                className="mt-3 border-[1px] flex justify-center items-center py-3 px-4 bg-gray-100 border-solid border-slate-300 rounded-md shadow-md"
+              >
+                <input
+                  id="upload-file-home-work"
+                  type="file"
+                  className="hidden"
+                  onChange={handleChangeFile}
+                />
+                {isDragging ? (
+                  <div className="h-[125px] flex justify-center items-center ">
+                    <div className="text-center">
+                      <ArrowDownOutlined className="text-[50px]" />
+                      <div className="font-bold text-base">
                         Kéo và thả file vào đây...
+                      </div>
                     </div>
                   </div>
-                </div>
-              ) : (
-                <label
-                  for="upload-file-home-work"
-                  className="text-center cursor-pointer"
-                >
-                  <CloudUploadOutlined className="text-[50px]" />
-                  <div className="font-bold">
-                    Kéo thả hoặc chọn file bài tập
-                  </div>
-                  <div className="font-bold text-base  italic">
-                    Duy nhất PDF (5MB)
-                  </div>
-                </label>
-              )}
-            </div>
-
-            {/* <div className="mt-3 border-[1px] text-base flex justify-between items-center py-3 px-4 bg-gray-100 border-solid border-slate-300 rounded-md shadow-md">
-              <div className="flex gap-3 items-center cursor-pointer hover:scale-105 transition duration-700 ease-in-out ">
-                <FilePdfOutlined />
-                <u className="fileName">Hoàng Minh đức.pdf</u>
+                ) : (
+                  <label
+                    for="upload-file-home-work"
+                    className="text-center cursor-pointer"
+                  >
+                    <CloudUploadOutlined className="text-[50px]" />
+                    <div className="font-bold">
+                      Kéo thả hoặc chọn file bài tập
+                    </div>
+                    <div className="font-bold text-base  italic">
+                      Duy nhất PDF (5MB)
+                    </div>
+                  </label>
+                )}
               </div>
-              <div className="cursor-pointer hover:scale-125 transition duration-700 ease-in-out">
-                <DeleteOutlined />
-              </div>
-            </div> */}
+            )}
           </div>
         </div>
         <div className="w-1/3">
           <div className="font-medium">Điểm</div>
-          <div className="text-lg font-bold">10</div>
+          <div className="text-lg font-bold">
+            {detailSubAssigment?.point || "Chưa có điểm"}
+          </div>
         </div>
       </div>
     </div>

@@ -1,9 +1,10 @@
 import { ApiGetAssignments } from "@/api/student";
 import { dayOfWeekVn } from "@/common/util";
 import LayoutAdmin from "@/components/LayoutAdmin";
+import PopupCheckPoint from "@/components/popup/popupCheckPoint";
 import PopupCreateHomework from "@/components/popup/popupCreateHomework";
 import TeacherDetailHomework from "@/components/teacher/DetailHomework";
-import { CheckOutlined, LeftOutlined } from "@ant-design/icons";
+import {  LeftOutlined } from "@ant-design/icons";
 import { Button, Pagination, Table, Tag, message } from "antd";
 import dayjs from "dayjs";
 import { useRouter } from "next/router";
@@ -19,7 +20,6 @@ function TeacherHomeworks({ user }) {
     linePer: 10,
     page: 1,
   });
-
   const [assignments, setAssignments] = useState({
     total: 0,
     data: [],
@@ -84,6 +84,7 @@ function TeacherHomeworks({ user }) {
         open={isOpenCre}
         classId={id}
       />
+
       {isDetail ? (
         <div className="transaction-detail">
           <TeacherDetailHomework
@@ -102,7 +103,8 @@ function TeacherHomeworks({ user }) {
             <LeftOutlined className="flex items-center" />{" "}
             <div className="mb-[5px]">Trở lại</div>
           </div>
-          <div className="flex justify-end">
+          <div className="flex justify-between">
+            <div className="text-2xl font-bold"> Mã lớp: {id}</div>
             <Button
               type="primary"
               onClick={() => {
@@ -112,57 +114,65 @@ function TeacherHomeworks({ user }) {
               Thêm mới
             </Button>
           </div>
-          {assignments.data?.map((el, index) => (
-            <div className="mt-4 p-4" key={index}>
-              <div className="flex gap-5 text-xl mb-3">
-                <div className="font-bold">
-                  {dayjs(el.ctime).format("Ngày DD/MM/YYYY")}
-                </div>
-                <div className=" text-slate-400">{dayOfWeekVn(el.ctime)}</div>
-              </div>
+          {assignments.data?.length ? (
+            <>
+              {assignments.data?.map((el, index) => (
+                <div className="mt-4 p-4" key={index}>
+                  <div className="flex gap-5 text-xl mb-3">
+                    <div className="font-bold">
+                      {dayjs(el.ctime).format("Ngày DD/MM/YYYY")}
+                    </div>
+                    <div className=" text-slate-400">
+                      {dayOfWeekVn(el.ctime)}
+                    </div>
+                  </div>
 
-              <div className="border-[1px] flex justify-between items-center py-3 px-4 bg-gray-100 border-solid border-slate-300 rounded-md shadow-md">
-                <div
-                  onClick={() => handleClickDetail(el.id)}
-                  className=" cursor-pointer hover:scale-105 transition duration-700 ease-in-out"
-                >
-                  <div className="font-bold">{el.title}</div>
-                  <div>
-                    Đã gửi và lúc{" "}
-                    {`${dayjs(el.ctime)
-                      .hour()
-                      .toString()
-                      .padStart(2, "0")}:${dayjs(el.ctime)
-                      .minute()
-                      .toString()
-                      .padStart(2, "0")}`}
+                  <div className="border-[1px] flex justify-between items-center py-3 px-4 bg-gray-100 border-solid border-slate-300 rounded-md shadow-md">
+                    <div
+                      onClick={() => handleClickDetail(el.id)}
+                      className=" cursor-pointer hover:scale-105 transition duration-700 ease-in-out"
+                    >
+                      <div className="font-bold">{el.title}</div>
+                      <div>
+                        Đã gửi và lúc{" "}
+                        {`${dayjs(el.ctime)
+                          .hour()
+                          .toString()
+                          .padStart(2, "0")}:${dayjs(el.ctime)
+                          .minute()
+                          .toString()
+                          .padStart(2, "0")}`}
+                      </div>
+                    </div>
+                    <div>
+                      <Button onClick={() => hanldeUpdate(el)} type="primary">
+                        Chỉnh sửa
+                      </Button>
+                      <Button
+                        onClick={() => handleDeleteAssignment(el.id)}
+                        type="primary"
+                        danger
+                        className="ml-4"
+                      >
+                        Xóa
+                      </Button>
+                    </div>
                   </div>
                 </div>
-                <div>
-                  <Button onClick={() => hanldeUpdate(el)} type="primary">
-                    Chỉnh sửa
-                  </Button>
-                  <Button
-                    onClick={() => handleDeleteAssignment(el.id)}
-                    type="primary"
-                    danger
-                    className="ml-4"
-                  >
-                    Xóa
-                  </Button>
-                </div>
-              </div>
-            </div>
-          ))}
+              ))}
 
-          <div className="flex justify-end mt-3">
-            <Pagination
-              current={page.page}
-              pageSize={page.linePer}
-              onChange={handleChangePageOption}
-              total={assignments.total}
-            />
-          </div>
+              <div className="flex justify-end mt-3">
+                <Pagination
+                  current={page.page}
+                  pageSize={page.linePer}
+                  onChange={handleChangePageOption}
+                  total={assignments.total}
+                />
+              </div>
+            </>
+          ) : (
+            ""
+          )}
         </div>
       )}
     </div>
