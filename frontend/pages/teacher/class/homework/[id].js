@@ -1,4 +1,4 @@
-import { ApiGetAssignments } from "@/api/student";
+import { ApiGetAssignments, ApiGetDetailClass, ApiUpdateHomework } from "@/api/student";
 import { dayOfWeekVn } from "@/common/util";
 import LayoutAdmin from "@/components/LayoutAdmin";
 import PopupCheckPoint from "@/components/popup/popupCheckPoint";
@@ -25,12 +25,17 @@ function TeacherHomeworks({ user }) {
     data: [],
   });
   const [assignmentDetail, setAssignmentDetail] = useState();
+  const [classDetail, setClassDetail] = useState();
 
   useEffect(() => {
     if (!isOpenCre) {
       fetchAssignments();
     }
   }, [isOpenCre]);
+
+  useEffect(() => {
+    fetchDetailClass()
+  }, []);
 
   const fetchAssignments = async () => {
     try {
@@ -46,7 +51,6 @@ function TeacherHomeworks({ user }) {
   };
 
   const handleClickDetail = (id) => {
-    console.log(id);
     setIsDetail(true);
     setIdDetail(id);
   };
@@ -70,12 +74,20 @@ function TeacherHomeworks({ user }) {
 
   const handleDeleteAssignment = async (id) => {
     try {
-      await ApiUpdateHomework(detail?.id, { status: "deactive" });
+      await ApiUpdateHomework(id, { status: "deactive" });
       message.success("Xóa bài tập thành công!");
+      fetchAssignments()
     } catch (error) {
-      message.success("Xóa bài tập thất bại! Vui lòng thử lại.");
+        console.log(error);
+      message.error("Xóa bài tập thất bại! Vui lòng thử lại.");
     }
   };
+
+  const fetchDetailClass = async () =>{
+    const res = await ApiGetDetailClass(id);
+    setClassDetail(res.data)
+  }
+
   return (
     <div>
       <PopupCreateHomework
@@ -95,7 +107,6 @@ function TeacherHomeworks({ user }) {
         </div>
       ) : (
         <div className="transaction-list  ml-3">
-          {/* <div className="flex justify-between"> */}
           <div
             onClick={handleBackClasses}
             className="text-xl flex items-center cursor-pointer text-[#1677ff] w-[75px]"
@@ -104,7 +115,7 @@ function TeacherHomeworks({ user }) {
             <div className="mb-[5px]">Trở lại</div>
           </div>
           <div className="flex justify-between">
-            <div className="text-2xl font-bold"> Mã lớp: {id}</div>
+            <div className="text-2xl font-bold"> Mã lớp: {id} - {classDetail?.name}</div>
             <Button
               type="primary"
               onClick={() => {
