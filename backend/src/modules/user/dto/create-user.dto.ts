@@ -41,6 +41,12 @@ export class CreateUserDto {
 	@IsEnum(ROLE)
 	role: string;
 
+	@ApiProperty({ required: true })
+	@IsOptional()
+	@IsNotEmpty()
+	@IsEnum(ROLE)
+	avatar?: string;
+
 // attribute of student
     @ApiProperty({ required: false })
     @IsOptional()

@@ -16,8 +16,8 @@ export class UploadService {
 		const params = {
 			Bucket: bucket,
 			Key: `${userId}`,
-			Expires: 86400,
-			ContentType: 'image/jpeg' || 'image/png',
+			Expires: 604800,
+			ContentType: '*/*',
 		};
 
 		const url = this.s3.getSignedUrl('putObject', params);
@@ -29,7 +29,7 @@ export class UploadService {
 		const params = {
 			Bucket: bucket,
 			Key: `${userId}`,
-			Expires: 86400,
+			Expires: 604800,
 		};
 
 		const url = this.s3.getSignedUrl('getObject', params);

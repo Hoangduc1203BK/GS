@@ -19,6 +19,13 @@ export class User {
         unsigned: true,
     })
     id: string;
+    @Column({
+        type: 'varchar',
+        length: '200',
+        name: 'avatar',
+        nullable: true,
+    })
+    avatar: string;
 
     @Column({
         type: 'varchar',

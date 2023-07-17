@@ -23,7 +23,7 @@ export class UserController {
         const path = `profile/${user["id"]}`
         const result = await this.uploadService.uploadFile(path, file.buffer);
 
-        return result;
+        return {url: result};
     }
 
     @UseGuards(JwtAuthGuard)
@@ -31,7 +31,7 @@ export class UserController {
     async getPresign(@Req() req: Request){
         const user = req["user"];
         const path = `profile/${user["id"]}`
-        const result = await this.uploadService.getPresignUrl('/profile/ST3145');
+        const result = await this.uploadService.getPresignUrl(path);
 
         return result;
     }
