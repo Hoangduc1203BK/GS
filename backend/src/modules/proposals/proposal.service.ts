@@ -25,10 +25,10 @@ export class ProposalService {
         private readonly userService: UserService,
         private readonly classService: ClassService,
         private readonly mailService: MailService
-    ) {}
+    ) { }
 
     setProposalStrategy(type: string) {
-        switch (type){
+        switch (type) {
             case PROPOSAL_TYPE.TEACHER_REGISTER_CLASS:
                 this.proposalStrategy = new TeacherRegisterClass(this.proposalRepos, this.userService, this.mailService, this.classService);
                 break;
@@ -36,7 +36,7 @@ export class ProposalService {
                 this.proposalStrategy = new TeacherTakeBrake(this.proposalRepos, this.userService, this.mailService, this.classService);
                 break;
             case PROPOSAL_TYPE.STUDENT_REGISTER_CLASS:
-                this.proposalStrategy = new StudentRegisterClass(this.proposalRepos,this.classService, this.mailService, this.userService);
+                this.proposalStrategy = new StudentRegisterClass(this.proposalRepos, this.classService, this.mailService, this.userService);
                 break;
             case PROPOSAL_TYPE.STUDENT_TERMINATE_CLASS:
                 this.proposalStrategy = new StudentTerminateClass(this.proposalRepos, this.classService, this.mailService, this.userService);
@@ -45,41 +45,55 @@ export class ProposalService {
         }
     }
 
-    async listProposal(dto: ListProposalDto) {
+    async listProposal(role: string, dto: ListProposalDto) {
         const current = new Date();
         let month = current.getMonth() + 1;
         const year = current.getFullYear();
-        const lastDay = new Date(year, month+1,0);
+        const lastDay = new Date(year, month + 1, 0);
         let formatMonth = month <= 9 ? `0${month}` : month.toString();
         const startDate = `${year}-${formatMonth}-01`;
         const endDate = `${year}-${formatMonth}-${lastDay.getDate()}`;
-        const { page = DEFAULT_PAGING.PAGE, size = DEFAULT_PAGING.LIMIT, start = startDate, end = endDate,...rest  } = dto;
-        if(dto.userId) {
+        const { page = DEFAULT_PAGING.PAGE, size = DEFAULT_PAGING.LIMIT, start = startDate, end = endDate, ...rest } = dto;
+        if (dto.userId) {
             await this.userService.getUser(dto.userId)
         }
 
-        let paramArr = [` p."time" >= '${start}' `, ` p."time" <= '${end}' ` ];
-        
-        for(const [k,v] of Object.entries(rest)) {
-            if(k  == "userId"){
+        let paramArr = [` p."time" >= '${start}' `, ` p."time" <= '${end}' `];
+
+        for (const [k, v] of Object.entries(rest)) {
+            if (k == "userId") {
                 paramArr.push(' p.user_id = ' + `'` + v + `'`)
             }
             else {
                 paramArr.push(' p."' + k + `" = '` + v + `'`)
             }
         }
-        
-        let qr = 'select p.*, u.name as user, u.email as email, d.id as department_id from proposals p, users u, departments d where p.user_id=u.id and u.department_id=d.id';
-        if(paramArr.length >0) {
-            qr = qr + ' AND ' + paramArr.join(' AND ')
+        if (role == ROLE.TEACHER) {
+            let qr = 'select p.*, u.name as user, u.email as email, d.id as department_id from proposals p, users u, departments d where p.user_id=u.id and u.department_id=d.id';
+            if (paramArr.length > 0) {
+                qr = qr + ' AND ' + paramArr.join(' AND ')
+            }
+
+            const skip = (page - 1) * size;
+            qr += ` limit ${size} offset ${skip}`;
+
+            const result = await this.proposalRepos.query(qr);
+
+            return result;
+        }else {
+            let qr = 'select p.*, u.name as user, u.email as email from proposals p, users u where p.user_id=u.id';
+            if (paramArr.length > 0) {
+                qr = qr + ' AND ' + paramArr.join(' AND ')
+            }
+
+            const skip = (page - 1) * size;
+            qr += ` limit ${size} offset ${skip}`;
+
+            const result = await this.proposalRepos.query(qr);
+
+            return result;
         }
 
-        const skip = (page-1)*size;
-        qr += ` limit ${size} offset ${skip}`;
-
-        const result = await this.proposalRepos.query(qr);
-
-        return result;   
     }
 
     async getProposal(id: number) {
@@ -87,14 +101,14 @@ export class ProposalService {
             where: {
                 id: id
             },
-            relations: ['user','user.department']
+            relations: ['user', 'user.department']
         })
 
-        if(!proposal) {
-            throw new Error('Không tìm thấy đề xuất với id:'+id);
+        if (!proposal) {
+            throw new Error('Không tìm thấy đề xuất với id:' + id);
         }
 
-        const {user,subData, ...rest} = proposal;
+        const { user, subData, ...rest } = proposal;
         const classes = await this.classService.getClass(proposal.subData.classId);
 
         const doc = {
@@ -114,28 +128,28 @@ export class ProposalService {
 
     async createProposal(dto: CreateProposalDto) {
         const user = await this.userService.getUser(dto.userId);
-        const { classId } = dto.subData; 
+        const { classId } = dto.subData;
         await this.classService.getClass(classId);
 
-        if(user.role == ROLE.TEACHER && dto.type == PROPOSAL_TYPE.TEACHER_REGISTER_CLASS) {
+        if (user.role == ROLE.TEACHER && dto.type == PROPOSAL_TYPE.TEACHER_REGISTER_CLASS) {
             const schedules = await this.classService.listTimeTable(dto.subData.classId);
             const mapSchedules = schedules.map(el => {
                 return {
                     date: el.date,
                     roomId: el.roomId,
-                    start:(el.start).toString(),
+                    start: (el.start).toString(),
                     end: (el.end).toString(),
                 }
             })
-            const listTeacherEmpty = await this.classService.listTeacherEmpty({schedules: mapSchedules});
+            const listTeacherEmpty = await this.classService.listTeacherEmpty({ schedules: mapSchedules });
             const existUser = listTeacherEmpty.find(el => el.id == dto.userId);
-            if(!existUser) {
-                throw new Error('Lớp '+dto.subData.classId+' có lịch trùng với lịch dạy đang có nên không thể tạo đề xuất')
+            if (!existUser) {
+                throw new Error('Lớp ' + dto.subData.classId + ' có lịch trùng với lịch dạy đang có nên không thể tạo đề xuất')
             }
-        }else if(user.role == ROLE.USER && dto.type == PROPOSAL_TYPE.STUDENT_REGISTER_CLASS) {
+        } else if (user.role == ROLE.USER && dto.type == PROPOSAL_TYPE.STUDENT_REGISTER_CLASS) {
             const classes = await this.classService.getClass(dto.subData.classId);
             const listUserInClass = await this.classService.listUserInClass(dto.subData.classId, USER_CLASS_TYPE.MAIN);
-            if(listUserInClass.length >= classes.numberStudent) {
+            if (listUserInClass.length >= classes.numberStudent) {
                 throw new Error('Lớp có id:' + dto.subData.classId + ' đã đầy chỗ, vui lòng chọn đăng ký lớp khác')
             }
         }
@@ -152,21 +166,21 @@ export class ProposalService {
     }
 
     async updateProposal(id: number, dto: UpdateProposalDto) {
-        const proposal = await this.proposalRepos.findOne({where: {id}});
+        const proposal = await this.proposalRepos.findOne({ where: { id } });
 
-        if(!proposal) {
-            throw new Error("Không tìm thấy đề xuất với id:"+id);
+        if (!proposal) {
+            throw new Error("Không tìm thấy đề xuất với id:" + id);
         }
 
-        if(proposal.status !=PROPOSAL_STATUS.PENDING) {
-            throw new Error('Đề xuất này có trạng thái:'+proposal.status+' và không thể sửa đổi');
+        if (proposal.status != PROPOSAL_STATUS.PENDING) {
+            throw new Error('Đề xuất này có trạng thái:' + proposal.status + ' và không thể sửa đổi');
         }
 
         this.setProposalStrategy(proposal.type);
 
-        if(proposal.type == PROPOSAL_TYPE.TEACHER_TAKE_BRAKE) {
-            await this.proposalStrategy.handleProposal(dto, proposal,dto.subData);
-        }else {
+        if (proposal.type == PROPOSAL_TYPE.TEACHER_TAKE_BRAKE) {
+            await this.proposalStrategy.handleProposal(dto, proposal, dto.subData);
+        } else {
             await this.proposalStrategy.handleProposal(dto, proposal);
         }
 

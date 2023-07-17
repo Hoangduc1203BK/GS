@@ -1,16 +1,19 @@
-import { Body, Controller, Param, Query, Get, Post, Patch } from "@nestjs/common";
+import { Body, Controller, Param, Query, Get, Post, Patch, UseGuards, Req } from "@nestjs/common";
 import { ProposalService } from "./proposal.service";
-import { query } from "express";
+import { Request, query } from "express";
 import { ListProposalDto } from "./dto/list-proposal.dto";
 import { CreateProposalDto } from "./dto/create-proposal.dto";
+import { JwtAuthGuard } from "src/core/guards";
 
 @Controller('proposal')
 export class ProposalController {
     constructor(private readonly proposalService: ProposalService) {}
 
+    @UseGuards(JwtAuthGuard)
     @Get('/')
-    async listProposal(@Query() query: ListProposalDto) {
-        const result = await this.proposalService.listProposal(query);
+    async listProposal(@Req() req: Request, @Query() query: ListProposalDto) {
+        const user = req["user"];
+        const result = await this.proposalService.listProposal(user["role"], query);
 
         return result;
     }
