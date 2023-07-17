@@ -1,18 +1,34 @@
-import { Body, Controller, Get, Param, Patch, Post, Query, Req, UseGuards } from "@nestjs/common";
-import { CreateAssigmentDto, ListAssigmentDto, UpdateAssigmentDto, UpdateSubAssigmentDto } from "./dto";
+import { Body, Controller, Get, Param, Patch, Post, Query, Req, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { CreateAssigmentDto, ListAssigmentDto, UpdateAssigmentDto, UpdateSubAssigmentDto, UploadtDto } from "./dto";
 import { JwtAuthGuard } from "src/core/guards";
 import { AssigmentService } from "./assigment.service";
 import { query } from "express";
 import { ListAssigmenStudenttDto } from "./dto/list-assigment-for-student";
 import { GetSubAssigmentDto } from "./dto/get-sub-assigment.dto";
 import { Request } from 'express';
+import { FileInterceptor } from "@nestjs/platform-express";
+import { UploadService } from "src/core/shared/services/upload.service";
 @Controller('assigments')
 export class AssigmentController{
-    constructor(private readonly assigmentService: AssigmentService) {}
+    constructor(
+        private readonly assigmentService: AssigmentService,
+        private readonly uploadService: UploadService,
+        ) {}
 
     //sub-assigment
-    // @Get('/sub-assigment')
-    // async listSubAssigment() {}
+    @UseGuards(JwtAuthGuard)
+    @Post('/upload')
+    @UseInterceptors(FileInterceptor('file'))
+    async postPresign(@Req() req: Request,@Query() query: UploadtDto, @UploadedFile() file: Express.Multer.File) {
+        const { classId, assigmentId } = query;
+        const user = req["user"];
+        const path = `${classId}/${assigmentId}/${user["id"]}`
+        const result = await this.uploadService.uploadFile(path, file.buffer);
+
+        return result;
+    }
+
+
 
     @Get('/sub-assigment')
     async getSubAssigment(@Query() query: GetSubAssigmentDto) {

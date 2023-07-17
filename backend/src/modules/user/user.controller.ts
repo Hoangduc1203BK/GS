@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, Query, UploadedFile, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Get, Param, Patch, Post, Query, Req, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { CreateUserDto, ListUsertDto, UpdateUserDto } from "./dto";
 import { UserService } from "./user.service";
 import { checkEmailDecorator } from "src/core/decorator/util";
@@ -6,6 +6,7 @@ import { MailService } from "src/core/shared/services/mail/mail.service";
 import { UploadService } from "src/core/shared/services/upload.service";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Express } from 'express';
+import { JwtAuthGuard } from "src/core/guards";
 @Controller('user')
 export class UserController {
     constructor(
@@ -13,6 +14,27 @@ export class UserController {
         private readonly mailService: MailService,
         private readonly uploadService: UploadService,
     ) {}
+
+    @UseGuards(JwtAuthGuard)
+    @Post('/avatar')
+    @UseInterceptors(FileInterceptor('file'))
+    async postPresign(@Req() req: Request, @UploadedFile() file: Express.Multer.File) {
+        const user = req["user"];
+        const path = `profile/${user["id"]}`
+        const result = await this.uploadService.uploadFile(path, file.buffer);
+
+        return result;
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get('/avatar')
+    async getPresign(@Req() req: Request){
+        const user = req["user"];
+        const path = `profile/${user["id"]}`
+        const result = await this.uploadService.getPresignUrl('/profile/ST3145');
+
+        return result;
+    }
 
     @Get('/')
     async listUser(@Query() query: ListUsertDto) {
@@ -40,14 +62,5 @@ export class UserController {
         const result = await this.userService.updateUser(id, data);
 
         return result;
-    }
-
-    @Post('/presign')
-    @UseInterceptors(FileInterceptor('file'))
-    async postPresign(@UploadedFile() file: Express.Multer.File) {
-        console.log(file)
-        const result = await this.uploadService.uploadFile('ST3145', file.buffer);
-
-        return true;
     }
 }

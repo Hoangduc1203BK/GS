@@ -7,7 +7,7 @@ export class UploadService {
 	private s3: S3;
 	constructor(private configService: ApiConfigService) {
 		const { accessKeyId, secretAccessKey } = this.configService.getS3Config();
-		AWS.config.update({ accessKeyId: 'AKIATCQ75ANMZYZ6D7GA', secretAccessKey: '44usGqzQ6pvId4Nw5Gh327LsVIZ3HyRc815IoxX' });
+		AWS.config.update({ accessKeyId: 'AKIA53D7VHNA7XRNZMGB', secretAccessKey: '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' });
 		this.s3 = new S3();
 	}
 
@@ -42,11 +42,11 @@ export class UploadService {
 			Bucket: bucket,
 			Body: file,
 			Key: title,
-			ContentType: 'image/jpeg',
+			ContentType: '*/*',
 		};
 		const result = await this.s3.upload(params).promise();
 
-		return result;
+		return result.Location;
 	}
 
 	async deleteFile(key: string) {
