@@ -101,3 +101,10 @@ export function ApiGetDetailSubAssignments (params){
 export function ApiUpdateSubAssignments (id, payload){
   return axios.patch('/assigments/sub-assigment/'+ id, payload);
 }
+
+export function ApiUploadFileAssigment (classId,assigmentId, fd) {
+
+  return axios.post(`/assigments/upload?classId=${classId}&assigmentId=${assigmentId}`, fd);
+
+
+}

@@ -20,7 +20,7 @@ export default function LayoutTimeTables({ schedule }) {
 
             {el.classes?.length ? (
               el.classes?.map((e, idx) => (
-                <div className="flex items-center" key={idx}>
+                <div className="flex items-center mt-2" key={idx}>
                   <div className="w-3/12 text-xs">
                     Từ {e.start}h đến {e.end}h
                   </div>

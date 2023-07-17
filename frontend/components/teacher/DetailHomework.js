@@ -16,11 +16,10 @@ export default function TeacherDetailHomework({ info, setIsDetail, idDetail }) {
   const [isOpenPoint, setIsOpenPoint] = useState(false);
   const [assigment, setAssigment] = useState();
   useEffect(() => {
-    if(!isOpenPoint){
-        getDetailAssignment();
-
+    if (!isOpenPoint) {
+      getDetailAssignment();
     }
-  }, [idDetail,isOpenPoint]);
+  }, [idDetail, isOpenPoint]);
 
   const getDetailAssignment = async () => {
     try {
@@ -59,7 +58,11 @@ export default function TeacherDetailHomework({ info, setIsDetail, idDetail }) {
     {
       title: "Bài làm",
       render: (text, record, index) => {
-        return <a href={record.file}>{record.file || ""}</a>;
+        return (
+          <a href={record.file} target="_blank">
+            {record.file || ""}
+          </a>
+        );
       },
     },
 
@@ -67,6 +70,11 @@ export default function TeacherDetailHomework({ info, setIsDetail, idDetail }) {
       title: "Điểm",
       dataIndex: "point",
       key: "point",
+    },
+    {
+      title: "Nhận xét",
+      dataIndex: "feedback",
+      key: "feedback",
     },
     {
       title: "Trạng thái",
