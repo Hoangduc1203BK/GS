@@ -1,7 +1,7 @@
 import LayoutAdmin from "@/components/LayoutAdmin";
 import DetailTranscript from "@/components/student/DetailTranscript";
 import { CheckOutlined, LeftOutlined } from "@ant-design/icons";
-import { Tabs, Tag, message } from "antd";
+import { Spin, Tabs, Tag, message } from "antd";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { FORMAT_DATE, SUB_ASSIGMENT_STATUS_LIST } from "@/common/const";
@@ -16,6 +16,7 @@ const Homeworks = ({ user }) => {
   const router = useRouter();
   const { id } = router.query;
   const [classDetail, setClassDetail] = useState();
+  const [isFetchList, setFetchList] =  useState(false);
 
   useEffect(() => {
     fetchListAssigments();
@@ -114,6 +115,7 @@ const Homeworks = ({ user }) => {
 
   const fetchListAssigments = async () => {
     try {
+      setFetchList(true)
       const params = {
         classId: id,
         status: SUB_ASSIGMENT_STATUS_LIST.find(
@@ -123,9 +125,12 @@ const Homeworks = ({ user }) => {
       const res = (await ApiGetStudentAssignments(params)).data;
       console.log(res);
       setAssigments([...res]);
+      setFetchList(false)
     } catch (error) {
       console.log(error);
       message.error("Xem danh sách bài tập thất bại! Vui lòng thử lại");
+      setFetchList(false)
+
     }
   };
 
@@ -140,7 +145,7 @@ const Homeworks = ({ user }) => {
           <DetailTranscript setShowDetail={setIsDetail} detail={detail} />
         </div>
       ) : (
-        <div>
+        <Spin tip="loading" size="large" spinning={isFetchList}>
           <div className="flex">
             <div
               onClick={handleBackClasses}
@@ -158,7 +163,7 @@ const Homeworks = ({ user }) => {
             onChange={handleChangeTab}
             items={items}
           />
-        </div>
+        </Spin>
       )}
     </div>
   );

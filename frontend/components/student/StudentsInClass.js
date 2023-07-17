@@ -8,18 +8,25 @@ import { useEffect, useState } from "react";
 export default function StudentsInClass({ info }) {
   const [classes, setClasses] = useState([]);
   const [students, setStudents] = useState([]);
-  const [isFetchStudent, setIsFetchStudent] = useState(false)
+  const [isFetchStudent, setIsFetchStudent] = useState(false);
+  const [isFetchClass, setIsFetchClass] = useState(false)
+
   const [expandedKey, setExpandedKey] = useState([]);
   const router = useRouter()
 
   const fetchDataClass = async () => {
     try {
       if (info?.id) {
+        setIsFetchClass(true)
         const classOfStudent = await ApiClassOfStudent(info.id);
         setClasses(classOfStudent?.data?.map((i, index) => ({ ...i, key: i?.id, number: index + 1 })));
+        setIsFetchClass(false)
+
       }
     } catch (error) {
       message.error("Có lỗi xảy ra! Vui lòng thử lại.");
+      setIsFetchClass(false)
+
     }
   };
 
@@ -176,6 +183,7 @@ export default function StudentsInClass({ info }) {
         bordered
         scroll={{ x: 1000 }}
         pagination={false}
+        loading={isFetchClass}
       />
       ;
     </div>
