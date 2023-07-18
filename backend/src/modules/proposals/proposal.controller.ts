@@ -9,11 +9,10 @@ import { JwtAuthGuard } from "src/core/guards";
 export class ProposalController {
     constructor(private readonly proposalService: ProposalService) {}
 
-    @UseGuards(JwtAuthGuard)
+    // @UseGuards(JwtAuthGuard)
     @Get('/')
-    async listProposal(@Req() req: Request, @Query() query: ListProposalDto) {
-        const user = req["user"];
-        const result = await this.proposalService.listProposal(user["role"], query);
+    async listProposal( @Query() query: ListProposalDto) {
+        const result = await this.proposalService.listProposal(query);
 
         return result;
     }

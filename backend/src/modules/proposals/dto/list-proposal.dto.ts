@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, IsNumber, IsEnum, IsNumberString, IsOptional } from 'class-validator';
-import { PROPOSAL_STATUS, PROPOSAL_TYPE } from 'src/common/constants';
+import { PROPOSAL_STATUS, PROPOSAL_TYPE, ROLE } from 'src/common/constants';
 
 export class ListProposalDto {
 	@ApiProperty({ required: true })
@@ -44,4 +44,9 @@ export class ListProposalDto {
 	@IsNotEmpty()
     @IsEnum(PROPOSAL_STATUS)
 	status?: string;
+
+	@ApiProperty({ required: true })
+	@IsNotEmpty()
+    @IsEnum(ROLE)
+	role: string;
 }

@@ -45,7 +45,7 @@ export class ProposalService {
         }
     }
 
-    async listProposal(role: string, dto: ListProposalDto) {
+    async listProposal(dto: ListProposalDto) {
         const current = new Date();
         let month = current.getMonth() + 1;
         const year = current.getFullYear();
@@ -53,7 +53,7 @@ export class ProposalService {
         let formatMonth = month <= 9 ? `0${month}` : month.toString();
         const startDate = `${year}-${formatMonth}-01`;
         const endDate = `${year}-${formatMonth}-${lastDay.getDate()}`;
-        const { page = DEFAULT_PAGING.PAGE, size = DEFAULT_PAGING.LIMIT, start = startDate, end = endDate, ...rest } = dto;
+        const { page = DEFAULT_PAGING.PAGE, size = DEFAULT_PAGING.LIMIT, start = startDate, end = endDate,role, ...rest } = dto;
         if (dto.userId) {
             await this.userService.getUser(dto.userId)
         }
@@ -68,8 +68,8 @@ export class ProposalService {
                 paramArr.push(' p."' + k + `" = '` + v + `'`)
             }
         }
-        if (role == ROLE.TEACHER) {
-            let qr = 'select p.*, u.name as user, u.email as email, d.id as department_id from proposals p, users u, departments d where p.user_id=u.id and u.department_id=d.id';
+        if (dto.role == ROLE.TEACHER) {
+            let qr = `select p.*, u.name as user, u.email as email, d.id as department_id from proposals p, users u, departments d where p.user_id=u.id and u.department_id=d.id and p.user_id LIKE 'TC%'`;
             if (paramArr.length > 0) {
                 qr = qr + ' AND ' + paramArr.join(' AND ')
             }
@@ -80,8 +80,8 @@ export class ProposalService {
             const result = await this.proposalRepos.query(qr);
 
             return result;
-        }else {
-            let qr = 'select p.*, u.name as user, u.email as email from proposals p, users u where p.user_id=u.id';
+        }else if(dto.role == ROLE.USER){
+            let qr = `select p.*, u.name as user, u.email as email from proposals p, users u where p.user_id=u.id and p.user_id LIKE 'ST%'`;
             if (paramArr.length > 0) {
                 qr = qr + ' AND ' + paramArr.join(' AND ')
             }
