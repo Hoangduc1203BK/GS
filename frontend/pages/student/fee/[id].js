@@ -59,7 +59,7 @@ const StudentFeeDetail = ({ user }) => {
   return (
     <div>
       <div
-        onClick={() => router.push("student/fee")}
+        onClick={() => router.push("/student/fee")}
         className="text-xl flex items-center cursor-pointer text-[#1677ff] w-[75px]"
       >
         <LeftOutlined className="flex items-center" />{" "}

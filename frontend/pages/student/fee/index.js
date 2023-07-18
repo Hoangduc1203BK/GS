@@ -67,16 +67,22 @@ function StudentFeeList({ user }) {
         return <div>{record.subject}</div>;
       },
     },
+
+    {
+      title: "Buổi học",
+      render: (text, record, index) => {
+        return <div>{record.numberOfStudy}</div>;
+      },
+    },
     {
       title: "Học phí",
       render: (text, record, index) => {
         return <div>{formatVND(record?.fee)}</div>;
       },
-    },
-    {
-      title: "Sĩ số",
+    },    {
+      title: "Tổng tiền",
       render: (text, record, index) => {
-        return <div>{record.numberOfStudy}</div>;
+        return <div>{formatVND(record?.total)}</div>;
       },
     },
     {
