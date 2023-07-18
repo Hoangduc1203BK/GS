@@ -52,7 +52,7 @@ export default function PopupCheckPoint({ open, setOpen, assigment }) {
             <Col>
               <label>
                 {" "}
-                <a href={assigment?.file} className="cursor-pointer">
+                <a href={assigment?.file} target="_blank" className="cursor-pointer">
                   {assigment?.file}
                 </a>
               </label>
@@ -72,6 +72,9 @@ export default function PopupCheckPoint({ open, setOpen, assigment }) {
                 </Select.Option>
               ))}
             </Select>
+          </Form.Item>
+          <Form.Item name="feedback" label="Nhận xét">
+            <Input.TextArea type="text" rows={4}></Input.TextArea>
           </Form.Item>
           <Row gutter={[8, 8]} justify="center">
             <Col>

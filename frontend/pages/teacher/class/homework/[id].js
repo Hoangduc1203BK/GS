@@ -1,11 +1,15 @@
-import { ApiGetAssignments } from "@/api/student";
+import {
+  ApiGetAssignments,
+  ApiGetDetailClass,
+  ApiUpdateHomework,
+} from "@/api/student";
 import { dayOfWeekVn } from "@/common/util";
 import LayoutAdmin from "@/components/LayoutAdmin";
 import PopupCheckPoint from "@/components/popup/popupCheckPoint";
 import PopupCreateHomework from "@/components/popup/popupCreateHomework";
 import TeacherDetailHomework from "@/components/teacher/DetailHomework";
-import {  LeftOutlined } from "@ant-design/icons";
-import { Button, Pagination, Table, Tag, message } from "antd";
+import { LeftOutlined } from "@ant-design/icons";
+import { Button, Pagination, Spin, Table, Tag, message } from "antd";
 import dayjs from "dayjs";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -14,6 +18,8 @@ function TeacherHomeworks({ user }) {
   const [idDeteil, setIdDetail] = useState("");
   const [isDetail, setIsDetail] = useState(false);
   const [isOpenCre, setIsOpenCre] = useState(false);
+  const [isFetchList, setIsFetchList] = useState(false);
+
   const router = useRouter();
   const { id } = router.query;
   const [page, setPage] = useState({
@@ -25,6 +31,7 @@ function TeacherHomeworks({ user }) {
     data: [],
   });
   const [assignmentDetail, setAssignmentDetail] = useState();
+  const [classDetail, setClassDetail] = useState();
 
   useEffect(() => {
     if (!isOpenCre) {
@@ -32,21 +39,27 @@ function TeacherHomeworks({ user }) {
     }
   }, [isOpenCre]);
 
+  useEffect(() => {
+    fetchDetailClass();
+  }, []);
+
   const fetchAssignments = async () => {
     try {
+      setIsFetchList(true);
       const res = (await ApiGetAssignments({ classId: id, ...page })).data;
       setAssignments({
         data: [...res.result],
         total: res.total,
       });
+      setIsFetchList(false);
     } catch (error) {
       console.log(error);
       message.error("Xem danh sách bài tập thất bại! Vui lòng thủ lại sau");
+      setIsFetchList(false);
     }
   };
 
   const handleClickDetail = (id) => {
-    console.log(id);
     setIsDetail(true);
     setIdDetail(id);
   };
@@ -70,14 +83,22 @@ function TeacherHomeworks({ user }) {
 
   const handleDeleteAssignment = async (id) => {
     try {
-      await ApiUpdateHomework(detail?.id, { status: "deactive" });
+      await ApiUpdateHomework(id, { status: "deactive" });
       message.success("Xóa bài tập thành công!");
+      fetchAssignments();
     } catch (error) {
-      message.success("Xóa bài tập thất bại! Vui lòng thử lại.");
+      console.log(error);
+      message.error("Xóa bài tập thất bại! Vui lòng thử lại.");
     }
   };
+
+  const fetchDetailClass = async () => {
+    const res = await ApiGetDetailClass(id);
+    setClassDetail(res.data);
+  };
+
   return (
-    <div>
+    <Spin tip="loading" size="large" spinning={isFetchList}>
       <PopupCreateHomework
         detail={assignmentDetail}
         setOpen={setIsOpenCre}
@@ -95,7 +116,6 @@ function TeacherHomeworks({ user }) {
         </div>
       ) : (
         <div className="transaction-list  ml-3">
-          {/* <div className="flex justify-between"> */}
           <div
             onClick={handleBackClasses}
             className="text-xl flex items-center cursor-pointer text-[#1677ff] w-[75px]"
@@ -104,7 +124,10 @@ function TeacherHomeworks({ user }) {
             <div className="mb-[5px]">Trở lại</div>
           </div>
           <div className="flex justify-between">
-            <div className="text-2xl font-bold"> Mã lớp: {id}</div>
+            <div className="text-2xl font-bold">
+              {" "}
+              Mã lớp: {id} - {classDetail?.name}
+            </div>
             <Button
               type="primary"
               onClick={() => {
@@ -175,7 +198,7 @@ function TeacherHomeworks({ user }) {
           )}
         </div>
       )}
-    </div>
+    </Spin>
   );
 }
 

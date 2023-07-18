@@ -1,11 +1,11 @@
 import LayoutAdmin from "@/components/LayoutAdmin";
 import DetailTranscript from "@/components/student/DetailTranscript";
 import { CheckOutlined, LeftOutlined } from "@ant-design/icons";
-import { Tabs, Tag, message } from "antd";
+import { Spin, Tabs, Tag, message } from "antd";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { FORMAT_DATE, SUB_ASSIGMENT_STATUS_LIST } from "@/common/const";
-import { ApiGetStudentAssignments } from "@/api/student";
+import { ApiGetDetailClass, ApiGetStudentAssignments } from "@/api/student";
 import dayjs from "dayjs";
 import { dayOfWeekVn } from "@/common/util";
 const Homeworks = ({ user }) => {
@@ -15,10 +15,21 @@ const Homeworks = ({ user }) => {
   const [assigments, setAssigments] = useState([]);
   const router = useRouter();
   const { id } = router.query;
+  const [classDetail, setClassDetail] = useState();
+  const [isFetchList, setFetchList] =  useState(false);
 
   useEffect(() => {
     fetchListAssigments();
   }, [tabActive]);
+
+  useEffect(() => {
+    fetchDetailClass()
+  }, []);
+
+  const fetchDetailClass = async () =>{
+    const res = await ApiGetDetailClass(id);
+    setClassDetail(res.data)
+  }
 
   const handleClickDetail = (detail) => {
     setIsDetail(true);
@@ -42,9 +53,9 @@ const Homeworks = ({ user }) => {
           <div className="mt-4 p-4" key={el.id}>
             <div className="flex gap-5 text-xl mb-3">
               <div className="font-bold">
-                {dayjs(el.ctime).format(FORMAT_DATE.DATE)}
+                {dayjs(el.created_at).format(FORMAT_DATE.DATE)}
               </div>
-              <div className=" text-slate-400">{dayOfWeekVn(el.ctime)}</div>
+              <div className=" text-slate-400">{dayOfWeekVn(el.created_at)}</div>
             </div>
 
             <div
@@ -55,10 +66,10 @@ const Homeworks = ({ user }) => {
                 <div className="font-bold">{el.title}</div>
                 <div>
                   Đã gửi và lúc{" "}
-                  {`${dayjs(el.ctime)
+                  {`${dayjs(el.created_at)
                     .hour()
                     .toString()
-                    .padStart(2, "0")}:${dayjs(el.ctime)
+                    .padStart(2, "0")}:${dayjs(el.created_at)
                     .minute()
                     .toString()
                     .padStart(2, "0")}`}
@@ -100,15 +111,11 @@ const Homeworks = ({ user }) => {
       label: "Quá hạn",
       children: homeworks(),
     },
-    {
-      key: "5",
-      label: "Hủy",
-      children: homeworks(),
-    },
   ];
 
   const fetchListAssigments = async () => {
     try {
+      setFetchList(true)
       const params = {
         classId: id,
         status: SUB_ASSIGMENT_STATUS_LIST.find(
@@ -118,9 +125,12 @@ const Homeworks = ({ user }) => {
       const res = (await ApiGetStudentAssignments(params)).data;
       console.log(res);
       setAssigments([...res]);
+      setFetchList(false)
     } catch (error) {
       console.log(error);
       message.error("Xem danh sách bài tập thất bại! Vui lòng thử lại");
+      setFetchList(false)
+
     }
   };
 
@@ -135,7 +145,7 @@ const Homeworks = ({ user }) => {
           <DetailTranscript setShowDetail={setIsDetail} detail={detail} />
         </div>
       ) : (
-        <div>
+        <Spin tip="loading" size="large" spinning={isFetchList}>
           <div className="flex">
             <div
               onClick={handleBackClasses}
@@ -144,7 +154,7 @@ const Homeworks = ({ user }) => {
               <LeftOutlined className="flex items-center" />{" "}
               <div className="mb-[5px]">Trở lại</div>
             </div>
-            <div className="ml-5 text-2xl font-bold">Mã lớp {id}</div>
+            <div className="ml-5 text-2xl font-bold mb-[5px]">Mã lớp {id} - {classDetail?.name}</div>
           </div>
 
           <Tabs
@@ -153,7 +163,7 @@ const Homeworks = ({ user }) => {
             onChange={handleChangeTab}
             items={items}
           />
-        </div>
+        </Spin>
       )}
     </div>
   );
