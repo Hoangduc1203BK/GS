@@ -11,7 +11,12 @@ export class AttendanceGuard implements CanActivate {
     constructor(@InjectRepository(TimeTable) private readonly timeRepos: Repository<TimeTable>) { }
     async canActivate(context: ExecutionContext) {
         const req = context.switchToHttp().getRequest();
-        const { classId } = req.query;
+        let classId;
+        if(req.query.classId) {
+            classId = req.query.classId
+        }else if(req.body.classId) {
+            classId = req.body.classId
+        }
         if (!classId) {
             throw new Error('Lớp không tồn tại với id:' + classId)
         }

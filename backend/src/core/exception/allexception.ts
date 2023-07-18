@@ -1,4 +1,4 @@
-import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
+import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus, UnauthorizedException } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
 import type { Response } from 'express';
 
@@ -11,8 +11,9 @@ export class AllExceptionsFilter implements ExceptionFilter {
 		let statusCode: number = HttpStatus.BAD_REQUEST;
 		if (exception instanceof HttpException) {
 			(statusCode = exception.getStatus()), (responseBody = exception.getResponse());
-		} else if (exception instanceof Error) {
-			(statusCode = HttpStatus.BAD_REQUEST),
+		}
+		 else if (exception instanceof Error) {
+			(statusCode = exception.message == 'Unauthorized' ? HttpStatus.UNAUTHORIZED : HttpStatus.BAD_REQUEST),
 				(responseBody = {
 					success: false,
 					status: statusCode,

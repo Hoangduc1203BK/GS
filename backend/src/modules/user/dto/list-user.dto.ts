@@ -32,4 +32,10 @@ export class ListUsertDto {
 	@IsNotEmpty()
 	@IsNumberString()
 	departmentId?: number;
+
+	@ApiProperty({ required: true })
+    @IsOptional()
+	@IsNotEmpty()
+	@IsString()
+	name?: string;
 }

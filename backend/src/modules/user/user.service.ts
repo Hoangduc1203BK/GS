@@ -1,6 +1,6 @@
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { Attendance, SubAttendance, User } from 'src/databases/entities';
 import { DepartmentService } from '../department';
 import { CreateUserDto, ListUsertDto, UpdateUserDto } from './dto';
@@ -48,6 +48,7 @@ export class UserService {
     const users = await this.userRepos.find({
       where: {
         ...filter,
+        name: dto.name ? Like(`%${dto.name}%`) : null
       },
       order: { ctime: 'ASC' },
       skip: (page - 1) * size,
@@ -57,6 +58,7 @@ export class UserService {
     const all = await this.userRepos.find({
       where: {
         ...filter,
+        name: dto.name ? Like(`%${dto.name}%`) : null
       },
       order: { ctime: 'ASC' },
     });

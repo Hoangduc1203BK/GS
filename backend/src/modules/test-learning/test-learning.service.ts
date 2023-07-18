@@ -40,7 +40,9 @@ export class TestLearningService {
             take: size,
         })
 
-        const result = testLearnings.map(async (testLearning) => {
+        const result = [];
+
+        for(const testLearning of testLearnings) {
             const { student, timeTable, subject, ...rest } = testLearning;
             const item = {
                 ...rest,
@@ -57,8 +59,8 @@ export class TestLearningService {
                 room: timeTable ?timeTable.room.name: null
             }
 
-            return item;
-        })
+            result.push(item);
+        }
 
         const all = await this.testLearningRepos.find({
             where: filter,

@@ -672,7 +672,7 @@ export class ClassService {
       ...rest
     }
 
-    const result = await this.attendanceRepos.save(doc);
+    const result = await this.attendanceRepos.save({id: attendance.id, ...doc});
 
     if (attendances && attendances.length > 0) {
       await this.datasource.manager.transaction(async (manager) => {
@@ -692,7 +692,7 @@ export class ClassService {
       })
     }
 
-    return this.getAttendance(result.id)
+    return this.getAttendance({classId :result.classId, date: result.date, day: result.day})
   }
 
   async getAttendance(query: any) {
