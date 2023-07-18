@@ -72,46 +72,59 @@ export function ApiCreateHomework(payload) {
   return axios.post("/assigments", payload);
 }
 
-export function ApiUpdateHomework(id,payload) {
+export function ApiUpdateHomework(id, payload) {
   return axios.patch(`/assigments/${id}`, payload);
 }
 
-export function ApiGetAssignments (params){
-  return axios.get('/assigments',{
+export function ApiGetAssignments(params) {
+  return axios.get('/assigments', {
     params
   })
 }
 
-export function ApiGetAssignmentDetail (id){
-  return axios.get('/assigments/'+id);
+export function ApiGetAssignmentDetail(id) {
+  return axios.get('/assigments/' + id);
 }
 
-export function ApiGetStudentAssignments (params){
-  return axios.get('/assigments/student',{
+export function ApiGetStudentAssignments(params) {
+  return axios.get('/assigments/student', {
     params
   })
 }
 
-export function ApiGetDetailSubAssignments (params){
-  return axios.get('/assigments/sub-assigment',{
+export function ApiGetDetailSubAssignments(params) {
+  return axios.get('/assigments/sub-assigment', {
     params
   })
 }
 
-export function ApiUpdateSubAssignments (id, payload){
-  return axios.patch('/assigments/sub-assigment/'+ id, payload);
+export function ApiUpdateSubAssignments(id, payload) {
+  return axios.patch('/assigments/sub-assigment/' + id, payload);
 }
 
-export function ApiUploadFileAssigment (classId,assigmentId, fd) {
+export function ApiUploadFileAssigment(classId, assigmentId, fd) {
+
   return axios.post(`/assigments/upload?classId=${classId}&assigmentId=${assigmentId}`, fd);
 }
 
-export function ApiGetListFee () {
+export function ApiGetListFee() {
   return axios.get(`/user/fee`);
 }
 
-export function ApiGetDetailFee (params) {
-  return axios.get(`/user/fee/detail`,{
+export function ApiGetDetailFee(params) {
+  return axios.get(`/user/fee/detail`, {
     params
   });
+}
+// attendance
+export const getAttendance = (params) => {
+  return axios.get(`/class/attendance`, { params: params })
+}
+
+export const postAttendance = (params) => {
+  return axios.post(`/class/attendance`, params)
+}
+
+export const updateAttendance = (params, classId, day, date) => {
+  return axios.patch(`/class/attendance?classId=${classId}&day=${day}&date=${date}`, params)
 }
