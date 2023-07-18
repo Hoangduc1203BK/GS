@@ -9,46 +9,55 @@ export default function StudentsInClass({ info }) {
   const [classes, setClasses] = useState([]);
   const [students, setStudents] = useState([]);
   const [isFetchStudent, setIsFetchStudent] = useState(false);
-  const [isFetchClass, setIsFetchClass] = useState(false)
+  const [isFetchClass, setIsFetchClass] = useState(false);
 
   const [expandedKey, setExpandedKey] = useState([]);
-  const router = useRouter()
+  const router = useRouter();
 
   const fetchDataClass = async () => {
     try {
       if (info?.id) {
-        setIsFetchClass(true)
+        setIsFetchClass(true);
         const classOfStudent = await ApiClassOfStudent(info.id);
-        setClasses(classOfStudent?.data?.map((i, index) => ({ ...i, key: i?.id, number: index + 1 })));
-        setIsFetchClass(false)
-
+        setClasses(
+          classOfStudent?.data?.map((i, index) => ({
+            ...i,
+            key: i?.id,
+            number: index + 1,
+          }))
+        );
+        setIsFetchClass(false);
       }
     } catch (error) {
       message.error("Có lỗi xảy ra! Vui lòng thử lại.");
-      setIsFetchClass(false)
-
+      setIsFetchClass(false);
     }
   };
 
   const fetchDataStudents = async (expanded, record) => {
     try {
       if (expanded) {
-        setIsFetchStudent(true)
+        setIsFetchStudent(true);
         const studentInClass = await ApiStudentsInClass(record.classId);
-        setStudents(studentInClass?.data?.map((i, index) => ({ ...i, key: i?.id, number: index + 1, gender: i?.gender == 'female' ? "Nữ" : "Nam" })));
-        setIsFetchStudent(false)
-        setExpandedKey([record?.key])
-      }
-      else{
+        setStudents(
+          studentInClass?.data?.map((i, index) => ({
+            ...i,
+            key: i?.id,
+            number: index + 1,
+            gender: i?.gender == "female" ? "Nữ" : "Nam",
+          }))
+        );
+        setIsFetchStudent(false);
+        setExpandedKey([record?.key]);
+      } else {
         setStudents([]);
-        setExpandedKey([])
-        setIsFetchStudent(false)
+        setExpandedKey([]);
+        setIsFetchStudent(false);
       }
     } catch (error) {
       console.log(error);
-      message.error("Lấy dữ liệu học sinh thất bại!")
+      message.error("Lấy dữ liệu học sinh thất bại!");
     }
-      
   };
 
   useEffect(() => {
@@ -127,11 +136,12 @@ export default function StudentsInClass({ info }) {
         return <div>{record.classes?.subjectId}</div>;
       },
     },
-    {      title: "Ngày bắt đầu",
+    {
+      title: "Ngày bắt đầu",
       render: (text, record, index) => {
         return <div>{record.classes?.startDate}</div>;
       },
-  },
+    },
     {
       title: "Giáo viên",
       render: (text, record, index) => {
@@ -159,7 +169,16 @@ export default function StudentsInClass({ info }) {
     {
       title: "Tùy chọn",
       render: (text, record, index) => {
-        return <Button type="primary" onClick={  ()=>router.push(`/student/homework/${record.classId}`)}>Bài tập</Button>;
+        return (
+          <div>
+            <Button
+              type="primary"
+              onClick={() => router.push(`/student/homework/${record.classId}`)}
+            >
+              Bài tập
+            </Button>
+          </div>
+        );
       },
     },
   ];

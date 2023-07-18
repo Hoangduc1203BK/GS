@@ -71,6 +71,10 @@ export default function LayoutAdmin({
 					key: "classStudent",
 				},
 				{
+					label: <Link href="/student/fee">Học phí</Link>,
+					key: "classFeeStudent",
+				},
+				{
 					label: <Link href="/student/suggest">Quản lý đề xuất</Link>,
 					key: "studentSuggest",
 				},

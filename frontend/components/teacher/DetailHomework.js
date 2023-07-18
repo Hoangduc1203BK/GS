@@ -124,18 +124,20 @@ export default function TeacherDetailHomework({ info, setIsDetail, idDetail }) {
       <div className="flex justify-between w-full gap-6">
         <div className="custom-table my-3 w-1/3 ml-3">
           <table className="w-full">
-            <tr>
-              <th className="text-left w-[125px]">Tên lớp</th>
-              <td>{classDetail?.name}</td>
-            </tr>
-            <tr>
-              <th className="text-left">Môn</th>
-              <td>{classDetail?.subject?.name}</td>
-            </tr>
-            <tr>
-              <th className="text-left">Giáo viên</th>
-              <td>{classDetail?.user?.name}</td>
-            </tr>
+            <tbody>
+              <tr>
+                <th className="text-left w-[125px]">Tên lớp</th>
+                <td>{classDetail?.name}</td>
+              </tr>
+              <tr>
+                <th className="text-left">Môn</th>
+                <td>{classDetail?.subject?.name}</td>
+              </tr>
+              <tr>
+                <th className="text-left">Giáo viên</th>
+                <td>{classDetail?.user?.name}</td>
+              </tr>
+            </tbody>
           </table>
         </div>
 

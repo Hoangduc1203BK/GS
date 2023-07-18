@@ -52,3 +52,29 @@ body {
     line-height: 1;
     content: "*";
 }
+
+
+
+.events-fee {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+  }
+  .events-fee .ant-badge-status {
+	width: 100%;
+	overflow: hidden;
+	font-size: 12px;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+  }
+  .notes-month-fee {
+	font-size: 28px;
+	text-align: center;
+  }
+  .notes-month-fee section {
+	font-size: 28px;
+  }
+
+  .custom-calender .ant-picker-calendar-header {
+	display: none;
+  }
