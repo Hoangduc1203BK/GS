@@ -99,27 +99,29 @@ const RecommendManage = () => {
       open: open,
       data: open ? record : {}
     })
-    let resultClass
-    await getClass(record?.sub_data?.classId).then(
-      res => {
-        setDetailClass(res?.data)
-        resultClass = res?.data
+    if (open) {
+      let resultClass
+      await getClass(record?.sub_data?.classId).then(
+        res => {
+          setDetailClass(res?.data)
+          resultClass = res?.data
+        }
+      ).catch(err => console.log(err, 'errrr'))
+      const params = {
+        schedules: resultClass?.time_tables?.map(i => ({
+          date: i?.date,
+          start: i?.start,
+          end: i?.end,
+          roomId: i?.roomId
+        })),
+        departmentId: record?.department_id
       }
-    ).catch(err => console.log(err, 'errrr'))
-    const params = {
-      schedules: resultClass?.time_tables?.map(i => ({
-        date: i?.date,
-        start: i?.start,
-        end: i?.end,
-        roomId: i?.roomId
-      })),
-      departmentId: record?.department_id
+      await getListTeacherEmpty(params).then(
+        res => {
+          setListTeacher(res?.data)
+        }
+      ).catch(err => console.log(err, 'errrr'))
     }
-    await getListTeacherEmpty(params).then(
-      res => {
-        setListTeacher(res?.data)
-      }
-    ).catch(err => console.log(err, 'errrr'))
   }
 
   async function submit(values) {
@@ -148,19 +150,15 @@ const RecommendManage = () => {
   }
   useEffect(() => {
     setDataTeacher([])
-    getListProposal({ type: "teacher_register_class" }).then(res => {
-      getListProposal({ type: "teacher_take_break" }).then(res2 => {
-        setDataTeacher([...dataTeacher, ...res?.data, ...res2?.data])
-      }).catch(err => console.log(err, 'errr'))
+    getListProposal({ role: "teacher" }).then(res => {
+      setDataTeacher(res?.data)
     }).catch(err => console.log(err, 'errr'))
   }, [recall.teacher]);
 
   useEffect(() => {
     setDataStudent([])
-    getListProposal({ type: "student_register_class" }).then(res => {
-      getListProposal({ type: "student_terminate_class" }).then(res2 => {
-        setDataStudent([...dataTeacher, ...res?.data, ...res2?.data])
-      }).catch(err => console.log(err, 'errr'))
+    getListProposal({ role: "user" }).then(res => {
+      setDataStudent(res?.data)
     }).catch(err => console.log(err, 'errr'))
   }, [recall.student]);
 

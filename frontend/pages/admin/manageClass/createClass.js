@@ -181,7 +181,7 @@ const CreateClass = () => {
                 </Form.Item>
                 <Form.Item
                   label="Giáo viên dạy"
-                  name="teacherId"
+                  name="teacher"
                 >
                   <Select placeholder="-- Chọn --">
                     {
@@ -356,7 +356,7 @@ const CreateClass = () => {
                 <Col xs={18} className="px-4 flex items-center">
                   <p>
                     {
-                      listTeacher?.find(item => item.id === dataAdd.teacherId)?.name
+                      listTeacher?.find(item => item.id === dataAdd.teacher)?.name
                     }
                   </p>
                 </Col>

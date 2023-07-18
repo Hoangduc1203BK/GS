@@ -7,10 +7,14 @@ import {
 	DashboardOutlined,
 	FileProtectOutlined,
 	IdcardOutlined,
+	InfoCircleOutlined,
 	LogoutOutlined,
 	MenuFoldOutlined,
 	MenuUnfoldOutlined,
+	OrderedListOutlined,
+	RetweetOutlined,
 	SettingOutlined,
+	SnippetsOutlined,
 	UploadOutlined,
 	UserOutlined,
 	UsergroupAddOutlined,
@@ -56,57 +60,46 @@ export default function LayoutAdmin({
 
 	const itemStudent = [
 		{
-			label: "Học sinh",
-			key: "studentManagement",
-			icon: <UsergroupAddOutlined />,
-			children: [
-				{
-					label: (
-						<Link href="/student">Thông tin cá nhân</Link>
-					),
-					key: "infoStudent",
-				},
-				{
-					label: <Link href="/student/class">Quản lý danh sách lớp</Link>,
-					key: "classStudent",
-				},
-				{
-					label: <Link href="/student/fee">Học phí</Link>,
-					key: "classFeeStudent",
-				},
-				{
-					label: <Link href="/student/suggest">Quản lý đề xuất</Link>,
-					key: "studentSuggest",
-				},
-			],
+			label: (
+				<Link href="/student">Thông tin cá nhân</Link>
+			),
+			key: "infoStudent",
+			icon: <InfoCircleOutlined />
+		},
+		{
+			label: <Link href="/student/class">Quản lý danh sách lớp</Link>,
+			key: "classStudent",
+			icon: <OrderedListOutlined />
+		},
+		{
+			label: <Link href="/student/suggest">Quản lý đề xuất</Link>,
+			key: "studentSuggest",
+			icon: <SnippetsOutlined />
 		},
 	]
 
 	const itemsTeacher = [
 		{
-			label: "Giáo viên",
-			key: "teacherManagement",
-			icon: <IdcardOutlined />,
-			children: [
-				{
-					label: (
-						<Link href="/teacher">Thông tin cá nhân</Link>
-					),
-					key: "infoTeacher",
-				},
-				{
-					label: <Link href="/teacher/class">Danh sách lớp học</Link>,
-					key: "tkbTeacher",
-				},
-				{
-					label: <Link href="/admin">Đăng ký dạy</Link>,
-					key: "regisTeach",
-				},
-				{
-					label: <Link href="/teacher/suggest">Quản lý đề xuất</Link>,
-					key: "teacherSuggestClass",
-				},
-			],
+			label: (
+				<Link href="/teacher">Thông tin cá nhân</Link>
+			),
+			key: "infoTeacher",
+			icon: <InfoCircleOutlined />
+		},
+		{
+			label: <Link href="/teacher/class">Danh sách lớp học</Link>,
+			key: "tkbTeacher",
+			icon: <OrderedListOutlined />
+		},
+		{
+			label: <Link href="/admin">Đăng ký dạy</Link>,
+			key: "regisTeach",
+			icon: <RetweetOutlined />
+		},
+		{
+			label: <Link href="/teacher/suggest">Quản lý đề xuất</Link>,
+			key: "teacherSuggestClass",
+			icon: <SnippetsOutlined />
 		},
 	]
 
