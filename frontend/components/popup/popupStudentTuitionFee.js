@@ -26,7 +26,8 @@ export default function PopupStudentTuitionFee  ({ open, setOpen , info}) {
       >
         <div className="p-10 custom-table">
             <table className="border-collapse w-1/2">
-                <tr>
+              <tbody>
+              <tr>
                     <th>Mã số</th>
                     <td>{info?.code || ""}</td>
                 </tr>
@@ -42,6 +43,8 @@ export default function PopupStudentTuitionFee  ({ open, setOpen , info}) {
                     <th>Tháng</th>
                     <td></td>
                 </tr>
+              </tbody>
+               
             </table>
           
         </div>

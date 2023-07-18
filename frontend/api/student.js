@@ -103,8 +103,15 @@ export function ApiUpdateSubAssignments (id, payload){
 }
 
 export function ApiUploadFileAssigment (classId,assigmentId, fd) {
-
   return axios.post(`/assigments/upload?classId=${classId}&assigmentId=${assigmentId}`, fd);
+}
 
+export function ApiGetListFee () {
+  return axios.get(`/user/fee`);
+}
 
+export function ApiGetDetailFee (params) {
+  return axios.get(`/user/fee/detail`,{
+    params
+  });
 }
