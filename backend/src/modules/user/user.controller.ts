@@ -5,8 +5,10 @@ import { checkEmailDecorator } from "src/core/decorator/util";
 import { MailService } from "src/core/shared/services/mail/mail.service";
 import { UploadService } from "src/core/shared/services/upload.service";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { Express } from 'express';
+import { Express, query, Request } from 'express';
 import { JwtAuthGuard } from "src/core/guards";
+import { GetFeeDetailDto } from "./dto/get-fee-detail.dto";
+import { ListFeetDto } from "./dto/list-fee.dto";
 @Controller('user')
 export class UserController {
     constructor(
@@ -15,6 +17,25 @@ export class UserController {
         private readonly uploadService: UploadService,
     ) {}
 
+    @UseGuards(JwtAuthGuard)
+    @Get('/fee')
+    async listFee(@Req() req: Request, @Query() query: ListFeetDto) {
+        const user = req["user"]
+        const userId = user["id"]
+        const result = await this.userService.listFee(userId,query);
+        return result;
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get('/fee/detail')
+    async getFeeDetail(@Req() req: Request, @Query() query: GetFeeDetailDto) {
+        const user = req["user"]
+        const userId = user["id"]
+        const result = await this.userService.getFeeDetail(userId,query);
+
+        return result;
+    }
+ 
     @UseGuards(JwtAuthGuard)
     @Post('/avatar')
     @UseInterceptors(FileInterceptor('file'))
