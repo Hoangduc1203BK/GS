@@ -97,3 +97,8 @@ export function disabledDate(current) {
 	return current < today;
 	// return current && current <= moment().endOf('day');
 };
+
+export function formatVND(price) {
+  return price?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+}
+
