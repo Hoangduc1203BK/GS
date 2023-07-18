@@ -17,21 +17,21 @@ export class UserController {
         private readonly uploadService: UploadService,
     ) {}
 
-    @UseGuards(JwtAuthGuard)
+    // @UseGuards(JwtAuthGuard)
     @Get('/fee')
     async listFee(@Req() req: Request, @Query() query: ListFeetDto) {
-        const user = req["user"]
-        const userId = user["id"]
-        const result = await this.userService.listFee(userId,query);
+        // const user = req["user"]
+        // const userId = user["id"]
+        const result = await this.userService.listFee('ST2585',query);
         return result;
     }
 
-    @UseGuards(JwtAuthGuard)
+    // @UseGuards(JwtAuthGuard)
     @Get('/fee/detail')
     async getFeeDetail(@Req() req: Request, @Query() query: GetFeeDetailDto) {
-        const user = req["user"]
-        const userId = user["id"]
-        const result = await this.userService.getFeeDetail(userId,query);
+        // const user = req["user"]
+        // const userId = user["id"]
+        const result = await this.userService.getFeeDetail('ST2585',query);
 
         return result;
     }

@@ -187,12 +187,34 @@ export class UserService {
   }
 
   async getFeeDetail(userId: string, query: GetFeeDetailDto) {
+    const classes = await this.classService.getClass(query.classId)
     const {classId, start,end} = query;
     const qr = `
     select c.name as class_name, a.*, sa.status from attendance a , "sub-attendance" sa, "class" c
     where a.id = sa.attendance_id and a.class_id = c.id
     and a."day" >= '` + start + `' and a."day" <= '` + end + `' and sa.user_id ='`+ userId + `' and a.class_id = '` + classId + `'`;
-    const result = await this.attendanceRepos.query(qr);
+    const attendances = await this.attendanceRepos.query(qr);
+    const attends = attendances.filter(el => el.status == true).length;
+    const numberOfStudy = `${attends}/${attendances.length}`;
+    const mapAttendances = attendances.map(el => {
+      return {
+        day: el.day,
+        date: el.date,
+        status: el.status,
+      }
+    })
+
+    const result = {
+      id: classes.id,
+      name: classes.name,
+      numberStudent: classes.numberStudent,
+      subject: classes.subject.name,
+      grade: classes.subject.grade,
+      teacher: classes.user.name,
+      numberOfStudy: numberOfStudy,
+      total: classes.fee * attends,
+      attendances: mapAttendances
+    }
 
     return result;
   }
