@@ -54,8 +54,8 @@ export class UserService {
         ...filter,
       },
       order: { ctime: 'ASC' },
-      skip: (+page - 1) * (+size),
-      take: +size,
+      skip: (page - 1) * (size),
+      take: size,
     });
 
     const all = await this.userRepos.find({

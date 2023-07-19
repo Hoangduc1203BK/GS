@@ -454,8 +454,16 @@ export class ClassService {
     const listClass = await this.listClass({ subjectId: subjectId });
 
     const result = listClass.filter(el => !listClassOfUser.some(el1 => el1.classId == el.id));
+    const result1 = result.map(el => {
+      const { id, ...rest} = el;
 
-    return result;
+      return {
+        classId: id,
+        ...rest,
+      }
+    })
+
+    return result1;
   }
 
   //lấy danh sách các lớp trong bộ môn chưa có người dạy
@@ -469,6 +477,14 @@ export class ClassService {
     const subjectParam = subjectIds.join(', ')
     const qr = 'select c.*,  s."name" as subject, s.grade as  grade from class c, subjects s, "time-tables" t, "rooms" r where c.id = t.class_id and t.room_id = r.id and c.subject_id = s.id and c.subject_id IN(' + subjectParam + ') and c.teacher IS NULL'
     const classes = await this.classRepos.query(qr);
+    const result = classes.map(el => {
+      const {id, ...rest } = el;
+
+      return {
+        classId: id,
+        ...rest
+      }
+    })
 
     return classes;
   }
