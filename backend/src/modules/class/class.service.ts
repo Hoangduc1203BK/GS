@@ -486,7 +486,7 @@ export class ClassService {
       }
     })
 
-    return classes;
+    return result;
   }
 
   async createClass(dto: CreateClassDto) {
