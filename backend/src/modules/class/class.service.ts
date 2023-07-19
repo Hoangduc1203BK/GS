@@ -493,6 +493,7 @@ export class ClassService {
       id: id,
       ...rest,
       type: CLASS_TYPE.ACTIVE,
+      teacherOfDay: rest.teacher,
     };
     const result = await this.classRepos.save(doc);
 

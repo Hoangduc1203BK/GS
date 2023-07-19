@@ -45,20 +45,22 @@ export class UserService {
       filter.departmentId = dto.departmentId;
     }
 
+    if(dto.name) {
+      filter.prefix = Like(`%${dto.name.toLocaleLowerCase()}%`)
+    }
+
     const users = await this.userRepos.find({
       where: {
         ...filter,
-        name: dto.name ? Like(`%${dto.name}%`) : null
       },
       order: { ctime: 'ASC' },
-      skip: (page - 1) * size,
-      take: size,
+      skip: (+page - 1) * (+size),
+      take: +size,
     });
 
     const all = await this.userRepos.find({
       where: {
         ...filter,
-        name: dto.name ? Like(`%${dto.name}%`) : null
       },
       order: { ctime: 'ASC' },
     });
@@ -96,6 +98,7 @@ export class UserService {
     const doc = {
       id: this.generatorService.randomUserID(dto.role),
       password: hashPassword,
+      prefix: dto.name.toLocaleLowerCase(),
       ...dto,
     };
 
