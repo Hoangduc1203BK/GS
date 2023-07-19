@@ -1,8 +1,9 @@
 import { getListDepartment, getListUser } from "@/api/address";
+import { COLORS, GRADE } from "@/common/const";
 import AddEditTs from "@/components/AddEditTS";
 import LayoutAdmin from "@/components/LayoutAdmin";
-import { PlusCircleOutlined, ProfileOutlined } from "@ant-design/icons";
-import { Button, Empty, Space, Table, Tooltip } from "antd";
+import { PlusCircleOutlined, ProfileOutlined, RetweetOutlined, SearchOutlined } from "@ant-design/icons";
+import { Badge, Button, Col, Empty, Form, Input, Row, Select, Space, Table, Tooltip } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 
@@ -55,7 +56,7 @@ const ManageStudent = () => {
     {
       title: "Khối",
       render: (text, record) => {
-        return <div>Khối {record?.grade || "..."} </div>;
+        return <div><Badge key={COLORS[record?.grade]} color={COLORS[record?.grade]} text={`Khối ${record?.grade || "..."} `} /></div>;
       },
       align: "center",
     },
@@ -118,13 +119,24 @@ const ManageStudent = () => {
   }
 
   useEffect(() => {
-    getListUser({ role: 'user', page: tableParams.page, size: tableParams.size }).then(
+    getListUser({ role: 'user', ...tableParams }).then(
       res => {
         setListStudent(res?.data?.result);
         setTotal(res?.data?.perPage * res?.data?.maxPages)
       }
     ).catch(err => message.error("Lấy dữ liệu thất bại!"))
   }, [tableParams, recall]);
+
+  const [form] = Form.useForm()
+
+  function submitSearch(values) {
+    console.log(values, 'valiess');
+    setTableParams({
+      page: 1,
+      size: 10,
+      ...values
+    })
+  }
 
   return (
     <>
@@ -133,8 +145,42 @@ const ManageStudent = () => {
           :
           <>
             <p className="font-medium text-lg mb-4">Danh sách học sinh</p>
+            <Form
+              form={form}
+              onFinish={submitSearch}
+              layout="horizontal"
+            >
+              <Row gutter={[8, 8]}>
+                <Col xs={24} md={9}>
+                  <Form.Item name="name" label="Tên HS">
+                    <Input placeholder="Nhập tên HS" />
+                  </Form.Item>
+                </Col>
+                <Col xs={24} md={9}>
+                  <Form.Item name="grade" label="Khối">
+                    <Select
+                      placeholder="-- Chọn --"
+                      options={GRADE}
+                    >
+                    </Select>
+                  </Form.Item>
+                </Col>
+                <Col xs={24} md={6} className="flex justify-end gap-2">
+                  <Button
+                    icon={<RetweetOutlined />}
+                    onClick={() => {
+                      form.resetFields()
+                      setTableParams({
+                        page: 1,
+                        size: 10
+                      })
+                    }} >Hủy</Button>
+                  <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>Tìm kiếm</Button>
+                </Col>
+              </Row>
+            </Form>
             <div className="text-right">
-              <Button type="primary" icon={<PlusCircleOutlined />} onClick={() => handleOpenForm(true, false)}>Thêm mới học sinh</Button>
+              <Button type="primary" icon={<PlusCircleOutlined />} onClick={() => handleOpenForm(true, false)}>Thêm mới</Button>
             </div>
             <Table
               locale={{

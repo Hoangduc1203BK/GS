@@ -2,7 +2,7 @@ import { createDepartment, createSubject, getListDepartment, getListSubject, get
 import { GRADE } from "@/common/const";
 import { validatePhone } from "@/common/util";
 import LayoutAdmin from "@/components/LayoutAdmin";
-import { EditOutlined, GroupOutlined } from "@ant-design/icons";
+import { EditOutlined, GroupOutlined, PlusCircleFilled, VerticalAlignTopOutlined } from "@ant-design/icons";
 import { Button, Col, Empty, Form, Input, InputNumber, Modal, Row, Select, Space, Table, Tooltip, message } from "antd";
 import { useEffect, useState } from "react";
 
@@ -129,12 +129,10 @@ const DepartmentManage = () => {
           <p className="font-medium text-lg mb-4">Danh sách bộ môn</p>
         </Col>
         <Col xs={12} className="w-full flex gap-2 justify-end !text-right">
-          <Button type="primary" style={{
-            backgroundColor: 'purple'
-          }}
+          <Button type="primary" danger icon={<PlusCircleFilled />}
             onClick={() => showModal(0, false, true)}
           >Tạo bộ môn</Button>
-          <Button type="primary" onClick={() => showModal(1, false, true)} >Tạo môn học</Button>
+          <Button type="primary" icon={<VerticalAlignTopOutlined />} onClick={() => showModal(1, false, true)} >Tạo môn học</Button>
         </Col>
       </Row>
     </>
@@ -329,6 +327,7 @@ const DepartmentManage = () => {
       }
     }
   }
+  console.log(modal.checkEdit, 'cekc');
   return (
     <>
       <Modal
@@ -442,7 +441,7 @@ const DepartmentManage = () => {
                 >
                   <Select
                     placeholder="-- Chọn --"
-                    allowClear
+                    disabled={modal.checkEdit}
                   >
                     {fullDepartment?.map((item) => (
                       <>

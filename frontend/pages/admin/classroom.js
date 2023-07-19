@@ -2,7 +2,7 @@
 
 import { createClassRoom, getListClassRoom, updateClassRoom } from "@/api/address";
 import LayoutAdmin from "@/components/LayoutAdmin";
-import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, PlusCircleFilled, PlusCircleOutlined } from "@ant-design/icons";
 import { Button, Col, Form, Input, Modal, Row, Space, Table, Tooltip, message } from "antd";
 import { useEffect, useState } from "react";
 
@@ -61,7 +61,7 @@ const ClassroomManagement = ({ user }) => {
     {
       title: "Mô tả",
       render: (text, record) => {
-        return <div >{record?.description}</div>;
+        return <div className="text-left">{record?.description}</div>;
       },
       align: "center",
     },
@@ -92,7 +92,7 @@ const ClassroomManagement = ({ user }) => {
         <p className="font-bold mb-2">Danh sách phòng học</p>
       </Col>
       <Col xs={12} className="text-right">
-        <Button onClick={() => handleModal(true, 1)} type="primary">Thêm mới</Button>
+        <Button onClick={() => handleModal(true, 1)} type="primary" icon={<PlusCircleOutlined />}>Thêm mới</Button>
       </Col>
     </Row>
   </>;

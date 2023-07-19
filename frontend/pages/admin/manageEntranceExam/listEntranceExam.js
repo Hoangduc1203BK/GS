@@ -1,10 +1,11 @@
 "use client";
 
 import { getListClassRoom, getListExam, getListUser, updateExam } from "@/api/address";
+import { COLORS } from "@/common/const";
 import { disabledDate } from "@/common/util";
 import LayoutAdmin from "@/components/LayoutAdmin";
-import { CalendarOutlined, DeleteOutlined, EditOutlined, SnippetsOutlined } from "@ant-design/icons";
-import { Button, Col, DatePicker, Form, Input, Modal, Row, Select, Space, Table, TimePicker, Tooltip, message } from "antd";
+import { CalendarOutlined, DeleteOutlined, EditOutlined, LoginOutlined, RetweetOutlined, SearchOutlined, SnippetsOutlined } from "@ant-design/icons";
+import { Badge, Button, Col, DatePicker, Form, Input, Modal, Row, Select, Space, Table, TimePicker, Tooltip, message } from "antd";
 import { Tabs } from 'antd';
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
@@ -24,6 +25,7 @@ const ListEntranceExam = () => {
     page: 1,
     size: 10
   });
+  const [total, setTotal] = useState(tableParams.size);
 
   const [idSelect, setIdSelect] = useState("");
 
@@ -50,16 +52,16 @@ const ListEntranceExam = () => {
       align: "center",
     },
     {
-      title: "Lớp",
+      title: "Khối ",
       render: (text, record) => {
-        return <div>{record?.grade}</div>;
+        return <div><Badge key={COLORS[record?.grade]} color={COLORS[record?.grade]} text={`Khối ${record?.grade || "..."} `} /></div>;
       },
       align: "center",
     },
     {
       title: "Môn",
       render: (text, record) => {
-        return <div>{record?.subjects?.map(i => i.name)?.join(', ')}</div>;
+        return <div className="text-left">{record?.subjects?.map(i => i.name)?.join(', ')}</div>;
       },
       align: "center",
     },
@@ -94,28 +96,28 @@ const ListEntranceExam = () => {
     {
       title: "Ghi chú",
       render: (text, record) => {
-        return <div >{record?.description}</div>;
+        return <div className="text-left">{record?.description}</div>;
       },
       align: "center",
     },
-    {
-      title: "Thao tác",
-      render: (text, record) => {
-        return <div >
-          <Space size="small">
-            {/* <Tooltip title="Chỉnh sửa">
-              <EditOutlined style={{
-                color: "#b9db84"
-              }} className="text-base cursor-pointer" />
-            </Tooltip> */}
-            <DeleteOutlined style={{
-              color: "#fc4a6c"
-            }} className="text-base cursor-pointer" />
-          </Space>
-        </div>;
-      },
-      align: "center",
-    },
+    // {
+    //   title: "Thao tác",
+    //   render: (text, record) => {
+    //     return <div >
+    //       <Space size="small">
+    //         {/* <Tooltip title="Chỉnh sửa">
+    //           <EditOutlined style={{
+    //             color: "#b9db84"
+    //           }} className="text-base cursor-pointer" />
+    //         </Tooltip> */}
+    //         <DeleteOutlined style={{
+    //           color: "#fc4a6c"
+    //         }} className="text-base cursor-pointer" />
+    //       </Space>
+    //     </div>;
+    //   },
+    //   align: "center",
+    // },
   ]
   function openModal() {
     let option = {
@@ -139,7 +141,6 @@ const ListEntranceExam = () => {
   async function handleFinish(values) {
     values.hour = `${dayjs(values.hour).hour().toString().padStart(2, '0')}:${dayjs(values.hour).minute().toString().padStart(2, '0')}`
     values.date = dayjs(values.date).format("YYYY-MM-DD")
-    console.log(values, 'valuess');
     updateExam(idSelect[0], values).then(
       res => {
         if (res?.data?.id) {
@@ -155,6 +156,13 @@ const ListEntranceExam = () => {
     ).catch(err => message.error("Thất bại! " + err))
   }
 
+
+  function handleChangeTable(pag) {
+    setTableParams({
+      page: pag.current,
+      size: pag.pageSize
+    })
+  }
 
   useEffect(() => {
     getListClassRoom().then(
@@ -174,10 +182,10 @@ const ListEntranceExam = () => {
     getListExam(tableParams).then(
       res => {
         setListExam(res?.data?.result)
+        setTotal(res?.data?.maxPages * res?.data?.perPage)
       }
     ).catch(err => message.error("Lấy dữ liệu thất bại!"))
-  }, [recall]);
-
+  }, [recall, tableParams]);
   return (
     <>
       <Modal
@@ -269,10 +277,10 @@ const ListEntranceExam = () => {
                     <Col xs={12} lg={8}>
                       <Row gutter={[8, 8]}>
                         <Col>
-                          <Button>Đặt lại</Button>
+                          <Button icon={<RetweetOutlined />}>Đặt lại</Button>
                         </Col>
                         <Col>
-                          <Button type="primary">Tìm kiếm</Button>
+                          <Button type="primary" icon={<SearchOutlined />} >Tìm kiếm</Button>
                         </Col>
                       </Row>
                     </Col>
@@ -283,6 +291,8 @@ const ListEntranceExam = () => {
                             type="primary"
                             onClick={openModal}
                             disabled={idSelect.length !== 1 || record[0]?.date}
+                            icon={<LoginOutlined />}
+                            danger
                           >Xếp lịch thi</Button>
                         </Col>
                       </Row>
@@ -290,9 +300,6 @@ const ListEntranceExam = () => {
                   </Row>
                 </Form>
                 <Table
-                  // locale={{
-                  //                     emptyText: <div style={{ marginTop: '20px' }}>{loading ? null : listResult.length === 0 ? "Sinh viên chưa đăng ký HP nào trong kỳ này!" : null}</div>,
-                  //                 }}
                   rowSelection={{
                     type: 'checkbox',
                     selectedRowKeys: idSelect,
@@ -309,15 +316,18 @@ const ListEntranceExam = () => {
                   columns={columns}
                   bordered
                   scroll={{ x: 1000 }}
+                  onChange={handleChangeTable}
                   pagination={{
                     locale: { items_per_page: "/ trang" },
-                    total: listExam?.length,
+                    total: total,
                     showTotal: (total, range) => (
                       <span>{`${range[0]} - ${range[1]} / ${total}`}</span>
                     ),
                     showSizeChanger: true,
                     pageSizeOptions: ["10", "20", "50"],
                     defaultPageSize: 10,
+                    current: tableParams.page,
+                    pageSize: tableParams.size,
                     position: ["bottomRight"],
                   }}
                 />
