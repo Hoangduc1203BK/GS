@@ -58,7 +58,7 @@ const Dashboard = ({user}) => {
       <PopupStudentTuitionFee open={openTuitionFee} setOpen={setOpenTuitionFee} info={info} />
       <div className="w-2/5">
         <InfoStuTea info={info || {}}>
-          <div className="flex gap-2 w-full mt-3">
+          {/* <div className="flex gap-2 w-full mt-3">
             <Button
                 type="primary"
                 className="w-1/2 !bg-green-600"
@@ -73,7 +73,7 @@ const Dashboard = ({user}) => {
             >
               Học phí
             </Button>
-          </div>
+          </div> */}
         </InfoStuTea>
       </div>
       <div className="w-3/5">

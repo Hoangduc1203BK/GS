@@ -88,7 +88,7 @@ export function ApiGetAssignmentDetail(id) {
 
 export function ApiGetStudentAssignments(params) {
   return axios.get('/assigments/student', {
-    params
+    params: params
   })
 }
 

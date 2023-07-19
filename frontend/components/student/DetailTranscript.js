@@ -30,22 +30,27 @@ export default function DetailTranscript({ setShowDetail, detail }) {
 
   useEffect(() => {
     if (detail?.id) {
-      setLoading(true);
-      const getDetail = async () => {
-        const res = (
-          await ApiGetDetailSubAssignments({
-            assigmentId: detail?.id,
-          })
-        ).data;
-        setDetailSubAssigment({ ...res });
-        setFileAssigment({
-          name: res?.file,
-        });
-      };
-      getDetail();
-      setLoading(false);
+      try {
+        setLoading(true);
+        getDetail();
+        setLoading(false);
+      } catch (error) {
+        message.error("Xem chi tiết bài tập thất bại.");
+      }
     }
   }, [detail]);
+
+  const getDetail = async () => {
+    const res = (
+      await ApiGetDetailSubAssignments({
+        assigmentId: detail?.id,
+      })
+    ).data;
+    setDetailSubAssigment({ ...res });
+    setFileAssigment({
+      name: res?.file,
+    });
+  };
 
   const handleDragEnter = (event) => {
     event.preventDefault();
@@ -96,20 +101,17 @@ export default function DetailTranscript({ setShowDetail, detail }) {
 
   const handleChangeFile = async (ev) => {
     try {
-      setLoading(true)
-
+      setLoading(true);
       const files = ev.target.files[0];
-
       const fd = new FormData();
       fd.append("file", files);
       const res = await ApiUploadFileAssigment(id, detail?.id, fd);
       setFileAssigment({
         name: res.data,
       });
-      setLoading(false)
-
+      setLoading(false);
     } catch (error) {
-      setLoading(false)
+      setLoading(false);
 
       console.log(error);
       message.error("Chọn file thất bại! vui lòng chỉ chọn PDF hoặc IMG");
@@ -118,19 +120,18 @@ export default function DetailTranscript({ setShowDetail, detail }) {
 
   const handleCompletedAssigment = async () => {
     try {
-      setLoading(true)
+      setLoading(true);
 
       await ApiUpdateSubAssignments(detailSubAssigment?.id, {
         file: fileAssigment.name,
       });
       message.success("Nộp bài thành công.");
-      setLoading(false)
-
+      getDetail()
+      setLoading(false);
     } catch (error) {
       console.log(error);
       message.error("Nộp bài thất bại! Vui lòng thử lại.");
-      setLoading(false)
-
+      setLoading(false);
     }
   };
 

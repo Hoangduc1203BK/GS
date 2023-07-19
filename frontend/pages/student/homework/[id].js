@@ -122,6 +122,7 @@ const Homeworks = ({ user }) => {
           (el, index) => index + 1 == tabActive
         ).value,
       };
+      console.log(params);
       const res = (await ApiGetStudentAssignments(params)).data;
       console.log(res);
       setAssigments([...res]);
