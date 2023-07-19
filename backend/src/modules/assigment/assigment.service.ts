@@ -212,6 +212,6 @@ export class AssigmentService{
 
         const result = await this.assigmentRepos.query(qr);
 
-        return result;
+            return result;
     }
 }

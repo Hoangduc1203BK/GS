@@ -49,6 +49,7 @@ const TeacherSuggest = ({ user }) => {
       let params = {
         ...tableParams,
         userId: user.id,
+        role: "teacher"
       };
 
       if (formData.type) {
@@ -208,7 +209,7 @@ const TeacherSuggest = ({ user }) => {
             scroll={{ x: 1000 }}
             pagination={{
               locale: { items_per_page: "/ trang" },
-              total: suggests?.total,
+              total: suggests?.length,
               showTotal: (total, range) => (
                 <span>{`${range[0]} - ${range[1]} / ${total}`}</span>
               ),

@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import Link from "next/link";
 import {
 	AreaChartOutlined,
+	AuditOutlined,
 	DashboardOutlined,
 	FileProtectOutlined,
 	IdcardOutlined,
@@ -70,6 +71,11 @@ export default function LayoutAdmin({
 			label: <Link href="/student/class">Quản lý danh sách lớp</Link>,
 			key: "classStudent",
 			icon: <OrderedListOutlined />
+		},
+		{
+			label: <Link href="/student/fee">Quản lý điểm danh</Link>,
+			key: "classDeeStudent",
+			icon: <AuditOutlined />
 		},
 		{
 			label: <Link href="/student/suggest">Quản lý đề xuất</Link>,

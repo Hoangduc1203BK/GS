@@ -91,7 +91,7 @@ function StudentFeeList({ user }) {
         return (
           <div>
             <Button onClick={()=> router.push('fee/'+record.classId)} className="hover:!bg-violet-600 bg-violet-500 text-white hover:!text-white ml-3">
-              Học phí
+              Điểm danh
             </Button>
           </div>
         );

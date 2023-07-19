@@ -11,7 +11,7 @@ import { formatVND } from "@/common/util";
 const StudentFeeDetail = ({ user }) => {
   const router = useRouter();
   const { id } = router.query;
-  const [detail, setDetail] = useState([]);
+  const [detail, setDetail] = useState();
   const [isFetching, setIsFetching] = useState(true);
 
   const [classInfo, setClassInfo] = useState();
@@ -22,12 +22,13 @@ const StudentFeeDetail = ({ user }) => {
       const end = dayjs().endOf("month").format(FORMAT_DATE.YYYYMMDD);
       const res = (await ApiGetDetailFee({ classId: id, start, end })).data;
       const classRes = (await ApiGetDetailClass(id)).data;
-      setDetail([...res]);
+      setDetail({...res});
+      console.log(res);
       setClassInfo(classRes);
       setIsFetching(false);
       console.log(classRes);
     } catch (error) {
-      message.error("XEm lịch sử điểm danh thất bại. Vui lòng thử lại");
+      message.error("Xxm lịch sử điểm danh thất bại. Vui lòng thử lại");
       setIsFetching(false);
     }
   };
@@ -38,15 +39,16 @@ const StudentFeeDetail = ({ user }) => {
 
   const dateCellRender = (value) => {
     const convertVaule = dayjs(value).format(FORMAT_DATE.YYYYMMDD);
-    const dates = detail.filter((el) => el.day == convertVaule);
+    const dates = detail?.attendances?.filter((el) => el.day == convertVaule);
     return (
       <ul className="events-fee">
         {dates?.map((item) => (
           <li key={item.content}>
             <Badge
               status={item?.status ? "success" : "error"}
-              text={item?.class_name}
+              text={detail?.name}
             />
+            <div>GV: {detail?.teacher}</div>
           </li>
         ))}
       </ul>
@@ -83,38 +85,57 @@ const StudentFeeDetail = ({ user }) => {
                 <th className="text-left">Số điện thoại</th>
                 <td>{user?.phoneNumber}</td>
               </tr>
+              <tr>
+                <th className="text-left">Số Buổi học</th>
+                <td>{detail?.numberOfStudy}</td>
+              </tr>
+              <tr>
+                <th className="text-left">Tổng tiền</th>
+                <td>{formatVND(detail?.total)}</td>
+              </tr>
             </tbody>
           </table>
         </div>
 
         <div className="custom-table my-3 w-2/5">
-          <div className="flex p-1">
-            <div className="text-left w-[100px] font-bold">Tên lớp:</div>
-            <div className="w-subtraction-100">{classInfo?.name}</div>
-          </div>
-          <div className="flex p-1">
-            <div className="text-left w-[100px] font-bold">Môn:</div>
-            <div className="w-subtraction-100">{classInfo?.subject?.name}</div>
-          </div>
-          <div className="flex p-1">
-            <div className="text-left w-[100px] font-bold">Môn:</div>
-            <div className="w-subtraction-100">
-              {GRADE.find((el) => el.value == classInfo?.subject?.grade)?.label}
-            </div>
-          </div>
-          <div className="flex p-1">
-            <div className="text-left w-[100px] font-bold">Học phí:</div>
-            <div className="w-subtraction-100">{formatVND(classInfo?.fee)}</div>
-          </div>
-          <div className="flex p-1">
-            <div className="text-left w-[100px] font-bold">Chủ nhiệm:</div>
-            <div className="w-subtraction-100">{classInfo?.user?.name}</div>
-          </div>
+        <table className="w-full">
+            <tbody>
+              <tr>
+                <th className="text-left w-[125px]">Tên lớp</th>
+                <td>{classInfo?.name}</td>
+              </tr>
+              <tr>
+                <th className="text-left">Môn</th>
+                <td>{classInfo?.subject?.name}</td>
+              </tr>
+              <tr>
+                <th className="text-left">Khối</th>
+                <td> {GRADE.find((el) => el.value == classInfo?.subject?.grade)?.label}</td>
+              </tr>
+              <tr>
+                <th className="text-left">Học phí:</th>
+                <td>{formatVND(classInfo?.fee)}</td>
+              </tr>
+              <tr>
+                <th className="text-left">Chủ nhiệm:</th>
+                <td>{classInfo?.user?.name}</td>
+              </tr>
+            </tbody>
+          </table>
+         
         </div>
       </div>
 
       <div className="text-xl font-bold my-4 flex items-center gap-3"> <CalendarOutlined /><div>Chi tiêt bảng điểm danh</div></div>
       <Spin spinning={isFetching} tip="loading" size="large">
+
+      <div className="flex items-center">
+        <div className="h-3 w-3 rounded-full bg-[#52c41a] m-3"></div>Được điểm danh
+      </div>
+      <div className="flex items-center">
+        <div className="h-3 w-3 rounded-full bg-[#ff4d4f] m-3"></div>Vắng
+      </div>
+
         <Calendar
           className=" custom-calender"
           cellRender={cellRender}
