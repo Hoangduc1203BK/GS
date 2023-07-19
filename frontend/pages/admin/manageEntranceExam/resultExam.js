@@ -1,10 +1,10 @@
 "use client"
 
 import { getListExam, updateExam } from "@/api/address";
-import { GRADE, RESULT_EXAM } from "@/common/const";
+import { COLORS, GRADE, RESULT_EXAM } from "@/common/const";
 import LayoutAdmin from "@/components/LayoutAdmin";
-import { DeleteOutlined } from "@ant-design/icons";
-import { Button, Col, Form, Input, Modal, Row, Space, Table, Tooltip, message } from "antd";
+import { DeleteOutlined, IssuesCloseOutlined } from "@ant-design/icons";
+import { Badge, Button, Col, Form, Input, Modal, Row, Space, Table, Tag, Tooltip, message } from "antd";
 import { useEffect, useState } from "react";
 
 const ResultExam = () => {
@@ -43,6 +43,8 @@ const ResultExam = () => {
     }
   }
 
+  const [total, setTotal] = useState(tableParams.size);
+
   function handleChangeTable(pagination) {
     setTableParams({
       ...tableParams,
@@ -54,6 +56,7 @@ const ResultExam = () => {
     getListExam(tableParams).then(
       res => {
         setListExam(res?.data);
+        setTotal(res?.data?.maxPages * res?.data?.perPage)
       }
     ).catch(err => console.log(err, 'errr get list student!'))
   }, [tableParams, recall]);
@@ -88,30 +91,31 @@ const ResultExam = () => {
       align: "center",
     },
     {
-      title: "Lớp",
+      title: "Khối",
       render: (text, record) => {
-        return <div>{GRADE?.find(i => i.value === record?.grade)?.label}</div>;
+        return <div>{<Badge key={COLORS[record?.grade]} color={COLORS[record?.grade]} text={`Khối ${record?.grade || "..."} `} />}</div>;
       },
       align: "center",
     },
     {
       title: "Môn",
       render: (text, record) => {
-        return <div>{record?.subjects?.map(i => i.name)?.join(", ")}</div>;
+        return <div className="text-left">{record?.subjects?.map(i => i.name)?.join(", ")}</div>;
       },
       align: "center",
     },
     {
       title: "Điểm thi",
       render: (text, record) => {
-        return <div className="font-bold">{record?.subjects?.filter(item => item?.score)?.map(i => `${i.name} : ${i?.score}`)?.join(", ")}</div>;
+        return <div className="font-bold text-left">{record?.subjects?.filter(item => item?.score)?.map(i => `${i.name} : ${i?.score}`)?.join(", ")}</div>;
       },
       align: "center",
     },
     {
       title: "Trạng thái",
       render: (text, record) => {
-        return <div className={`font-medium  ${record?.result === 'fail' ? 'text-red-500' : record?.result === 'pass_exam' ? 'text-green-500' : 'text-black'}`}>{RESULT_EXAM?.find(i => i?.value == record?.result)?.label}</div>;
+        const result = RESULT_EXAM?.find(i => i?.value == record?.result)
+        return <div>{<Tag color={result?.color} icon={result?.icon}>{result?.label}</Tag>}</div>;
       },
       align: "center",
     }
@@ -195,6 +199,7 @@ const ResultExam = () => {
           <Button type="primary"
             disabled={idSelect.length !== 1 || record[0]?.result == 'pass_exam'}
             onClick={() => handleModal(false, true)}
+            icon={<IssuesCloseOutlined />}
           >Cập nhật điểm thi</Button>
         </Col>
       </Row>
@@ -219,11 +224,11 @@ const ResultExam = () => {
         dataSource={listExam?.result?.map(item => ({ ...item, key: item?.studentId }))}
         columns={columns}
         bordered
-        // scroll={{ x: 700 }}
+        scroll={{ x: 1000 }}
         onChange={handleChangeTable}
         pagination={{
           locale: { items_per_page: "/ trang" },
-          total: listExam?.total,
+          total: total,
           showTotal: (total, range) => (
             <span>{`${range[0]} - ${range[1]} / ${total}`}</span>
           ),
@@ -231,6 +236,8 @@ const ResultExam = () => {
           pageSizeOptions: ["10", "20", "50"],
           defaultPageSize: 10,
           position: ["bottomRight"],
+          current: tableParams.page,
+          pageSize: tableParams.size
         }}
       />
     </>
