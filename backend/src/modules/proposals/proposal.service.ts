@@ -74,8 +74,8 @@ export class ProposalService {
                 qr = qr + ' AND ' + paramArr.join(' AND ')
             }
 
-            const skip = (page - 1) * size;
-            qr += ` limit ${size} offset ${skip}`;
+            // const skip = (page - 1) * size;
+            // qr += ` limit ${size} offset ${skip}`;
 
             const result = await this.proposalRepos.query(qr);
 
@@ -86,8 +86,8 @@ export class ProposalService {
                 qr = qr + ' AND ' + paramArr.join(' AND ')
             }
 
-            const skip = (page - 1) * size;
-            qr += ` limit ${size} offset ${skip}`;
+            // const skip = (page - 1) * size;
+            // qr += ` limit ${size} offset ${skip}`;
 
             const result = await this.proposalRepos.query(qr);
 
