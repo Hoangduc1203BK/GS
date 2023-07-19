@@ -75,13 +75,13 @@ export default function PopupStudentSuggest({
   const changeInfoClass = (value) => {
     const field = form.getFieldsValue();
 
-    const classInfo = classes.find((el) => el.id === value);
+    const classInfo = classes.find((el) => el.classId === value);
     console.log(classInfo);
     setClassInfo(info);
     form.setFieldsValue({
       ...form.getFieldValue,
       room:
-        field.suggestType === PROPOSAL_TYPE.STUDENT_REGISTER_CLASS
+        field.suggestType == PROPOSAL_TYPE.STUDENT_REGISTER_CLASS
           ? classInfo?.time_tables[0]?.room_name
           : classInfo?.classes?.timeTables[0]?.room?.name,
     });
@@ -101,6 +101,7 @@ export default function PopupStudentSuggest({
       message.success("Tạo đề xuất thành công!");
       setOpen(!open);
       setUpdate(true);
+      form.resetFields();
     } catch (error) {
       message.error("Tạo đề xuất Thất bại!");
     }
@@ -211,8 +212,8 @@ export default function PopupStudentSuggest({
           >
             <Select placeholder="-- Chọn --" onChange={changeInfoClass}>
               {classes?.map((subject, index) => (
-                <Select.Option value={subject?.id} key={index}>
-                  {subject?.name}
+                <Select.Option value={subject?.classId} key={index}>
+                  {subject?.name || subject?.classes?.name || ""}
                 </Select.Option>
               ))}
             </Select>
