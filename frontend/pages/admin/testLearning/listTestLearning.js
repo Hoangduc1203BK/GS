@@ -1,8 +1,9 @@
 import { getListClass, getListTestLearning, updateTestLearning } from "@/api/address";
+import { COLORS } from "@/common/const";
 import { disabledDate } from "@/common/util";
 import LayoutAdmin from "@/components/LayoutAdmin";
 import { ClockCircleOutlined, ContainerOutlined, DeleteOutlined, DeliveredProcedureOutlined, EditOutlined, SnippetsOutlined, SolutionOutlined } from "@ant-design/icons";
-import { Button, Col, DatePicker, Divider, Form, Input, Modal, Row, Select, Space, Steps, Table, Tabs, Tooltip, message } from "antd";
+import { Badge, Button, Col, DatePicker, Divider, Form, Input, Modal, Row, Select, Space, Steps, Table, Tabs, Tooltip, message } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 
@@ -49,14 +50,14 @@ const ListTestLearning = () => {
     {
       title: "Khối",
       render: (text, record) => {
-        return <div>Khối {record?.grade}</div>;
+        return <div><Badge key={COLORS[record?.grade]} color={COLORS[record?.grade]} text={`Khối ${record?.grade || "..."} `} /></div>;
       },
       align: "center",
     },
     {
       title: "Môn",
       render: (text, record) => {
-        return <div>{record?.subject}</div>;
+        return <div className="text-left">{record?.subject}</div>;
       },
       align: "center",
     },
@@ -122,7 +123,7 @@ const ListTestLearning = () => {
     {
       title: "Khối",
       render: (text, record) => {
-        return <div>Khối {record?.grade}</div>;
+        return <div><Badge key={COLORS[record?.grade]} color={COLORS[record?.grade]} text={`Khối ${record?.grade || "..."} `} /></div>;
       },
       align: "center",
     },

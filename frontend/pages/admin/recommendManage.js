@@ -1,8 +1,8 @@
 import { getClass, getListClass, getListClassRoom, getListProposal, getListTeacherEmpty, getListUser, updateProposal } from "@/api/address";
 import { FORMAT_DATE, PROPOSAL_STATUS_LIST, STUDENT_PROPOSAL_TYPE, TEACHER_PROPOSAL_TYPE } from "@/common/const";
 import LayoutAdmin from "@/components/LayoutAdmin";
-import { AliwangwangOutlined, BarcodeOutlined, BarsOutlined, ClockCircleOutlined, DiffOutlined, FileSearchOutlined, FileSyncOutlined, FlagOutlined, FormOutlined } from "@ant-design/icons";
-import { Button, Col, Empty, Form, Modal, Row, Select, Space, Table, Tabs, Timeline, Tooltip, message } from "antd";
+import { AliwangwangOutlined, BarcodeOutlined, BarsOutlined, ClockCircleOutlined, DiffOutlined, FileSearchOutlined, FileSyncOutlined, FlagOutlined, FormOutlined, RetweetOutlined, SearchOutlined } from "@ant-design/icons";
+import { Button, Col, DatePicker, Empty, Form, Modal, Row, Select, Space, Table, Tabs, Tag, Timeline, Tooltip, message } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 const RecommendManage = () => {
@@ -54,7 +54,8 @@ const RecommendManage = () => {
     {
       title: "Trạng thái",
       render: (text, record) => {
-        return <div className="font-medium">{PROPOSAL_STATUS_LIST?.find(i => i?.value == record?.status)?.label}</div>;
+        const result = PROPOSAL_STATUS_LIST?.find(i => i?.value == record?.status)
+        return <div className="font-medium">{<Tag color={result?.color} icon={result?.icon}>{result?.label}</Tag>}</div>;
       },
       align: "center",
     },
@@ -148,19 +149,59 @@ const RecommendManage = () => {
       }
     )
   }
+
+  const [paramsSearch, setParamsSearch] = useState({});
+  const [paramsSearchStudent, setParamsSearchStudent] = useState({});
+
   useEffect(() => {
     setDataTeacher([])
-    getListProposal({ role: "teacher" }).then(res => {
+    const params = {
+      role: 'teacher',
+      ...paramsSearch
+    }
+    getListProposal({ ...params }).then(res => {
       setDataTeacher(res?.data)
     }).catch(err => console.log(err, 'errr'))
-  }, [recall.teacher]);
+  }, [recall.teacher, paramsSearch]);
 
   useEffect(() => {
     setDataStudent([])
-    getListProposal({ role: "user" }).then(res => {
+    const params = {
+      role: 'user',
+      ...paramsSearchStudent
+    }
+    getListProposal({ ...params }).then(res => {
       setDataStudent(res?.data)
     }).catch(err => console.log(err, 'errr'))
-  }, [recall.student]);
+  }, [recall.student, paramsSearchStudent]);
+
+
+  const [formSearch] = Form.useForm()
+  const [formSearchStudent] = Form.useForm()
+
+  function submitSearch(values) {
+    if (values.date) {
+      values.start = dayjs(values.date[0]).format("YYYY-MM-DD")
+      values.end = dayjs(values.date[1]).format("YYYY-MM-DD")
+      delete values.date
+    }
+    delete values.date
+    setParamsSearch({
+      ...values
+    })
+  }
+
+  function submitSearchStudent(values) {
+    console.log(values, 'valiess');
+    if (values.date) {
+      values.start = dayjs(values.date[0]).format("YYYY-MM-DD")
+      values.end = dayjs(values.date[1]).format("YYYY-MM-DD")
+      delete values.date
+    }
+    setParamsSearchStudent({
+      ...values
+    })
+  }
 
   return (
     <>
@@ -265,9 +306,54 @@ const RecommendManage = () => {
             key: '1',
             children: <>
               <p className="font-medium mb-2">Thông tin đề xuất giáo viên</p>
+              <Form
+                form={formSearch}
+                onFinish={submitSearch}
+                layout="horizontal"
+              >
+                <Row gutter={[8, 8]}>
+                  <Col xs={24} md={8}>
+                    <Form.Item name="type">
+                      <Select
+                        placeholder="-- Chọn loại đề xuất --"
+                        options={TEACHER_PROPOSAL_TYPE}
+                      >
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                  <Col xs={24} md={8}>
+                    <Form.Item name="status">
+                      <Select
+                        placeholder="-- Chọn trạng thái --"
+                        options={PROPOSAL_STATUS_LIST}
+                      >
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                  <Col xs={24} md={8}>
+                    <Form.Item name="date">
+                      <DatePicker.RangePicker
+                        placeholder={["Từ ngày", "Đến ngày"]}
+                        style={{
+                          width: '100%'
+                        }}
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col xs={24} className="flex justify-end gap-2">
+                    <Button
+                      icon={<RetweetOutlined />}
+                      onClick={() => {
+                        formSearch.resetFields()
+                        setParamsSearch({})
+                      }} >Hủy</Button>
+                    <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>Tìm kiếm</Button>
+                  </Col>
+                </Row>
+              </Form>
               <Table
                 locale={{
-                  emptyText: <div style={{ marginTop: '20px' }}>{dataTeacher?.length === 0 ? <Empty description="Chọn môn học để lọc dữ liệu lớp!" /> : null}</div>,
+                  emptyText: <div style={{ marginTop: '20px' }}>{dataTeacher?.length === 0 ? <Empty description="Danh sách đề xuất đang trống!" /> : null}</div>,
                 }}
                 size="middle"
                 style={{
@@ -277,6 +363,7 @@ const RecommendManage = () => {
                 dataSource={dataTeacher?.map(i => ({ ...i, key: i.id }))}
                 columns={columns}
                 bordered
+                scroll={{ x: 1000 }}
                 pagination={{
                   hideOnSinglePage: true,
                   locale: { items_per_page: "/ trang" },
@@ -303,9 +390,54 @@ const RecommendManage = () => {
             children: <>
               <div>
                 <p className="font-medium mb-2">Thông tin đề xuất học sinh</p>
+                <Form
+                  form={formSearchStudent}
+                  onFinish={submitSearchStudent}
+                  layout="horizontal"
+                >
+                  <Row gutter={[8, 8]}>
+                    <Col xs={24} md={8}>
+                      <Form.Item name="type">
+                        <Select
+                          placeholder="-- Chọn loại đề xuất --"
+                          options={STUDENT_PROPOSAL_TYPE}
+                        >
+                        </Select>
+                      </Form.Item>
+                    </Col>
+                    <Col xs={24} md={8}>
+                      <Form.Item name="status">
+                        <Select
+                          placeholder="-- Chọn trạng thái --"
+                          options={PROPOSAL_STATUS_LIST}
+                        >
+                        </Select>
+                      </Form.Item>
+                    </Col>
+                    <Col xs={24} md={8}>
+                      <Form.Item name="date">
+                        <DatePicker.RangePicker
+                          placeholder={["Từ ngày", "Đến ngày"]}
+                          style={{
+                            width: '100%'
+                          }}
+                        />
+                      </Form.Item>
+                    </Col>
+                    <Col xs={24} className="flex justify-end gap-2">
+                      <Button
+                        icon={<RetweetOutlined />}
+                        onClick={() => {
+                          formSearchStudent.resetFields()
+                          setParamsSearchStudent({})
+                        }} >Hủy</Button>
+                      <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>Tìm kiếm</Button>
+                    </Col>
+                  </Row>
+                </Form>
                 <Table
                   locale={{
-                    emptyText: <div style={{ marginTop: '20px' }}>{dataStudent?.length === 0 ? <Empty description="Không có dữ liệu!" /> : null}</div>,
+                    emptyText: <div style={{ marginTop: '20px' }}>{dataStudent?.length === 0 ? <Empty description="Danh sách đề xuất đang trống!" /> : null}</div>,
                   }}
                   size="middle"
                   style={{
@@ -315,6 +447,7 @@ const RecommendManage = () => {
                   dataSource={dataStudent?.map(i => ({ ...i, key: i.id }))}
                   columns={columns}
                   bordered
+                  scroll={{ x: 1000 }}
                   pagination={{
                     hideOnSinglePage: true,
                     locale: { items_per_page: "/ trang" },

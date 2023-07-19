@@ -1,8 +1,8 @@
 import { getListDepartment, getListUser } from "@/api/address";
 import AddEditTs from "@/components/AddEditTS";
 import LayoutAdmin from "@/components/LayoutAdmin";
-import { PlusCircleOutlined, ScheduleOutlined } from "@ant-design/icons";
-import { Button, Empty, Space, Table, Tooltip } from "antd";
+import { PlusCircleOutlined, RetweetOutlined, ScheduleOutlined, SearchOutlined } from "@ant-design/icons";
+import { Button, Col, Empty, Form, Input, Row, Select, Space, Table, Tooltip } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 
@@ -111,7 +111,7 @@ const ManageTeacher = () => {
   }
 
   useEffect(() => {
-    getListUser({ role: 'teacher', page: tableParams.page, size: tableParams.size }).then(
+    getListUser({ role: 'teacher', ...tableParams }).then(
       res => {
         setListTeacher(res?.data?.result);
         setTotal(res?.data?.perPage * res?.data?.maxPages)
@@ -126,6 +126,18 @@ const ManageTeacher = () => {
       }
     ).catch(err => console.log(err, 'errr'))
   }, []);
+
+  const [form] = Form.useForm()
+
+  function submitSearch(values) {
+    console.log(values, 'valiess');
+    setTableParams({
+      page: 1,
+      size: 10,
+      ...values
+    })
+  }
+
   return (
     <>
 
@@ -134,8 +146,46 @@ const ManageTeacher = () => {
           :
           <>
             <p className="font-medium text-lg mb-4">Danh sách giáo viên</p>
+            <Form
+              form={form}
+              onFinish={submitSearch}
+              layout="horizontal"
+            >
+              <Row gutter={[8, 8]}>
+                <Col xs={24} md={9}>
+                  <Form.Item name="name" label="Tên GV">
+                    <Input placeholder="Nhập tên GV" />
+                  </Form.Item>
+                </Col>
+                <Col xs={24} md={9}>
+                  <Form.Item name="departmentId" label="Bộ môn">
+                    <Select
+                      placeholder="-- Chọn --"
+                    >
+                      {
+                        listDepartment?.map(i => (
+                          <Select.Option key={i.id} value={i.id}>{i?.name}</Select.Option>
+                        ))
+                      }
+                    </Select>
+                  </Form.Item>
+                </Col>
+                <Col xs={24} md={6} className="flex justify-end gap-2">
+                  <Button
+                    icon={<RetweetOutlined />}
+                    onClick={() => {
+                      form.resetFields()
+                      setTableParams({
+                        page: 1,
+                        size: 10
+                      })
+                    }} >Hủy</Button>
+                  <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>Tìm kiếm</Button>
+                </Col>
+              </Row>
+            </Form>
             <div className="text-right">
-              <Button type="primary" icon={<PlusCircleOutlined />} onClick={() => handleOpenForm(true, false)}>Thêm mới giáo viên</Button>
+              <Button type="primary" icon={<PlusCircleOutlined />} onClick={() => handleOpenForm(true, false)}>Thêm mới</Button>
             </div>
             <Table
               locale={{

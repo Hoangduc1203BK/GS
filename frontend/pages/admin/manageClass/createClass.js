@@ -110,17 +110,22 @@ const CreateClass = () => {
     ).catch(err => message.error("Có lỗi xảy ra!" + err))
   }
 
+  async function handleSelectSubject(value) {
+    const subject = listSubject?.find(i => i.id === value)
+    console.log(subject, 'subject');
+    getListUser({ role: 'teacher', page: 1, size: 999, departmentId: subject?.departmentId }).then(
+      res => {
+        setListTeacher(res?.data?.result);
+      }
+    ).catch(err => message.error("Lấy dữ liệu thất bại!"))
+  }
+
   useEffect(() => {
     getListSubject({ page: 1, size: 999 }).then(
       res => {
         setListSubject(res?.data?.result);
       }
     ).catch(err => message.error("Lấy dữ liệu môn thất bại!"))
-    getListUser({ role: 'teacher', page: 1, size: 999 }).then(
-      res => {
-        setListTeacher(res?.data?.result);
-      }
-    ).catch(err => message.error("Lấy dữ liệu thất bại!"))
     getListClassRoom().then(
       res => {
         setListClassRoom(res?.data)
@@ -162,7 +167,9 @@ const CreateClass = () => {
                     { required: true, message: "Đây là trường dữ liệu bắt buộc!" }
                   ]}
                 >
-                  <Select placeholder="-- Chọn --">
+                  <Select placeholder="-- Chọn --"
+                    onSelect={handleSelectSubject}
+                  >
                     {
                       listSubject?.map(item => (<>
                         <Select.Option value={item?.id} key={item?.id}>{item?.name}</Select.Option>
