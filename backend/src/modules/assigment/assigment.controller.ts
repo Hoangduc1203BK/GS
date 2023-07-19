@@ -29,10 +29,14 @@ export class AssigmentController{
     }
 
 
-
+    @UseGuards(JwtAuthGuard)
     @Get('/sub-assigment')
-    async getSubAssigment(@Query() query: GetSubAssigmentDto) {
-        const result = await this.assigmentService.getSubAssigment(query);
+    async getSubAssigment(@Req() req: Request,@Query() query: GetSubAssigmentDto) {
+        const user = req["user"]
+        const result = await this.assigmentService.getSubAssigment({
+            ...query,
+            studentId: user["id"]
+        });
 
         return result;
     }
