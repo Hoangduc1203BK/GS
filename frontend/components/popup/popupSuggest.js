@@ -80,6 +80,8 @@ export default function PopupStudentSuggest({
       setOpen(!open);
       setUpdate(true);
       form.resetFields();
+      setIsRegister(true)
+
     } catch (error) {
       message.error("Tạo đề xuất Thất bại!");
     }
@@ -105,7 +107,15 @@ export default function PopupStudentSuggest({
         room: "",
       });
       setIsRegister(true);
+      
     } else {
+      form.setFieldsValue({
+        ...form.getFieldValue,
+        grade: "",
+        subject: "",
+        class: "",
+        room: "",
+      });
       setIsRegister(false);
       let response = await ApiClassOfStudent(info.id);
       setClasses([...response.data]);
