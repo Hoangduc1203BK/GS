@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Exam, Subject, TestLearning } from "src/databases/entities";
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 import { ClassService } from "../class/class.service";
 import { ListTestLearningDto } from "./dto/list-test-learning.dto";
 import { DEFAULT_PAGING } from "src/common/constants/paging";
@@ -12,6 +12,7 @@ import { UpdateTestLearningDto } from "./dto/update-test-learning.dto";
 import { EXAM_RESULT, TEST_LEARNING_STATUS } from "src/common/constants";
 import { ExamService } from "../exam";
 import { SubjectService } from "../subject";
+import { SearchTestLearningDto } from "./dto/search-test-learning.dto";
 
 @Injectable()
 export class TestLearningService {
@@ -30,7 +31,7 @@ export class TestLearningService {
             filter.studentId = userId;
         }
         if(status) {
-            filter.status = status;
+            filter.status = In(status.split(','));
         }
 
         const testLearnings = await this.testLearningRepos.find({
@@ -68,6 +69,28 @@ export class TestLearningService {
         })
         
         return {result: result, ...paginate(result.length, Number(page), Number(size), all.length)};
+    }
+
+    async searchTestLearning(query: SearchTestLearningDto) {
+        const { page=DEFAULT_PAGING.PAGE, size= DEFAULT_PAGING.LIMIT, classId, status} = query;
+        const result = [];
+        const timeTables = await this.classService.listTimeTable(classId);
+        const listTestLearning = await this.listTestLearning({status: status})
+        if(timeTables.length>0) {
+            for(const t of timeTables) {
+                let testLearning = listTestLearning.result.find(el => el.timeTableId == t.id);
+                if(testLearning && testLearning.id){
+                    result.push(testLearning);
+                }
+            }
+
+            const skip = (page-1)*size;
+            const resultSearch = result.slice(skip, skip+size+1);
+
+            return { result: resultSearch,...paginate(resultSearch.length, Number(page), Number(size), result.length)}
+        }else {
+            return [];
+        }
     }
 
     async getTestLearning(id: number) {

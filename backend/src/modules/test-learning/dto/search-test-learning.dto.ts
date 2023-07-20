@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, IsEnum, IsNumberString, IsOptional } from 'class-validator';
 import { ROLE, TEST_LEARNING_STATUS } from 'src/common/constants';
 
-export class ListTestLearningDto {
+export class SearchTestLearningDto {
 	@ApiProperty({ required: true })
     @IsOptional()
 	@IsNotEmpty()
@@ -19,12 +19,6 @@ export class ListTestLearningDto {
     @IsOptional()
 	@IsNotEmpty()
 	status?: string;
-
-    @ApiProperty({ required: true })
-    @IsOptional()
-	@IsNotEmpty()
-	@IsString()
-	userId?: string;
 
     @ApiProperty({ required: true })
     @IsOptional()
