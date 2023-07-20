@@ -35,49 +35,27 @@ export default function PopupStudentSuggest({
   const [form] = Form.useForm();
   const [subjects, setSubjects] = useState([]);
   const [classes, setClasses] = useState([]);
-  const [classInfo, setClassInfo] = useState({
-    start: "",
-    end: "",
-    room: "",
-  });
-
-  const getListSubject = async (value) => {
-    const response = await ApiGetListSubject({ grade: value });
-    setSubjects([...response.data?.result]);
-    form.setFieldsValue({
-      ...form.getFieldValue,
-      subject: "",
-      class: "",
-      room: "",
-    });
-  };
+  const [isRegister, setIsRegister] = useState(true);
 
   const getListClass = async (value) => {
     const field = form.getFieldsValue();
-    let response = {};
     form.setFieldsValue({
       ...form.getFieldValue,
       class: "",
       room: "",
     });
     if (field.suggestType === PROPOSAL_TYPE.STUDENT_REGISTER_CLASS) {
-      response = await ApiGetListClassEmpty({
+      let response = await ApiGetListClassEmpty({
         subjectId: value,
       });
-    } else if (field.suggestType === PROPOSAL_TYPE.STUDENT_TERMINATE_CLASS) {
-      response = await ApiClassOfStudent(info.id, {
-        subjectId: value,
-      });
+      setClasses([...response.data]);
     }
-    setClasses([...response.data]);
   };
 
   const changeInfoClass = (value) => {
     const field = form.getFieldsValue();
 
     const classInfo = classes.find((el) => el.classId === value);
-    console.log(classInfo);
-    setClassInfo(info);
     form.setFieldsValue({
       ...form.getFieldValue,
       room:
@@ -87,16 +65,16 @@ export default function PopupStudentSuggest({
     });
   };
   const handleFinish = async (values) => {
-    const payload = {
-      userId: info?.id,
-      description: values.note,
-      type: values.suggestType,
-      time: dayjs(new Date()).format(FORMAT_DATE.YYYYMMDD),
-      subData: {
-        classId: values.class,
-      },
-    };
     try {
+      const payload = {
+        userId: info?.id,
+        description: values.note,
+        type: values.suggestType,
+        time: dayjs(new Date()).format(FORMAT_DATE.YYYYMMDD),
+        subData: {
+          classId: values.class,
+        },
+      };
       await ApiCreateSuggest(payload);
       message.success("Tạo đề xuất thành công!");
       setOpen(!open);
@@ -107,14 +85,31 @@ export default function PopupStudentSuggest({
     }
   };
 
-  const handleChaneSuggestType = () => {
-    form.setFieldsValue({
-      ...form.getFieldValue,
-      grade: "",
-      subject: "",
-      class: "",
-      room: "",
-    });
+  const handleChaneSuggestType = async () => {
+    const field = form.getFieldsValue();
+    if (field.suggestType == PROPOSAL_TYPE.STUDENT_REGISTER_CLASS) {
+      form.setFieldsValue({
+        ...form.getFieldValue,
+        grade: info?.grade,
+        subject: "",
+        class: "",
+        room: "",
+      });
+
+      const response = await ApiGetListSubject({ grade: info?.grade });
+      setSubjects([...response.data?.result]);
+      form.setFieldsValue({
+        ...form.getFieldValue,
+        subject: "",
+        class: "",
+        room: "",
+      });
+      setIsRegister(true);
+    } else {
+      setIsRegister(false);
+      let response = await ApiClassOfStudent(info.id);
+      setClasses([...response.data]);
+    }
   };
 
   return (
@@ -173,36 +168,50 @@ export default function PopupStudentSuggest({
               ))}
             </Select>
           </Form.Item>
-          <Form.Item
-            name="grade"
-            label="Khối"
-            rules={[
-              { required: true, message: "Đây là trường dữ liệu bắt buộc!" },
-            ]}
-          >
-            <Select placeholder="-- Chọn --" onChange={getListSubject}>
-              {GRADE?.map((user) => (
-                <Select.Option value={user.value} key={user.key}>
-                  {user.label}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-          <Form.Item
-            name="subject"
-            label="Môn"
-            rules={[
-              { required: true, message: "Đây là trường dữ liệu bắt buộc!" },
-            ]}
-          >
-            <Select placeholder="-- Chọn --" onChange={getListClass}>
-              {subjects?.map((subject, index) => (
-                <Select.Option value={subject?.id} key={index}>
-                  {subject?.name}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
+
+          {isRegister ? (
+            <>
+              <Form.Item
+                name="grade"
+                label="Khối"
+                rules={[
+                  {
+                    required: true,
+                    message: "Đây là trường dữ liệu bắt buộc!",
+                  },
+                ]}
+              >
+                <Select placeholder="-- Chọn --">
+                  {GRADE?.map((user) => (
+                    <Select.Option value={user.value} key={user.key}>
+                      {user.label}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              <Form.Item
+                name="subject"
+                label="Môn"
+                rules={[
+                  {
+                    required: true,
+                    message: "Đây là trường dữ liệu bắt buộc!",
+                  },
+                ]}
+              >
+                <Select placeholder="-- Chọn --" onChange={getListClass}>
+                  {subjects?.map((subject, index) => (
+                    <Select.Option value={subject?.id} key={index}>
+                      {subject?.name}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </>
+          ) : (
+            <></>
+          )}
+
           <Form.Item
             name="class"
             label="Lớp"
