@@ -272,4 +272,5 @@ export const COLORS = [
   'volcano',
   'gold',
   'lime',
+  'aqua'
 ];

@@ -3,8 +3,8 @@
 import { getListExam, updateExam } from "@/api/address";
 import { COLORS, GRADE, RESULT_EXAM } from "@/common/const";
 import LayoutAdmin from "@/components/LayoutAdmin";
-import { DeleteOutlined, IssuesCloseOutlined } from "@ant-design/icons";
-import { Badge, Button, Col, Form, Input, Modal, Row, Space, Table, Tag, Tooltip, message } from "antd";
+import { DeleteOutlined, IssuesCloseOutlined, RetweetOutlined, SearchOutlined } from "@ant-design/icons";
+import { Badge, Button, Col, Form, Input, Modal, Row, Select, Space, Table, Tag, Tooltip, message } from "antd";
 import { useEffect, useState } from "react";
 
 const ResultExam = () => {
@@ -56,7 +56,7 @@ const ResultExam = () => {
     getListExam(tableParams).then(
       res => {
         setListExam(res?.data);
-        setTotal(res?.data?.maxPages * res?.data?.perPage)
+        setTotal(res?.data?.maxPages * res?.data?.total)
       }
     ).catch(err => console.log(err, 'errr get list student!'))
   }, [tableParams, recall]);
@@ -152,6 +152,16 @@ const ResultExam = () => {
       }
     ).catch(err => message.error('Có lỗi xảy ra! ' + err))
   }
+
+  const [formSearch] = Form.useForm()
+  function submitSearch(value) {
+    setTableParams({
+      page: 1,
+      size: 10,
+      ...value
+    })
+  }
+
   return (
     <>
       <Modal
@@ -192,9 +202,43 @@ const ResultExam = () => {
           </Row>
         </Form>
       </Modal>
-      <p className="font-bold mb-2">Danh sách kết quả thi đầu vào</p>
+      <p className="font-bold mb-2 text-lg">Danh sách kết quả thi đầu vào</p>
       <Row gutter={[8, 8]}>
-        <Col xs={24} lg={12}></Col>
+        <Col xs={24} lg={12}>
+          <Form
+            form={formSearch}
+            onFinish={submitSearch}
+          >
+            <Row gutter={[8, 8]}>
+              <Col xs={24} md={12}>
+                <Form.Item
+                  name="result"
+                >
+                  <Select
+                    placeholder="-- Chọn kết quả thi thử --"
+                    options={RESULT_EXAM}
+                  >
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12} className="flex gap-2">
+                <Button icon={<RetweetOutlined />}
+                  onClick={
+                    () => {
+                      formSearch.resetFields()
+                      setTableParams({
+                        page: 1,
+                        size: 10
+                      })
+                    }
+                  }
+                >Hủy</Button>
+                <Button type="primary" icon={<SearchOutlined />} htmlType="submit">Tìm kiếm</Button>
+              </Col>
+            </Row>
+
+          </Form>
+        </Col>
         <Col xs={24} lg={12} className="text-right">
           <Button type="primary"
             disabled={idSelect.length !== 1 || record[0]?.result == 'pass_exam'}

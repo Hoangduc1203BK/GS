@@ -1,8 +1,9 @@
 
 import { getAttendance, getListAttendance, getListClass, getListSubject, getListUser, getListUserInClass } from "@/api/address";
+import { COLORS } from "@/common/const";
 import LayoutAdmin from "@/components/LayoutAdmin";
-import { CheckCircleFilled, CloseCircleFilled, DeleteOutlined, EditOutlined, EyeOutlined, HistoryOutlined, ProfileOutlined, SnippetsOutlined } from "@ant-design/icons";
-import { Avatar, Button, Col, Empty, Input, List, Modal, Row, Select, Space, Table, Tabs, Tooltip, Tour, message } from "antd";
+import { CheckCircleFilled, CloseCircleFilled, DeleteOutlined, EditOutlined, EllipsisOutlined, EyeOutlined, HistoryOutlined, ProfileOutlined, SnippetsOutlined, TeamOutlined } from "@ant-design/icons";
+import { Avatar, Badge, Button, Col, Empty, Input, List, Modal, Row, Select, Space, Table, Tabs, Tooltip, Tour, message } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useRef, useState } from "react";
 
@@ -41,7 +42,7 @@ const ListClass = () => {
     {
       title: "Khối",
       render: (text, record) => {
-        return <div>Khối {record?.grade}</div>;
+        return <div><Badge key={COLORS[record?.grade]} color={COLORS[record?.grade]} text={`Khối ${record?.grade || "..."} `} /></div>;
       },
       align: "center",
     },
@@ -116,7 +117,7 @@ const ListClass = () => {
     {
       title: "Thao tác",
       render: (text, record) => {
-        return <div><Button type="primary" style={{ backgroundColor: 'aqua', color: 'black', fontWeight: '500' }} onClick={() => detailAttendance(record)} className="hover:-translate-y-0.5 duration-300 hover:scale-105">Chi tiết</Button></div>;
+        return <div><Button icon={<TeamOutlined />} type="primary" style={{ backgroundColor: 'aqua', color: 'black', fontWeight: '500' }} onClick={() => detailAttendance(record)} className="hover:-translate-y-0.5 duration-300 hover:scale-105">Chi tiết</Button></div>;
       },
       align: "center",
     },
@@ -277,6 +278,42 @@ const ListClass = () => {
       }
     ).catch(err => message.error("Lấy dữ liệu thất bại!"))
   }, []);
+
+
+  const ref1 = useRef(null);
+  const ref2 = useRef(null);
+  const ref3 = useRef(null);
+  const [open, setOpen] = useState(false);
+  const steps = [
+    {
+      title: 'DANH SÁCH MÔN HỌC',
+      description: 'Lựa chọn môn để hiển thị các lớp theo từng bộ môn!',
+      // cover: (
+      //   <img
+      //     alt="tour.png"
+      //     src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
+      //   />
+      // ),
+      target: () => ref1.current,
+    },
+    {
+      title: 'DANH SÁCH LỚP',
+      description: 'Sau khi lựa chọn môn, các lớp họp sẽ được thống kê ở đây.',
+      target: () => ref2.current,
+    },
+    // {
+    //   title: 'Other Actions',
+    //   description: 'Click to see other actions.',
+    //   target: () => ref3.current,
+    // },
+  ];
+
+  useEffect(() => {
+    if (listSubject.length > 0) {
+      setOpen(true)
+    }
+  }, [listSubject]);
+
   return (
     <>
       <Modal
@@ -335,27 +372,31 @@ const ListClass = () => {
             ),
             key: '1',
             children: <>
-              <p className="font-medium mb-2">Thông tin lớp học</p>
+              <Tour open={open} onClose={() => setOpen(false)} steps={steps} />
+              <p className="font-medium mb-2 text-lg">Thông tin lớp học</p>
               <Row gutter={[8, 8]}>
                 <Col xs={24} md={12} className="grid grid-cols-4 ">
                   <p className="flex items-center">Chọn môn:</p>
-                  <Select
-                    className="col-span-3"
-                    placeholder="-- Chọn -- "
-                    style={{
-                      width: '100%'
-                    }}
-                    onSelect={selectSubject}
-                  >
-                    {
-                      listSubject?.map(item => (<>
-                        <Select.Option value={item?.id} key={item?.id}>{item?.name}</Select.Option>
-                      </>))
-                    }
-                  </Select>
+                  <div ref={ref1} className="w-full">
+                    <Select
+                      className="col-span-3"
+                      placeholder="-- Chọn -- "
+                      style={{
+                        width: '100%'
+                      }}
+                      onSelect={selectSubject}
+                    >
+                      {
+                        listSubject?.map(item => (<>
+                          <Select.Option value={item?.id} key={item?.id}>{item?.name}</Select.Option>
+                        </>))
+                      }
+                    </Select>
+                  </div>
                 </Col>
               </Row>
               <Table
+                ref={ref2}
                 locale={{
                   emptyText: <div style={{ marginTop: '20px' }}>{listClass?.length === 0 ? <Empty description="Chọn môn học để lọc dữ liệu lớp!" /> : null}</div>,
                 }}
