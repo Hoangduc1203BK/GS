@@ -1,5 +1,9 @@
 import { ApiGetListClass, ApiGetListSuggest } from "@/api/student";
-import { PROPOSAL_STATUS_LIST, STUDENT_PROPOSAL_TYPE } from "@/common/const";
+import {
+  PROPOSAL_STATUS_LIST,
+  STUDENT_PROPOSAL_TYPE,
+  TEACHER_PROPOSAL_TYPE,
+} from "@/common/const";
 import LayoutAdmin from "@/components/LayoutAdmin";
 import PopupStudentSuggest from "@/components/popup/popupSuggest";
 import { DatabaseFilled, PullRequestOutlined } from "@ant-design/icons";
@@ -13,8 +17,10 @@ import {
   Select,
   Table,
   Tabs,
+  Tag,
   message,
 } from "antd";
+import dayjs from "dayjs";
 import { useState, useEffect } from "react";
 
 const StudentSuggest = ({ user }) => {
@@ -47,7 +53,7 @@ const StudentSuggest = ({ user }) => {
 
   const getListClass = async () => {
     const classes = await ApiGetListClass({ type: "active" });
-    setListClass([...classes.data]);
+    setListClass([...classes?.data]);
   };
 
   const getListSuggest = async () => {
@@ -57,7 +63,7 @@ const StudentSuggest = ({ user }) => {
       let params = {
         ...tableParams,
         userId: user.id,
-        role : "user"
+        role: "user",
       };
 
       if (formData.type) {
@@ -86,53 +92,70 @@ const StudentSuggest = ({ user }) => {
       render: (text, record, index) => {
         return <div>{index + 1}</div>;
       },
+      align: "center",
+      witdh: 40,
     },
     {
-      title: "Người đề xuát",
-      dataIndex: "user",
-      key: "user",
-    },
-    {
-      title: "Môn đề xuất",
-      render: (text, record, index) => {
-        return (
-          <div>
-            {listClass.find((el) => el.id == record?.sub_data?.classId)?.name}
-          </div>
-        );
+      title: "Họ và tên",
+      render: (text, record) => {
+        return <div> {record?.user} </div>;
       },
+      align: "center",
     },
     {
-      title: "Ngày đề xuất",
-      dataIndex: "time",
-      key: "time",
-    },
-    {
-      title: "nội dung",
-      dataIndex: "description",
-      key: "description",
+      title: "Email",
+      render: (text, record) => {
+        return <div> {record?.email} </div>;
+      },
+      align: "center",
     },
     {
       title: "Loại đề xuất",
-      render: (text, record, index) => {
+      render: (text, record) => {
         return (
           <div>
-            {STUDENT_PROPOSAL_TYPE.find((el) => el.value === record.type)
-              ?.label || ""}
+            {" "}
+            {
+              STUDENT_PROPOSAL_TYPE.concat(TEACHER_PROPOSAL_TYPE).find(
+                (i) => i.value === record?.type
+              )?.label
+            }{" "}
           </div>
         );
       },
+      align: "center",
+    },
+    {
+      title: "Ngày đề xuất",
+      render: (text, record) => {
+        return <div> {dayjs(record?.time).format("DD-MM-YYYY")} </div>;
+      },
+      align: "center",
+    },
+    {
+      title: "Mô tả",
+      render: (text, record) => {
+        return <div> {record?.description} </div>;
+      },
+      align: "center",
     },
     {
       title: "Trạng thái",
-      render: (text, record, index) => {
+      render: (text, record) => {
+        const result = PROPOSAL_STATUS_LIST?.find(
+          (i) => i?.value == record?.status
+        );
         return (
-          <div>
-            {PROPOSAL_STATUS_LIST.find((el) => el.value === record.status)
-              ?.label || ""}
+          <div className="font-medium">
+            {
+              <Tag color={result?.color} icon={result?.icon}>
+                {result?.label}
+              </Tag>
+            }
           </div>
         );
       },
+      align: "center",
     },
   ];
 

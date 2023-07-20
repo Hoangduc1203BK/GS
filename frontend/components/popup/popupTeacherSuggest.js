@@ -35,9 +35,10 @@ export default function PopupStudentSuggest({
   const [form] = Form.useForm();
   const [subjects, setSubjects] = useState([]);
   const [classes, setClasses] = useState([]);
-
+  const [isRegister, setIsRegister] = useState(true);
   const getListSubject = async (value) => {
-    const response = await ApiGetListSubject({ grade: value });
+    console.log(info);
+    const response = await ApiGetListSubject({ grade: value, departmentId: info.departmentId });
     setSubjects([...response.data?.result]);
     form.setFieldsValue({
       ...form.getFieldValue,
@@ -49,54 +50,70 @@ export default function PopupStudentSuggest({
 
   const getListClass = async (value) => {
     const field = form.getFieldsValue();
-    let response = {};
     form.setFieldsValue({
       ...form.getFieldValue,
       class: "",
       room: "",
     });
     if (field.suggestType === PROPOSAL_TYPE.TEACHER_REGISTER_CLASS) {
-      response = await ApiGetListClassTeacherEmpty({
+      let  response = await ApiGetListClassTeacherEmpty({
         subjectId: value,
       });
-    } else if (field.suggestType === PROPOSAL_TYPE.TEACHER_TAKE_BRAKE) {
-      response = await ApiGetListClass({
-        subjectId: value,
-        teacher: info?.id,
-      });
-    }
-    setClasses([...response?.data]);
-    console.log(field);
+      setClasses([...response?.data]);
+    } 
   };
 
   const handleFinish = async (values) => {
-    const payload = {
-      userId: info?.id,
-      description: values.note,
-      type: values.suggestType,
-      time: dayjs(new Date()).format(FORMAT_DATE.YYYYMMDD),
-      subData: {
-        classId: values.class,
-      },
-    };
     try {
+      const payload = {
+        userId: info?.id,
+        description: values.note,
+        type: values.suggestType,
+        time: dayjs(new Date()).format(FORMAT_DATE.YYYYMMDD),
+        subData: {
+          classId: values.class,
+        },
+      };
       await ApiCreateSuggest(payload);
       message.success("Tạo đề xuất thành công!");
       setOpen(!open);
       setUpdate(true);
+      form.resetFields();
+      setIsRegister(true)
+
     } catch (error) {
       message.error("Tạo đề xuất Thất bại!");
     }
   };
 
-  const handleChaneSuggestType = () => {
-    form.setFieldsValue({
-      ...form.getFieldValue,
-      grade: "",
-      subject: "",
-      class: "",
-      room: "",
-    });
+  const handleChaneSuggestType = async () => {
+    const field = form.getFieldsValue();
+
+    if (field.suggestType === PROPOSAL_TYPE.TEACHER_REGISTER_CLASS) {
+      form.setFieldsValue({
+        ...form.getFieldValue,
+        grade: "",
+        subject: "",
+        class: "",
+        room: "",
+      });
+      setIsRegister(true)
+
+    } else {
+      setIsRegister(false)
+      form.setFieldsValue({
+        ...form.getFieldValue,
+        grade: "",
+        subject: "",
+        class: "",
+        room: "",
+      });
+      let response = await ApiGetListClass({
+        teacher: info?.id,
+      });
+      setClasses([...response?.data]);
+    }
+    
   };
   return (
     <>
@@ -151,36 +168,48 @@ export default function PopupStudentSuggest({
               ))}
             </Select>
           </Form.Item>
-          <Form.Item
-            name="grade"
-            label="Khối"
-            rules={[
-              { required: true, message: "Đây là trường dữ liệu bắt buộc!" },
-            ]}
-          >
-            <Select placeholder="-- Chọn --" onChange={getListSubject}>
-              {GRADE?.map((user) => (
-                <Select.Option value={user.value} key={user.key}>
-                  {user.label}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-          <Form.Item
-            name="subject"
-            label="Môn"
-            rules={[
-              { required: true, message: "Đây là trường dữ liệu bắt buộc!" },
-            ]}
-          >
-            <Select placeholder="-- Chọn --" onChange={getListClass}>
-              {subjects?.map((subject, index) => (
-                <Select.Option value={subject?.id} key={index}>
-                  {subject?.name}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
+          {isRegister ? (
+            <>
+              <Form.Item
+                name="grade"
+                label="Khối"
+                rules={[
+                  {
+                    required: true,
+                    message: "Đây là trường dữ liệu bắt buộc!",
+                  },
+                ]}
+              >
+                <Select placeholder="-- Chọn --" onChange={getListSubject}>
+                  {GRADE?.map((user) => (
+                    <Select.Option value={user.value} key={user.key}>
+                      {user.label}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              <Form.Item
+                name="subject"
+                label="Môn"
+                rules={[
+                  {
+                    required: true,
+                    message: "Đây là trường dữ liệu bắt buộc!",
+                  },
+                ]}
+              >
+                <Select placeholder="-- Chọn --" onChange={getListClass}>
+                  {subjects?.map((subject, index) => (
+                    <Select.Option value={subject?.id} key={index}>
+                      {subject?.name}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </>
+          ) : (
+            <></>
+          )}
           <Form.Item
             name="class"
             label="Lớp"
@@ -188,11 +217,9 @@ export default function PopupStudentSuggest({
               { required: true, message: "Đây là trường dữ liệu bắt buộc!" },
             ]}
           >
-            <Select
-              placeholder="-- Chọn --"
-            >
+            <Select placeholder="-- Chọn --">
               {classes?.map((subject, index) => (
-                <Select.Option value={subject?.id} key={index}>
+                <Select.Option value={subject?.classId} key={index}>
                   {subject?.name}
                 </Select.Option>
               ))}

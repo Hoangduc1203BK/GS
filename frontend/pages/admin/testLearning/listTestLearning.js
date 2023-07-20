@@ -1,9 +1,9 @@
-import { getListClass, getListTestLearning, updateTestLearning } from "@/api/address";
+import { getListClass, getListTestLearning, getListTestLearningSearch, updateTestLearning } from "@/api/address";
 import { COLORS } from "@/common/const";
 import { disabledDate } from "@/common/util";
 import LayoutAdmin from "@/components/LayoutAdmin";
-import { ClockCircleOutlined, ContainerOutlined, DeleteOutlined, DeliveredProcedureOutlined, EditOutlined, SnippetsOutlined, SolutionOutlined } from "@ant-design/icons";
-import { Badge, Button, Col, DatePicker, Divider, Form, Input, Modal, Row, Select, Space, Steps, Table, Tabs, Tooltip, message } from "antd";
+import { CheckCircleOutlined, ClockCircleOutlined, ContainerOutlined, DeleteOutlined, DeliveredProcedureOutlined, EditOutlined, FileDoneOutlined, RetweetOutlined, SearchOutlined, SnippetsOutlined, SolutionOutlined } from "@ant-design/icons";
+import { Badge, Button, Col, DatePicker, Divider, Form, Input, Modal, Row, Select, Space, Steps, Table, Tabs, Tag, Tooltip, message } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 
@@ -57,7 +57,7 @@ const ListTestLearning = () => {
     {
       title: "Môn",
       render: (text, record) => {
-        return <div className="text-left">{record?.subject}</div>;
+        return <div >{record?.subject}</div>;
       },
       align: "center",
     },
@@ -142,16 +142,9 @@ const ListTestLearning = () => {
       align: "center",
     },
     {
-      title: "Lớp học thử",
-      render: (text, record) => {
-        return <div>{record?.class}</div>;
-      },
-      align: "center",
-    },
-    {
       title: "Lịch học thử",
       render: (text, record) => {
-        return <div>Thứ {record?.timeTable?.date} ( {record?.timeTable?.start} : {record?.timeTable?.end} )</div>;
+        return <div>Thứ {record?.timeTable?.date} ( {record?.timeTable?.start} : {record?.timeTable?.end} ) - Ngày {dayjs(record?.desiredDate).format("DD-MM-YYYY")}</div>;
       },
       align: "center",
     },
@@ -163,37 +156,138 @@ const ListTestLearning = () => {
       align: "center",
     }
   ]
+
+  const columnsLearnedTab3 = [
+    {
+      title: "STT",
+      render: (text, record, index) => {
+        return <div>{index + 1}</div>;
+      },
+      align: "center",
+    },
+    {
+      title: "Mã HS",
+      render: (text, record) => {
+        return <div>{record?.studentId}</div>;
+      },
+      align: "center",
+    },
+    {
+      title: "Họ và tên",
+      render: (text, record) => {
+        return <div>{record?.student}</div>;
+      },
+      align: "center",
+    },
+    {
+      title: "Khối",
+      render: (text, record) => {
+        return <div><Badge key={COLORS[record?.grade]} color={COLORS[record?.grade]} text={`Khối ${record?.grade || "..."} `} /></div>;
+      },
+      align: "center",
+    },
+    {
+      title: "Môn đăng ký",
+      render: (text, record) => {
+        return <div>{record?.subject}</div>;
+      },
+      align: "center",
+    },
+    {
+      title: "Lớp học thử",
+      render: (text, record) => {
+        return <div>{record?.class}</div>;
+      },
+      align: "center",
+    },
+    {
+      title: "Lịch học thử",
+      render: (text, record) => {
+        return <div>Thứ {record?.timeTable?.date} ( {record?.timeTable?.start} : {record?.timeTable?.end} ) - Ngày {dayjs(record?.desiredDate).format("DD-MM-YYYY")}</div>;
+      },
+      align: "center",
+    },
+    {
+      title: "Ghi chú",
+      render: (text, record) => {
+        return <div>{record?.description}</div>;
+      },
+      align: "center",
+    },
+    {
+      title: "Trạng thái",
+      render: (text, record) => {
+        return <div><Tag color="green" icon={<CheckCircleOutlined />} >Hoàn thành</Tag></div>;
+      },
+      align: "center",
+    }
+  ]
+
   const [tableParams, setTableParams] = useState({
     page: 1,
     size: 10,
     status: 'pending'
   });
-
   const [tableParamsLearned, setTableParamsLearned] = useState({
     page: 1,
     size: 10,
     status: 'active'
   });
-
-  const [listPendingLearn, setListPendingLearn] = useState({});
-  const [listLearned, setListLearned] = useState({});
+  const [tableParamsLearnedTab3, setTableParamsLearnedTab3] = useState({
+    page: 1,
+    size: 10,
+    status: 'done'
+  });
   const [listClass, setListClass] = useState([]);
   const [timeTables, setTimeTables] = useState([]);
   const [recall, setRecall] = useState(false);
-
   const [modal, setModal] = useState({
     open: false,
     mode: 1,
     id: null
   });
+  const [data, setData] = useState({});
+  const [totalData, setTotalData] = useState(10);
+  const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('1');
+  async function getData(dependencies) {
+    setLoading(true)
+    await getListTestLearning({ ...dependencies }).then(
+      res => {
+        setData(res?.data);
+        setTotalData(res?.data?.maxPages * res?.data?.total)
+        setLoading(false)
+      }
+    )
+  }
 
-  function handleChangeTab(key) {
-    if (key === '2') {
-      getListTestLearning({ ...tableParamsLearned }).then(
-        res => {
-          setListLearned(res?.data);
-        }
-      )
+  async function handleChangeTab(key) {
+    setActiveTab(key)
+    setData({})
+    setTotalData(10)
+    if (key === '1') {
+      setTableParams({
+        page: 1,
+        size: 10,
+        status: "pending"
+      })
+      await getData({ ...tableParams, page: 1, size: 10, status: 'pending' })
+    }
+    else if (key === '2') {
+      setTableParamsLearned({
+        page: 1,
+        size: 10,
+        status: "active"
+      })
+      await getData({ ...tableParamsLearned, page: 1, size: 10, status: 'active' })
+    }
+    else {
+      setTableParamsLearnedTab3({
+        page: 1,
+        size: 10,
+        status: "done"
+      })
+      await getData({ ...tableParamsLearnedTab3, page: 1, size: 10, status: 'done' })
     }
   }
 
@@ -216,22 +310,34 @@ const ListTestLearning = () => {
     ).catch(err => message.error('Lấy dữ liệu lớp thất bại!'))
   }
 
-  function handleChangeTable(pagination) {
+  async function handleChangeTable(pagination) {
     setTableParams({
       ...tableParams,
       page: pagination.current,
       size: pagination.pageSize,
       status: 'pending'
     })
+    await getData({ page: pagination.current, size: pagination.pageSize, status: 'pending' })
   }
 
-  function handleChangeTableLearned(pagination) {
+  async function handleChangeTableLearned(pagination) {
     setTableParamsLearned({
       ...tableParamsLearned,
       page: pagination.current,
       size: pagination.pageSize,
       status: 'active'
     })
+    await getData({ ...tableParamsLearned, page: pagination.current, size: pagination.pageSize, status: 'active' })
+  }
+
+  async function handleChangeTableLearnedTab3(pagination) {
+    setTableParamsLearnedTab3({
+      ...tableParamsLearnedTab3,
+      page: pagination.current,
+      size: pagination.pageSize,
+      status: 'done'
+    })
+    await getData({ page: pagination.current, size: pagination.pageSize, status: 'done' })
   }
 
   function handleSelectClass(value) {
@@ -280,20 +386,33 @@ const ListTestLearning = () => {
   }
 
   useEffect(() => {
-    getListTestLearning({ ...tableParams }).then(
+    getData(tableParams)
+  }, [recall]);
+
+  const [listClassSearch, setListClassSearch] = useState([]);
+
+  const [valueSearch, setValueSearch] = useState(null);
+
+  function handleSelectSearch(value) {
+    setValueSearch(value)
+  }
+
+  async function clickSearch() {
+    await getListTestLearningSearch({ ...tableParamsLearned, classId: valueSearch }).then(
       res => {
-        setListPendingLearn(res?.data);
+        setData(res?.data)
+        setTotalData(res?.data?.total * res?.data?.maxPages)
       }
-    )
-  }, [tableParams, recall]);
+    ).catch(err => message.error("Tìm kiếm không thành công! Vui lòng kiểm tra lại!"))
+  }
 
   useEffect(() => {
-    getListTestLearning({ ...tableParamsLearned }).then(
+    getListClass().then(
       res => {
-        setListLearned(res?.data);
+        setListClassSearch(res?.data)
       }
-    )
-  }, [tableParamsLearned]);
+    ).catch(err => console.log(err, 'errr'))
+  }, []);
 
   return (
     <>
@@ -382,6 +501,7 @@ const ListTestLearning = () => {
         onChange={handleChangeTab}
         defaultActiveKey="1"
         centered
+        activeKey={activeTab}
         items={[
           {
             label: (
@@ -392,31 +512,24 @@ const ListTestLearning = () => {
             ),
             key: '1',
             children: <>
-              <Row gutter={[8, 8]}>
-                <Col xs={24} md={12}>
-                  <Input placeholder="Nhập mã học sinh, họ tên" />
-                </Col>
-                <Col xs={24} md={12}>
-                  <Button type="primary">Tìm kiếm</Button>
-                </Col>
-              </Row>
               <Table
                 locale={{
-                  emptyText: <div style={{ marginTop: '20px' }}>{listPendingLearn?.result?.length === 0 ? "Không có dữ liệu!" : null}</div>,
+                  emptyText: <div style={{ marginTop: '20px' }}>{data?.result?.length === 0 ? "Không có dữ liệu!" : null}</div>,
                 }}
                 size="middle"
                 style={{
                   marginTop: '10px',
                   width: '100%'
                 }}
-                dataSource={listPendingLearn?.result?.map(el => ({ ...el, key: el?.id }))}
+                dataSource={data?.result?.map(el => ({ ...el, key: el?.id }))}
                 columns={columns}
                 bordered
-                // scroll={{ x: 700 }}
+                scroll={{ x: 1000 }}
+                loading={loading}
                 onChange={handleChangeTable}
                 pagination={{
                   locale: { items_per_page: "/ trang" },
-                  total: listPendingLearn?.total,
+                  total: totalData,
                   showTotal: (total, range) => (
                     <span>{`${range[0]} - ${range[1]} / ${total}`}</span>
                   ),
@@ -424,6 +537,8 @@ const ListTestLearning = () => {
                   pageSizeOptions: ["10", "20", "50"],
                   defaultPageSize: 10,
                   position: ["bottomRight"],
+                  current: tableParams.page,
+                  pageSize: tableParams.size
                 }}
               />
             </>
@@ -432,36 +547,69 @@ const ListTestLearning = () => {
             label: (
               <span>
                 <SolutionOutlined />
-                Danh sách đã học thử
+                Danh sách học thử
               </span>
             ),
             key: '2',
             children: <>
               <Row gutter={[8, 8]}>
-                <Col xs={24} md={12}>
-                  <Input placeholder="Nhập mã học sinh, họ tên" />
+                <Col xs={24} md={8}>
+                  <Select
+                    placeholder="-- Chọn lớp --"
+                    className="w-full"
+                    onChange={handleSelectSearch}
+                    value={valueSearch}
+                  >
+                    {
+                      listClassSearch?.map(i => (
+                        <Select.Option value={i?.id} key={i.id}>{i.name}</Select.Option>
+                      ))
+                    }
+                  </Select>
                 </Col>
-                <Col xs={24} md={12}>
-                  <Button type="primary">Tìm kiếm</Button>
+                <Col xs={24} md={12} className="flex gap-2">
+                  <Button
+                    onClick={() => {
+                      setValueSearch(null)
+                      setTableParamsLearned({
+                        page: 1,
+                        size: 10,
+                        status: 'active'
+                      })
+                      getData({ page: 1, size: 10, status: 'active' })
+                    }}
+                    icon={<RetweetOutlined />}>Đặt lại</Button>
+                  <Button type="primary" icon={<SearchOutlined />}
+                    onClick={() => {
+                      setTableParamsLearned({
+                        status: "active",
+                        page: 1,
+                        size: 10,
+                        classId: valueSearch
+                      })
+                      clickSearch()
+                    }}
+                  >Tìm kiếm</Button>
                 </Col>
               </Row>
               <Table
                 locale={{
-                  emptyText: <div style={{ marginTop: '20px' }}>{listLearned?.result?.length === 0 ? "Không có dữ liệu!" : null}</div>,
+                  emptyText: <div style={{ marginTop: '20px' }}>{data?.result?.length === 0 ? "Không có dữ liệu!" : null}</div>,
                 }}
                 size="middle"
                 style={{
                   marginTop: '10px',
                   width: '100%'
                 }}
-                dataSource={listLearned?.result?.map(el => ({ ...el, key: el?.id }))}
+                loading={loading}
+                dataSource={data?.result?.map(el => ({ ...el, key: el?.id }))}
                 columns={columnsLearned}
                 bordered
-                // scroll={{ x: 700 }}
+                scroll={{ x: 1000 }}
                 onChange={handleChangeTableLearned}
                 pagination={{
                   locale: { items_per_page: "/ trang" },
-                  total: listPendingLearn?.total,
+                  total: totalData,
                   showTotal: (total, range) => (
                     <span>{`${range[0]} - ${range[1]} / ${total}`}</span>
                   ),
@@ -469,6 +617,48 @@ const ListTestLearning = () => {
                   pageSizeOptions: ["10", "20", "50"],
                   defaultPageSize: 10,
                   position: ["bottomRight"],
+                  current: tableParamsLearned.page,
+                  pageSize: tableParamsLearned.size
+                }}
+              />
+            </>
+          },
+          {
+            label: (
+              <span>
+                <FileDoneOutlined />
+                Danh sách đã học thử
+              </span>
+            ),
+            key: '3',
+            children: <>
+              <Table
+                locale={{
+                  emptyText: <div style={{ marginTop: '20px' }}>{data?.result?.length === 0 ? "Không có dữ liệu!" : null}</div>,
+                }}
+                size="middle"
+                style={{
+                  marginTop: '10px',
+                  width: '100%'
+                }}
+                loading={loading}
+                dataSource={data?.result?.map(el => ({ ...el, key: el?.id }))}
+                columns={columnsLearnedTab3}
+                bordered
+                scroll={{ x: 1000 }}
+                onChange={handleChangeTableLearnedTab3}
+                pagination={{
+                  locale: { items_per_page: "/ trang" },
+                  total: totalData,
+                  showTotal: (total, range) => (
+                    <span>{`${range[0]} - ${range[1]} / ${total}`}</span>
+                  ),
+                  showSizeChanger: true,
+                  pageSizeOptions: ["10", "20", "50"],
+                  defaultPageSize: 10,
+                  position: ["bottomRight"],
+                  current: tableParamsLearnedTab3.page,
+                  pageSize: tableParamsLearnedTab3.size
                 }}
               />
             </>

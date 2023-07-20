@@ -3,7 +3,7 @@
 import { getListClassRoom, getListSubject, getListUser, createClass } from "@/api/address";
 import { disabledDate } from "@/common/util";
 import LayoutAdmin from "@/components/LayoutAdmin";
-import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, DeleteOutlined, EditOutlined, PlusCircleOutlined } from "@ant-design/icons";
 import { Button, Col, DatePicker, Divider, Empty, Form, Input, InputNumber, Row, Select, Space, Table, TimePicker, message } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
@@ -112,7 +112,6 @@ const CreateClass = () => {
 
   async function handleSelectSubject(value) {
     const subject = listSubject?.find(i => i.id === value)
-    console.log(subject, 'subject');
     getListUser({ role: 'teacher', page: 1, size: 999, departmentId: subject?.departmentId }).then(
       res => {
         setListTeacher(res?.data?.result);
@@ -139,19 +138,19 @@ const CreateClass = () => {
           Thêm mới lớp học
         </p>
         <Row className="px-4 pt-4">
-          <Col xs={12} className="px-2">
+          <Col xs={24} md={12} className="px-2">
             <div className="border-2 py-2 px-4 font-semibold">
               Thông tin lớp học
             </div>
           </Col>
-          <Col xs={12} className="px-2">
+          <Col xs={24} md={12} className="px-2">
             <p className="border-2 py-2 px-4 font-semibold">
               Lớp học mới
             </p>
           </Col>
         </Row>
         <Row className="px-4 pb-4">
-          <Col xs={12} className="px-2">
+          <Col xs={24} md={12} className="px-2">
             <div className="border-2 border-t-0 py-2 px-4">
               <Form
                 name="validateOnly"
@@ -328,13 +327,14 @@ const CreateClass = () => {
                         backgroundColor: '#70B603'
                       }}
                       htmlType="submit"
+                      icon={<PlusCircleOutlined />}
                     >Tạo</Button>
                   </Col>
                 </Row>
               </Form>
             </div>
           </Col>
-          <Col xs={12} className="px-2">
+          <Col xs={24} md={12} className="px-2">
             <div className="border-2 border-t-0 py-2 px-4 h-full">
               <Row className="border-2">
                 <Col xs={6} className="text-right bg-[#d7d7d7] py-2 px-4 border-r-2">
@@ -418,7 +418,7 @@ const CreateClass = () => {
                 }}
               />
               <div className="text-right">
-                <Button type="primary" onClick={createClassFinal}>Hoàn thành</Button>
+                <Button type="primary" onClick={createClassFinal} icon={<CheckCircleOutlined />} >Hoàn thành</Button>
               </div>
             </div>
           </Col>

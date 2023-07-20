@@ -182,7 +182,7 @@ const ListEntranceExam = () => {
     getListExam(tableParams).then(
       res => {
         setListExam(res?.data?.result)
-        setTotal(res?.data?.maxPages * res?.data?.perPage)
+        setTotal(res?.data?.maxPages * res?.data?.total)
       }
     ).catch(err => message.error("Lấy dữ liệu thất bại!"))
   }, [recall, tableParams]);

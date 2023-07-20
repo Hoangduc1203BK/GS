@@ -151,7 +151,7 @@ const RegisTestLearning = () => {
                 }),
               ]}
             >
-              <Input placeholder="SĐT" />
+              <Input placeholder="SĐT" disabled />
             </Form.Item>
             <Form.Item
               name="grade"
