@@ -271,8 +271,14 @@ export class ClassService {
 
         result1.push(item)
       }
+      const result2 = result1.map(el => {
+        return {
+          ...el,
+          classId: el.id,
+        }
+      })
 
-      return result1;
+      return result2;
     } else {
       return [];
     }

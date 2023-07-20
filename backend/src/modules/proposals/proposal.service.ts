@@ -71,7 +71,7 @@ export class ProposalService {
         if (dto.role == ROLE.TEACHER) {
             let qr = `select p.*, u.name as user, u.email as email, d.id as department_id from proposals p, users u, departments d where p.user_id=u.id and u.department_id=d.id and p.user_id LIKE 'TC%'`;
             if (paramArr.length > 0) {
-                qr = qr + ' AND ' + paramArr.join(' AND ')
+                qr = qr + ' AND ' + paramArr.join(' AND ') + ' ORDER BY updated_at DESC;'
             }
 
             // const skip = (page - 1) * size;
@@ -83,7 +83,7 @@ export class ProposalService {
         }else if(dto.role == ROLE.USER){
             let qr = `select p.*, u.name as user, u.email as email from proposals p, users u where p.user_id=u.id and p.user_id LIKE 'ST%'`;
             if (paramArr.length > 0) {
-                qr = qr + ' AND ' + paramArr.join(' AND ')
+                qr = qr + ' AND ' + paramArr.join(' AND ') + ' ORDER BY updated_at DESC'
             }
 
             // const skip = (page - 1) * size;
