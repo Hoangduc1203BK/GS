@@ -98,8 +98,8 @@ export default function LayoutAdmin({
 			icon: <OrderedListOutlined />
 		},
 		{
-			label: <Link href="/admin">Đăng ký dạy</Link>,
-			key: "regisTeach",
+			label: <Link href="/teacher/fee">Bảng chấm công</Link>,
+			key: "feeTeacher",
 			icon: <RetweetOutlined />
 		},
 		{

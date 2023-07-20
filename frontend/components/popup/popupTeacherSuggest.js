@@ -66,24 +66,24 @@ export default function PopupStudentSuggest({
       });
     }
     setClasses([...response?.data]);
-    console.log(field);
   };
 
   const handleFinish = async (values) => {
-    const payload = {
-      userId: info?.id,
-      description: values.note,
-      type: values.suggestType,
-      time: dayjs(new Date()).format(FORMAT_DATE.YYYYMMDD),
-      subData: {
-        classId: values.class,
-      },
-    };
     try {
+      const payload = {
+        userId: info?.id,
+        description: values.note,
+        type: values.suggestType,
+        time: dayjs(new Date()).format(FORMAT_DATE.YYYYMMDD),
+        subData: {
+          classId: values.class,
+        },
+      };
       await ApiCreateSuggest(payload);
       message.success("Tạo đề xuất thành công!");
       setOpen(!open);
       setUpdate(true);
+      form.resetFields();
     } catch (error) {
       message.error("Tạo đề xuất Thất bại!");
     }
@@ -192,7 +192,7 @@ export default function PopupStudentSuggest({
               placeholder="-- Chọn --"
             >
               {classes?.map((subject, index) => (
-                <Select.Option value={subject?.id} key={index}>
+                <Select.Option value={subject?.classId} key={index}>
                   {subject?.name}
                 </Select.Option>
               ))}
