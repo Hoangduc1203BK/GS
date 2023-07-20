@@ -27,7 +27,7 @@ export class TestLearningService {
 
         let filter = {} as any;
         if(userId) {
-            filter.userId = userId;
+            filter.studentId = userId;
         }
         if(status) {
             filter.status = status;
