@@ -198,3 +198,10 @@ export const getListProposal = (params) => {
 export const updateProposal = (id, params) => {
 	return axios.patch(`/proposal/${id}`, params);
 };
+
+
+// search 
+
+export const getListTestLearningSearch = (params) => {
+	return axios.get(`/test-learning/search`, { params: params })
+}

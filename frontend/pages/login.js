@@ -38,13 +38,12 @@ export default function Login() {
           getMeInfo(res?.data?.accessToken)
             .then((e) => {
               e.json().then((value) => {
-                console.log(value);
                 if (value.role === "user") {
                   Router.push("student");
                 } else if (value.role === "teacher") {
                   Router.push("teacher");
                 } else {
-                  Router.push("admin");
+                  Router.push("/admin/departmentManage");
                 }
               });
             })

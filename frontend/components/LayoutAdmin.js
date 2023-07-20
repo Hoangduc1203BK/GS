@@ -3,8 +3,12 @@
 import { Inter } from "next/font/google";
 import Link from "next/link";
 import {
+	ApartmentOutlined,
 	AreaChartOutlined,
 	AuditOutlined,
+	BankOutlined,
+	CalculatorOutlined,
+	ContainerOutlined,
 	DashboardOutlined,
 	FileProtectOutlined,
 	IdcardOutlined,
@@ -13,6 +17,8 @@ import {
 	MenuFoldOutlined,
 	MenuUnfoldOutlined,
 	OrderedListOutlined,
+	PicCenterOutlined,
+	ReadOutlined,
 	RetweetOutlined,
 	SettingOutlined,
 	SnippetsOutlined,
@@ -110,106 +116,104 @@ export default function LayoutAdmin({
 	]
 
 	const itemsSlider = [
-		{
-			label: <Link href="/admin">Dashboard</Link>,
-			key: "dashboard",
-			icon: <DashboardOutlined />,
-		},
+		// {
+		// 	label: <Link href="/admin">Dashboard</Link>,
+		// 	key: "dashboard",
+		// 	icon: <DashboardOutlined />,
+		// },
 		// {
 		// 	type: "divider",
 		// },
 		{
-			label: "Trung tâm",
-			key: "centerManagement",
-			icon: <FileProtectOutlined />,
+			label: (
+				<Link href="/admin/classroom">Quản lý phòng học</Link>
+			),
+			key: "classroomManagement",
+			icon: <BankOutlined />
+		},
+		{
+			label: "Quản lý chung",
+			key: "manageSumary",
+			icon: <ApartmentOutlined />,
+			children: [
+				{
+					label: <Link href="/admin/departmentManage">Quản lý bộ môn</Link>,
+					key: "departmentManage",
+				},
+				{
+					label: <Link href="/admin/manageTeacher">Quản lý giáo viên</Link>,
+					key: "adminTeacherManage",
+				},
+				{
+					label: <Link href="/admin/manageStudent">Quản lý học sinh</Link>,
+					key: "adminStudentManage",
+				},
+				{
+					label: <Link href="/admin/recommendManage">Quản lý đề xuất</Link>,
+					key: "recommend",
+				},
+			]
+		},
+		{
+			label: "Thi đầu vào",
+			key: "extranceExam",
+			icon: <CalculatorOutlined />,
 			children: [
 				{
 					label: (
-						<Link href="/admin/classroom">Quản lý phòng học</Link>
+						<Link href="/admin/manageEntranceExam/regisEntranceExam">Đăng ký thi thử</Link>
 					),
-					key: "classroomManagement",
+					key: "regisExam",
 				},
 				{
-					label: "Quản lý chung",
-					key: "manageSumary",
-					children: [
-						{
-							label: <Link href="/admin/departmentManage">Quản lý bộ môn</Link>,
-							key: "departmentManage",
-						},
-						{
-							label: <Link href="/admin/manageTeacher">Quản lý giáo viên</Link>,
-							key: "adminTeacherManage",
-						},
-						{
-							label: <Link href="/admin/manageStudent">Quản lý học sinh</Link>,
-							key: "adminStudentManage",
-						},
-						{
-							label: <Link href="/admin/recommendManage">Quản lý đề xuất</Link>,
-							key: "recommend",
-						},
-					]
+					label: (
+						<Link href="/admin/manageEntranceExam/listEntranceExam">Danh sách thi thử</Link>
+					),
+					key: "listRegisExam",
 				},
 				{
-					label: "Thi đầu vào",
-					key: "extranceExam",
-					children: [
-						{
-							label: (
-								<Link href="/admin/manageEntranceExam/regisEntranceExam">Đăng ký thi thử</Link>
-							),
-							key: "regisExam",
-						},
-						{
-							label: (
-								<Link href="/admin/manageEntranceExam/listEntranceExam">Danh sách thi thử</Link>
-							),
-							key: "listRegisExam",
-						},
-						{
-							label: (
-								<Link href="/admin/manageEntranceExam/resultExam">Kết quả thi thử</Link>
-							),
-							key: "resultExam",
-						},
-					],
+					label: (
+						<Link href="/admin/manageEntranceExam/resultExam">Kết quả thi thử</Link>
+					),
+					key: "resultExam",
+				},
+			],
+		},
+		{
+			label: "Học thử",
+			key: "entrialLearning",
+			icon: <ContainerOutlined />,
+			children: [
+				{
+					label: (
+						<Link href="/admin/testLearning/regisTestLearning">Đăng ký học thử</Link>
+					),
+					key: "regisLearning",
 				},
 				{
-					label: "Học thử",
-					key: "entrialLearning",
-					children: [
-						{
-							label: (
-								<Link href="/admin/testLearning/regisTestLearning">Đăng ký học thử</Link>
-							),
-							key: "regisLearning",
-						},
-						{
-							label: (
-								<Link href="/admin/testLearning/listTestLearning">Danh sách học thử</Link>
-							),
-							key: "listLearning",
-						},
-					],
+					label: (
+						<Link href="/admin/testLearning/listTestLearning">Danh sách học thử</Link>
+					),
+					key: "listLearning",
+				},
+			],
+		},
+		{
+			label: "Lớp học",
+			key: "class",
+			icon: <ReadOutlined />,
+			children: [
+				{
+					label: (
+						<Link href="/admin/manageClass/createClass">Tạo lớp học mới</Link>
+					),
+					key: "createClass",
 				},
 				{
-					label: "Lớp học",
-					key: "class",
-					children: [
-						{
-							label: (
-								<Link href="/admin/manageClass/createClass">Tạo lớp học mới</Link>
-							),
-							key: "createClass",
-						},
-						{
-							label: (
-								<Link href="/admin/manageClass/listClass">Danh sách lớp</Link>
-							),
-							key: "listClass",
-						},
-					],
+					label: (
+						<Link href="/admin/manageClass/listClass">Danh sách lớp</Link>
+					),
+					key: "listClass",
 				},
 			],
 		},
