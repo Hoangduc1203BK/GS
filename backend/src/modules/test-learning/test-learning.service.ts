@@ -9,10 +9,11 @@ import { paginate } from "src/common/interfaces/paginate";
 import { CreateTestLearningDto } from "./dto/create-test-learning.dto";
 import { UserService } from "../user";
 import { UpdateTestLearningDto } from "./dto/update-test-learning.dto";
-import { EXAM_RESULT, TEST_LEARNING_STATUS } from "src/common/constants";
+import { DEFAULT_PASSWORD, EXAM_RESULT, TEST_LEARNING_STATUS } from "src/common/constants";
 import { ExamService } from "../exam";
 import { SubjectService } from "../subject";
 import { SearchTestLearningDto } from "./dto/search-test-learning.dto";
+import { MailService } from "src/core/shared/services/mail/mail.service";
 
 @Injectable()
 export class TestLearningService {
@@ -21,6 +22,7 @@ export class TestLearningService {
         private readonly classService: ClassService,
         private readonly userService: UserService,
         @InjectRepository(Exam) private readonly examRepos: Repository<Exam>,
+        private readonly mailService: MailService,
     ){}
 
     async listTestLearning(dto: ListTestLearningDto) {
@@ -190,12 +192,35 @@ export class TestLearningService {
             throw new Error('Không tìm thấy lịch học thử của học sinh với mã đăng ký học thử là:'+id);
         }
 
+        const user = await this.userService.getUser(testLearning.studentId);
+
         if(dto.timeTableId) {
             await this.classService.getTimeTable(dto.timeTableId)
         }
 
-        if(dto.status!= TEST_LEARNING_STATUS.DONE && testLearning.status == TEST_LEARNING_STATUS.DONE) {
+        // if(dto.status!= TEST_LEARNING_STATUS.DONE && testLearning.status == TEST_LEARNING_STATUS.DONE) {
+        //     throw new Error('Học sinh với id:' + testLearning.studentId +  'đã học thử xong, không thể cập nhật trạng thái')
+        // }
+
+        if(testLearning.status == TEST_LEARNING_STATUS.DONE) {
             throw new Error('Học sinh với id:' + testLearning.studentId +  'đã học thử xong, không thể cập nhật trạng thái')
+        }
+
+        if(dto.status == TEST_LEARNING_STATUS.ACTIVE) {
+            const testLearningResult = await this.getTestLearning(id);
+            await this.mailService.sendMail(
+                user.email,
+                'Thông báo trúng tuyển',
+                './test-learning',
+                {
+                    name: user.name,
+                    className: testLearningResult.class,
+                    date: testLearningResult.timeTable.date + 1,
+                    day: testLearningResult.day,
+                    email: user.email,
+                    password: DEFAULT_PASSWORD
+                }
+            )
         }
 
         const doc = {

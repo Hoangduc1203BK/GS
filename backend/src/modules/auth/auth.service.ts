@@ -31,6 +31,8 @@ export class AuthService {
 			const compare = await this.bcrytService.compare(password, result.password);
 			if (compare) {
 				return result;
+			} else {
+				throw new Error('Wrong password')
 			}
 		}
 	}

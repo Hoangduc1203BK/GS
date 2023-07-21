@@ -172,7 +172,7 @@ export class UserService {
         ...c,
         fee: c.teacher_rate != null ? c.teacher_rate * c.fee : c.fee,
         numberOfStudy: `${numberOfStudy}/${totalOfStudy}`,
-        total:c.teacher_rate != null ?  c.fee * numberOfStudy*c.teacher_rate: c.fee* numberOfStudy
+        total:c.teacher_rate != null ?  (c.fee * numberOfStudy*c.teacher_rate)/100: c.fee* numberOfStudy
       }
 
       result.push(item)
@@ -182,6 +182,39 @@ export class UserService {
       ...user,
       classes: result
     };
+  }
+
+  async timekeepingDetail(userId: string, query: GetFeeDetailDto) {
+    const { classId, start, end} = query;
+    const classes = await this.classService.getClass(classId);
+    const attendances = await this.attendanceRepos.find({
+      where: {classId: classId}
+    })
+
+    const attends = attendances.filter(el => el.teacherId == userId).length;
+    const numberOfStudy = `${attends}/${attendances.length}`;
+    const attendanceResult = [];
+    for(const a of attendances) {
+      const item = {
+        day: a.day,
+        date: a.date,
+        status: a.teacherId == userId ? true : false,
+      }
+
+      attendanceResult.push(item);
+    }
+
+    return {
+      id: classes.id,
+      name: classes.name,
+      numberOfStudent: classes.numberStudent,
+      subject: classes.subject.name,
+      grade: classes.subject.grade,
+      teacher: classes.user.name,
+      numberOfStudy: numberOfStudy,
+      total: classes.teacherRate != null ? (classes.fee * attends * classes.teacherRate)/100 : classes.fee * attends,
+      attendances: attendanceResult,
+    }
   }
 
   async listFee(userId: string, query: ListFeetDto) {
