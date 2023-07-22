@@ -1,5 +1,5 @@
-import { ApiClassOfStudent, ApiGetListFee, ApiStudentsInClass } from "@/api/student";
-import { GRADE, genderVNConvert } from "@/common/const";
+import {  ApiGetListTimeKeeping } from "@/api/student";
+import { GRADE } from "@/common/const";
 import { formatVND } from "@/common/util";
 import LayoutAdmin from "@/components/LayoutAdmin";
 import { TeamOutlined } from "@ant-design/icons";
@@ -17,7 +17,7 @@ function StudentFeeList({ user }) {
     try {
       if (user?.id) {
         setIsFetchClass(true);
-        const classOfStudent = (await ApiGetListFee()).data;
+        const classOfStudent = (await ApiGetListTimeKeeping()).data;
         setClasses(
           classOfStudent?.classes.map((i, index) => ({
             ...i,

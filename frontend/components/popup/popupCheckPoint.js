@@ -1,15 +1,28 @@
 import { ApiUpdateSubAssignments } from "@/api/student";
 import { Button, Col, Form, Modal, Row, message, Input, Select } from "antd";
+import { useEffect } from "react";
 
 const { TextArea } = Input;
-export default function PopupCheckPoint({ open, setOpen, assigment }) {
+export default function PopupCheckPoint({ open, setOpen, assigment, setIsUpdate }) {
   const [form] = Form.useForm();
+  console.log(assigment);
 
+  useEffect(()=> {
+    if(open){
+    form.setFieldsValue({
+      name:assigment?.student,
+      point: assigment?.point,
+      feedback: assigment?.feedback
+    })
+    }
+  },[open])
   const handleFinish = async (values) => {
     try {
-      await ApiUpdateSubAssignments(assigment.id, { point: values.point });
-      setOpen(!open);
+      const payload = { point: Number(values.point), feedback: values.feedback };
+      await ApiUpdateSubAssignments(assigment.id, payload);
       form.resetFields();
+      setOpen(!open);
+      setIsUpdate(true)
       message.success("Chấm điểm thành công!");
     } catch (error) {
       console.log(error);
@@ -36,7 +49,6 @@ export default function PopupCheckPoint({ open, setOpen, assigment }) {
           onFinish={handleFinish}
         >
           <Form.Item
-            initialValue={assigment?.student}
             name="name"
             label="Họ và tên"
             rules={[
@@ -52,7 +64,11 @@ export default function PopupCheckPoint({ open, setOpen, assigment }) {
             <Col>
               <label>
                 {" "}
-                <a href={assigment?.file} target="_blank" className="cursor-pointer">
+                <a
+                  href={assigment?.file}
+                  target="_blank"
+                  className="cursor-pointer"
+                >
                   {assigment?.file}
                 </a>
               </label>
@@ -73,7 +89,10 @@ export default function PopupCheckPoint({ open, setOpen, assigment }) {
               ))}
             </Select>
           </Form.Item>
-          <Form.Item name="feedback" label="Nhận xét">
+          <Form.Item
+            name="feedback"
+            label="Nhận xét"
+          >
             <Input.TextArea type="text" rows={4}></Input.TextArea>
           </Form.Item>
           <Row gutter={[8, 8]} justify="center">

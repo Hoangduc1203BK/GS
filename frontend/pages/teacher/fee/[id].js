@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Badge, Calendar, Divider, Spin, message } from "antd";
+import { Badge, Calendar, Spin, message } from "antd";
 import LayoutAdmin from "@/components/LayoutAdmin";
 import { useRouter } from "next/router";
-import { ApiGetDetailClass, ApiGetDetailFee } from "@/api/student";
+import { ApiGetDetailClass, ApiGetDetailTimeKeeping } from "@/api/student";
 import dayjs from "dayjs";
 import { FORMAT_DATE, GRADE } from "@/common/const";
 import { CalendarOutlined, LeftOutlined, UserOutlined } from "@ant-design/icons";
@@ -20,7 +20,7 @@ const StudentFeeDetail = ({ user }) => {
       setIsFetching(true);
       const start = dayjs().startOf("month").format(FORMAT_DATE.YYYYMMDD);
       const end = dayjs().endOf("month").format(FORMAT_DATE.YYYYMMDD);
-      const res = (await ApiGetDetailFee({ classId: id, start, end })).data;
+      const res = (await ApiGetDetailTimeKeeping({ classId: id, start, end })).data;
       const classRes = (await ApiGetDetailClass(id)).data;
       setDetail({...res});
       console.log(res);

@@ -6,11 +6,10 @@ import {
   Modal,
   Row,
   Select,
-  TimePicker,
   message,
   Input,
 } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   STUDENT_PROPOSAL_TYPE,
   GRADE,
@@ -36,6 +35,16 @@ export default function PopupStudentSuggest({
   const [subjects, setSubjects] = useState([]);
   const [classes, setClasses] = useState([]);
   const [isRegister, setIsRegister] = useState(true);
+
+  useEffect(()=> {
+    if(open){
+    form.setFieldsValue({
+      id: info?.id,
+      name : info?.name,
+    })
+    }
+  },[open])
+
 
   const getListClass = async (value) => {
     const field = form.getFieldsValue();
@@ -125,7 +134,7 @@ export default function PopupStudentSuggest({
   return (
     <>
       <Modal
-        title="Học phí"
+        title="Thêm đề xuất"
         open={open}
         width={800}
         footer={null}
@@ -141,7 +150,6 @@ export default function PopupStudentSuggest({
           onFinish={handleFinish}
         >
           <Form.Item
-            initialValue={info?.id}
             name="id"
             label="Mã học sinh"
             rules={[
@@ -151,7 +159,6 @@ export default function PopupStudentSuggest({
             <Input type="text" readOnly></Input>
           </Form.Item>
           <Form.Item
-            initialValue={info?.name}
             name="name"
             label="Họ và tên"
             rules={[

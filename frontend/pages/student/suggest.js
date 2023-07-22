@@ -70,7 +70,7 @@ const StudentSuggest = ({ user }) => {
         params["type"] = formData.type;
       }
       if (formData.status) {
-        params["type"] = formData.status;
+        params["status"] = formData.status;
       }
       const response = await ApiGetListSuggest(params);
       setSuggest({ result: [...response.data], total: response.total || 1 });
@@ -83,6 +83,7 @@ const StudentSuggest = ({ user }) => {
   };
 
   const submitSearch = (values) => {
+    console.log(values);
     getListSuggest();
   };
 

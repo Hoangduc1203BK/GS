@@ -111,6 +111,16 @@ export function ApiGetListFee() {
   return axios.get(`/user/fee`);
 }
 
+export function ApiGetListTimeKeeping() {
+  return axios.get(`/user/timekeeping`);
+}
+
+export function ApiGetDetailTimeKeeping(params) {
+  return axios.get(`/user/timekeeping/detail`, {
+    params
+  });
+}
+
 export function ApiGetDetailFee(params) {
   return axios.get(`/user/fee/detail`, {
     params
