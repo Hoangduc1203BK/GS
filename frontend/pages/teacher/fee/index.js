@@ -69,13 +69,13 @@ function StudentFeeList({ user }) {
     },
 
     {
-      title: "Buổi học",
+      title: "Buổi dạy",
       render: (text, record, index) => {
         return <div>{record.numberOfStudy}</div>;
       },
     },
     {
-      title: "Học phí",
+      title: "Giá",
       render: (text, record, index) => {
         return <div>{formatVND(record?.fee)}</div>;
       },
@@ -91,7 +91,7 @@ function StudentFeeList({ user }) {
         return (
           <div>
             <Button onClick={()=> router.push('fee/'+record.classId)} className="hover:!bg-violet-600 bg-violet-500 text-white hover:!text-white ml-3">
-              Điểm danh
+              Chi tiết
             </Button>
           </div>
         );
@@ -102,11 +102,11 @@ function StudentFeeList({ user }) {
   const items = [
     {
       key: "1",
-      label: `Học phí`,
+      label: `Danh sách chấm công`,
       children: (
         <div>
           <div className="text-2xl font-bold mt-1 mb-5">
-            <TeamOutlined /> Danh sách lớp học
+            <TeamOutlined /> Danh sách chấm công theo lớp học
           </div>
           <Table
             size="middle"

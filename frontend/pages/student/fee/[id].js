@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Badge, Calendar, Divider, Spin, message } from "antd";
+import { Badge, Calendar, Spin, message } from "antd";
 import LayoutAdmin from "@/components/LayoutAdmin";
 import { useRouter } from "next/router";
 import { ApiGetDetailClass, ApiGetDetailFee } from "@/api/student";
@@ -130,10 +130,10 @@ const StudentFeeDetail = ({ user }) => {
       <Spin spinning={isFetching} tip="loading" size="large">
 
       <div className="flex items-center">
-        <div className="h-3 w-3 rounded-full bg-[#52c41a] m-3"></div>Được điểm danh
+        <div className="h-3 w-3 rounded-full bg-[#52c41a] m-3"></div>Điểm danh
       </div>
       <div className="flex items-center">
-        <div className="h-3 w-3 rounded-full bg-[#ff4d4f] m-3"></div>Vắng
+        <div className="h-3 w-3 rounded-full bg-[#ff4d4f] m-3"></div>Nghỉ
       </div>
 
         <Calendar

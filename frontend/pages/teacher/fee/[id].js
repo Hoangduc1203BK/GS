@@ -28,7 +28,7 @@ const StudentFeeDetail = ({ user }) => {
       setIsFetching(false);
       console.log(classRes);
     } catch (error) {
-      message.error("Xxm lịch sử điểm danh thất bại. Vui lòng thử lại");
+      message.error("Xxm lịch sử chấm công thất bại. Vui lòng thử lại");
       setIsFetching(false);
     }
   };
@@ -61,7 +61,7 @@ const StudentFeeDetail = ({ user }) => {
   return (
     <div>
       <div
-        onClick={() => router.push("/student/fee")}
+        onClick={() => router.push("/teacher/fee")}
         className="text-xl flex items-center cursor-pointer text-[#1677ff] w-[75px]"
       >
         <LeftOutlined className="flex items-center" />{" "}
@@ -74,7 +74,7 @@ const StudentFeeDetail = ({ user }) => {
           <table className="w-full">
             <tbody>
               <tr>
-                <th className="text-left w-[125px]">Tên học sinh</th>
+                <th className="text-left w-[125px]">Tên giáo viên</th>
                 <td>{user?.name}</td>
               </tr>
               <tr>
@@ -86,7 +86,7 @@ const StudentFeeDetail = ({ user }) => {
                 <td>{user?.phoneNumber}</td>
               </tr>
               <tr>
-                <th className="text-left">Số Buổi học</th>
+                <th className="text-left">Số buổi dạy</th>
                 <td>{detail?.numberOfStudy}</td>
               </tr>
               <tr>
@@ -126,14 +126,14 @@ const StudentFeeDetail = ({ user }) => {
         </div>
       </div>
 
-      <div className="text-xl font-bold my-4 flex items-center gap-3"> <CalendarOutlined /><div>Chi tiêt bảng điểm danh</div></div>
+      <div className="text-xl font-bold my-4 flex items-center gap-3"> <CalendarOutlined /><div>Chi tiêt bảng chấm công</div></div>
       <Spin spinning={isFetching} tip="loading" size="large">
 
       <div className="flex items-center">
-        <div className="h-3 w-3 rounded-full bg-[#52c41a] m-3"></div>Được điểm danh
+        <div className="h-3 w-3 rounded-full bg-[#52c41a] m-3"></div>Chấm công
       </div>
       <div className="flex items-center">
-        <div className="h-3 w-3 rounded-full bg-[#ff4d4f] m-3"></div>Vắng
+        <div className="h-3 w-3 rounded-full bg-[#ff4d4f] m-3"></div>Nghỉ phép
       </div>
 
         <Calendar
