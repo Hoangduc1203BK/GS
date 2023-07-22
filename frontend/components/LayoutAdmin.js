@@ -41,6 +41,7 @@ import {
 import { useState } from "react";
 import { deleteCookie } from "@/api/cookies";
 import { goTo } from "@/common/util";
+import Image from "next/image";
 const { Header, Sider, Content } = Layout;
 const inter = Inter({ subsets: ["latin"] });
 
@@ -371,10 +372,23 @@ export default function LayoutAdmin({
 									placement="bottomLeft"
 									arrow
 								>
-									<a onClick={(e) => e.preventDefault()}>
-										<Avatar icon={<UserOutlined />} />{" "}
-										&nbsp; {user?.name}
-									</a>
+									{
+										user?.avatar ?
+											<a className="ant-dropdown-link flex h-full align-middle relative" style={{ marginRight: "16px", fontWeight: "bold" }} onClick={e => e.preventDefault()}>
+												<div className="flex w-10 h-full items-center justify-center">
+													<div className="w-10 h-10 relative overflow-hidden rounded-full bg-grey-1">
+														<Image fill src={user?.avatar} alt="avatar" />
+														{/* <img src={user?.avatar} alt="avatar" /> */}
+													</div>
+												</div>
+												<span className={`flex ml-2 items-center`}>{user?.name}</span>
+											</a>
+											:
+											<a onClick={(e) => e.preventDefault()}>
+												<Avatar icon={<UserOutlined />} />{" "}
+												&nbsp; {user?.name}
+											</a>
+									}
 								</Dropdown>
 							</Col>
 						</Row>

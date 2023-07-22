@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import weekday from 'dayjs/plugin/weekday';
 import 'dayjs/locale/vi';
+import { UPLOAD_IMAGE_FILE, UPLOAD_IMAGE_FILE_FORMAT } from "./const";
 dayjs.locale('vi');
 
 dayjs.extend(weekday);
@@ -73,32 +74,38 @@ const replaceVietnamese = (data) => {
 };
 
 export const removeVietnameseTones = (data) => {
-	let result = replaceVietnamese(data);
-	// Remove punctuations
-	// Bỏ dấu câu, kí tự đặc biệt
-	result = result.replace(
-		/!|@|%|\^|\*|\(|\)|\+|\=|\<|\>|\?|\/|,|\.|\:|\;|\'|\"|\&|\#|\[|\]|~|\$|_|`|-| |{|}|\||\\/g,
-		"-"
-	);
-	return result;
+  let result = replaceVietnamese(data);
+  // Remove punctuations
+  // Bỏ dấu câu, kí tự đặc biệt
+  result = result.replace(
+    /!|@|%|\^|\*|\(|\)|\+|\=|\<|\>|\?|\/|,|\.|\:|\;|\'|\"|\&|\#|\[|\]|~|\$|_|`|-| |{|}|\||\\/g,
+    "-"
+  );
+  return result;
 };
 
 export const dayOfWeekVn = (date) => {
-	const dayName = dayjs(date).format('dddd');
-	return dayName;
+  const dayName = dayjs(date).format('dddd');
+  return dayName;
 };
 
 
 export function disabledDate(current) {
-	// Can not select days before today and today
-	// Lấy ngày hiện tại
-	const today = dayjs().startOf('day');
-	// Trả về true nếu ngày đó là ngày trong quá khứ
-	return current < today;
-	// return current && current <= moment().endOf('day');
+  // Can not select days before today and today
+  // Lấy ngày hiện tại
+  const today = dayjs().startOf('day');
+  // Trả về true nếu ngày đó là ngày trong quá khứ
+  return current < today;
+  // return current && current <= moment().endOf('day');
 };
 
 export function formatVND(price) {
   return price?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
 }
 
+export const checkImageFileUpload = file => {
+  const type = file.type
+  const name = file.name
+  const format = name.substring(name.lastIndexOf("."), name.length)
+  return UPLOAD_IMAGE_FILE.includes(type) && UPLOAD_IMAGE_FILE_FORMAT.includes(format)
+}

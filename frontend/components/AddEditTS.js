@@ -1,7 +1,7 @@
-import { createUser, getListDepartment, updateUser } from "@/api/address"
+import { createUser, getListDepartment, updateUser, uploadAvatar, uploadImage } from "@/api/address"
 import { GRADE } from "@/common/const"
-import { validatePhone } from "@/common/util"
-import { Button, Card, Col, DatePicker, Divider, Form, Input, InputNumber, Row, Select, Switch, message } from "antd"
+import { checkImageFileUpload, validatePhone } from "@/common/util"
+import { Button, Card, Col, DatePicker, Divider, Form, Input, InputNumber, Row, Select, Switch, Upload, message } from "antd"
 import dayjs from "dayjs"
 import Image from "next/image"
 import { useEffect, useState } from "react"
@@ -36,6 +36,9 @@ const AddEditTs = ({ checkEdit, dataEdit, mode, handleOpenForm }) => {
     } else {
       values.role = 'user'
     }
+    if (imageUrl) {
+      values.avatar = imageUrl
+    }
     if (checkEdit) {
       updateUser(dataEdit?.id, values).then(
         res => {
@@ -58,7 +61,7 @@ const AddEditTs = ({ checkEdit, dataEdit, mode, handleOpenForm }) => {
       ).catch(err => message.error("Có lỗi xảy ra! " + err))
     }
   }
-  console.log(dataEdit);
+
   useEffect(() => {
     if (checkEdit) {
       if (mode == 1) {
@@ -90,6 +93,18 @@ const AddEditTs = ({ checkEdit, dataEdit, mode, handleOpenForm }) => {
           parentPhoneNumber: dataEdit?.parentPhoneNumber,
         })
       }
+      if (dataEdit?.avatar) {
+        setImageUrl(dataEdit?.avatar)
+        setFileList([
+          {
+            uid: "-1",
+            name: "images",
+            status: "done",
+            url: dataEdit?.avatar,
+          },
+        ])
+
+      }
     }
   }, [checkEdit, dataEdit]);
 
@@ -101,6 +116,44 @@ const AddEditTs = ({ checkEdit, dataEdit, mode, handleOpenForm }) => {
     ).catch(err => console.log(err, 'errr'))
   }, []);
 
+  //for upload image
+  const [fileList, setFileList] = useState([])
+  const [imageUrl, setImageUrl] = useState("")
+  const [loading, setLoading] = useState(false);
+  const customRequest = async options => {
+    setImageUrl("")
+    setLoading(true)
+    const file = fileList[0]
+    const fd = new FormData();
+    fd.append("file", file.originFileObj);
+    const { onSuccess } = options
+    await uploadImage(fd).then(
+      res => {
+        if (res?.data?.url) {
+          onSuccess("ok")
+          setImageUrl(res?.data?.url)
+          setLoading(false)
+        }
+      }
+    ).catch(err => {
+      message.error("Có lỗi xảy ra! Vui lòng kiểm tra lại")
+      setLoading(false)
+    })
+  }
+  const handleBeforeUpload = file => {
+    if (!checkImageFileUpload(file)) {
+      message.error(`${file.name} không đúng định dạng!`)
+    }
+    return checkImageFileUpload(file) ? true : Upload.LIST_IGNORE
+  }
+  const handleChangeImage = info => {
+    setFileList(info.fileList)
+  }
+  const handleRemoveImage = () => {
+    setFileList([])
+    setImageUrl("")
+  }
+  console.log(imageUrl, 'imageUrl');
   return (
     <>
       <Row gutter={[8, 8]}>
@@ -150,7 +203,10 @@ const AddEditTs = ({ checkEdit, dataEdit, mode, handleOpenForm }) => {
                 </div>
               </Col>
               <Col xs={8}>
-                <Image src={valueForm?.gender == 'male' ? logoMale : logoFemale} alt="Logo user" />
+                <img className="h-[85%] w-full" src={imageUrl} alt="Avatar User" />
+                {/* <div className="w-full h-[85%] relative overflow-hidden">
+                  <Image fill src={imageUrl} alt="Avatar User" />
+                </div> */}
                 <p className="text-[9px] text-center">{`${mode === 1 ? "MGV" : "MSSV"}`} / ID No</p>
                 <p className="text-sm font-medium text-center">{dataEdit?.id || ""} </p>
               </Col>
@@ -169,6 +225,10 @@ const AddEditTs = ({ checkEdit, dataEdit, mode, handleOpenForm }) => {
             onFinish={onFinish}
           >
             <p className="font-medium text-lg mb-2">Thông tin {mode === 1 ? "giáo viên" : "học sinh"}</p>
+
+            <Upload listType="picture-card" maxCount={1} customRequest={customRequest} fileList={fileList} beforeUpload={handleBeforeUpload} onChange={handleChangeImage} onRemove={handleRemoveImage}>
+              Chọn ảnh để tải lên (jpg, png ...)
+            </Upload>
             <Row gutter={[8, 8]}>
               <Col xs={24} md={12}>
                 <Form.Item label="Họ và tên" name="name" rules={[{ required: true, message: "Đây là trường dữ liệu bắt buộc!" }]}>
@@ -283,10 +343,14 @@ const AddEditTs = ({ checkEdit, dataEdit, mode, handleOpenForm }) => {
             </Row>
             <Row gutter={[8, 8]} justify="center">
               <Col>
-                <Button htmlType="submit" type="primary">Xác nhận</Button>
+                <Button htmlType="submit" type="primary" loading={loading}>Xác nhận</Button>
               </Col>
               <Col>
-                <Button onClick={() => handleOpenForm(false, false)}>Hủy</Button>
+                <Button onClick={() => {
+                  handleOpenForm(false, false)
+                  setFileList([])
+                  setImageUrl("")
+                }}>Hủy</Button>
               </Col>
             </Row>
           </Form>

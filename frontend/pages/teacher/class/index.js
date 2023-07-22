@@ -27,15 +27,14 @@ const LearningOutcomes = ({ user }) => {
       res => {
         if (res?.data?.length == 0) {
           message.error("Chưa có lịch sử điểm danh!")
-        } else {
-          setDataAttendance(
-            {
-              class: record,
-              listAttendance: res?.data
-            }
-          )
-          setActiveTab("2")
         }
+        setDataAttendance(
+          {
+            class: record,
+            listAttendance: res?.data
+          }
+        )
+        setActiveTab("2")
       }
     ).catch(err => message.error('Có lỗi xảy ra! Không thế lấy lịch sử điểm danh! ' + err))
   }
