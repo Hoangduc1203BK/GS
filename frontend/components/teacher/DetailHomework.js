@@ -14,12 +14,17 @@ export default function TeacherDetailHomework({ info, setIsDetail, idDetail }) {
   const [classDetail, setClassDetail] = useState();
   const [isFetchClass, setIsFetchClass] = useState(false);
   const [isOpenPoint, setIsOpenPoint] = useState(false);
-  const [assigment, setAssigment] = useState();
+  const [assigment, setAssigment] = useState({});
+  const [isUpdate, setIsUpdate] = useState(false);
   useEffect(() => {
-    if (!isOpenPoint) {
+    getDetailAssignment();
+  }, [idDetail]);
+
+  useEffect(() => {
+    if (isUpdate) {
       getDetailAssignment();
     }
-  }, [idDetail, isOpenPoint]);
+  }, [isUpdate]);
 
   const getDetailAssignment = async () => {
     try {
@@ -93,7 +98,13 @@ export default function TeacherDetailHomework({ info, setIsDetail, idDetail }) {
       title: "Tùy chọn",
       render: (text, record, index) => {
         return (
-          <Button onClick={() => handleCheckPoint(record)} type="primary">
+          <Button
+            onClick={() => {
+              setAssigment(record);
+              setIsOpenPoint(true);
+            }}
+            type="primary"
+          >
             Chấm điểm
           </Button>
         );
@@ -101,17 +112,13 @@ export default function TeacherDetailHomework({ info, setIsDetail, idDetail }) {
     },
   ];
 
-  const handleCheckPoint = (detail) => {
-    setIsOpenPoint(true);
-    setAssigment(detail);
-  };
-
   return (
     <div>
       <PopupCheckPoint
         setOpen={setIsOpenPoint}
         open={isOpenPoint}
         assigment={assigment}
+        setIsUpdate={setIsUpdate}
       />
 
       <div

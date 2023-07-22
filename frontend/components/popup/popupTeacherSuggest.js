@@ -10,7 +10,7 @@ import {
   message,
   Input,
 } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   TEACHER_PROPOSAL_TYPE,
   GRADE,
@@ -36,8 +36,17 @@ export default function PopupStudentSuggest({
   const [subjects, setSubjects] = useState([]);
   const [classes, setClasses] = useState([]);
   const [isRegister, setIsRegister] = useState(true);
+
+  useEffect(()=> {
+    if(open){
+    form.setFieldsValue({
+      id: info?.id,
+      name : info?.name,
+    })
+    }
+  },[open])
   const getListSubject = async (value) => {
-    console.log(info);
+
     const response = await ApiGetListSubject({ grade: value, departmentId: info.departmentId });
     setSubjects([...response.data?.result]);
     form.setFieldsValue({
@@ -118,7 +127,7 @@ export default function PopupStudentSuggest({
   return (
     <>
       <Modal
-        title="Học phí"
+        title="Thêm đề xuất"
         open={open}
         width={800}
         footer={null}
@@ -134,9 +143,8 @@ export default function PopupStudentSuggest({
           onFinish={handleFinish}
         >
           <Form.Item
-            initialValue={info?.id}
             name="id"
-            label="Mã học sinh"
+            label="Mã giáo viên"
             rules={[
               { required: true, message: "Đây là trường dữ liệu bắt buộc!" },
             ]}
@@ -144,7 +152,6 @@ export default function PopupStudentSuggest({
             <Input type="text" readOnly></Input>
           </Form.Item>
           <Form.Item
-            initialValue={info?.name}
             name="name"
             label="Họ và tên"
             rules={[

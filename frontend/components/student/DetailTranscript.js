@@ -121,12 +121,12 @@ export default function DetailTranscript({ setShowDetail, detail }) {
   const handleCompletedAssigment = async () => {
     try {
       setLoading(true);
-
-      await ApiUpdateSubAssignments(detailSubAssigment?.id, {
+      const payload = {
         file: fileAssigment.name,
-      });
+      };
+      await ApiUpdateSubAssignments(detailSubAssigment?.id, payload);
       message.success("Nộp bài thành công.");
-      getDetail()
+      getDetail();
       setLoading(false);
     } catch (error) {
       console.log(error);

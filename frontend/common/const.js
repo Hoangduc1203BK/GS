@@ -93,7 +93,7 @@ export const TYPE_SUGGEST_STUDENT = [
   },
   {
     value: 2,
-    label: "Thêm lớp",
+    label: "Đăng ký lớp học mới",
   },
 ];
 export const GRADE = new Array(9).fill({}).map((item, index) => ({
@@ -176,7 +176,7 @@ export const PROPOSAL_TYPE = {
 
 export const STUDENT_PROPOSAL_TYPE = [
   {
-    label: "Thêm lớp",
+    label: "Đăng ký lớp học mới",
     value: "student_register_class",
   },
   {
@@ -187,7 +187,7 @@ export const STUDENT_PROPOSAL_TYPE = [
 
 export const TEACHER_PROPOSAL_TYPE = [
   {
-    label: "Thêm lớp",
+    label: "Đăng ký lớp mới",
     value: "teacher_register_class",
   },
   {

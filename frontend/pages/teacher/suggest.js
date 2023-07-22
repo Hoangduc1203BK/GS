@@ -58,7 +58,7 @@ const TeacherSuggest = ({ user }) => {
         params["type"] = formData.type;
       }
       if (formData.status) {
-        params["type"] = formData.status;
+        params["status"] = formData.status;
       }
       const response = await ApiGetListSuggest(params);
       setSuggest({ result: [...response.data], total: response.total || 1 });
@@ -72,7 +72,7 @@ const TeacherSuggest = ({ user }) => {
     }
   };
 
-  const submitSearch = (values) => {
+  const submitSearch = () => {
     getListSuggest();
   };
 
