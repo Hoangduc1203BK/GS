@@ -274,3 +274,6 @@ export const COLORS = [
   'lime',
   'aqua'
 ];
+
+export const UPLOAD_IMAGE_FILE = ["image/png", "image/jpg", "image/jpeg", "image/bmp"]
+export const UPLOAD_IMAGE_FILE_FORMAT = [".png", ".jpg", ".jpeg", ".bmp"]

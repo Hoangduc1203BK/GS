@@ -205,3 +205,30 @@ export const updateProposal = (id, params) => {
 export const getListTestLearningSearch = (params) => {
 	return axios.get(`/test-learning/search`, { params: params })
 }
+
+
+
+
+export const uploadImage = (file) => {
+	return axios.post("/user/avatar", file, {
+		header: {
+			"content-type": file.type,
+			"x-amz-acl": "public-read",
+		}
+	})
+}
+
+export function uploadAvatar(file) {
+	const option = {
+		method: "POST",
+		headers: {
+			// 'content-type': 'application/x-www-form-urlencoded',
+			"content-type": file.type,
+			"x-amz-acl": "public-read",
+		},
+		url: "/user/avatar",
+		data: file,
+	}
+	const newAxios = axios.create()
+	return newAxios(option)
+}

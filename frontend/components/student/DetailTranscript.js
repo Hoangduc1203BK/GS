@@ -105,6 +105,7 @@ export default function DetailTranscript({ setShowDetail, detail }) {
       const files = ev.target.files[0];
       const fd = new FormData();
       fd.append("file", files);
+      console.log(fd, 'fd');
       const res = await ApiUploadFileAssigment(id, detail?.id, fd);
       setFileAssigment({
         name: res.data,

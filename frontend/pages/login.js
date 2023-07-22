@@ -34,22 +34,15 @@ export default function Login() {
         if (res?.data?.accessToken) {
           message.success("Đăng nhập thành công!");
           setCookie("token", res?.data?.accessToken);
-          console.log(res?.data?.accessToken);
-          getMeInfo(res?.data?.accessToken)
-            .then((e) => {
-              e.json().then((value) => {
-                if (value.role === "user") {
-                  Router.push("student");
-                } else if (value.role === "teacher") {
-                  Router.push("teacher");
-                } else {
-                  Router.push("/admin/departmentManage");
-                }
-              });
-            })
-            .catch((er) => {
-              console.log(er);
-            });
+          const userLogin = JSON.parse(Buffer.from(res?.data?.accessToken?.split(".")[1], "base64"))
+          setCookie("role", userLogin?.role);
+          if (userLogin.role === "user") {
+            Router.push("/student");
+          } else if (userLogin.role === "teacher") {
+            Router.push("/teacher");
+          } else {
+            Router.push("/admin/departmentManage");
+          }
         } else {
           message.error(
             "Đăng nhập thất bại! Vui lòng kiểm tra lại tài khoản và mật khẩu!"
