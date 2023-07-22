@@ -23,6 +23,15 @@ export default function PopupCreateHomework({
 }) {
   const [form] = Form.useForm();
 
+  useEffect(()=> {
+    if(open){
+    form.setFieldsValue({
+      classId: classId,
+    })
+    }
+  },[open])
+
+
   useEffect(() => {
     if (open && detail?.id) {
       const date = dayjs(detail.deadline);
@@ -85,7 +94,6 @@ export default function PopupCreateHomework({
           onFinish={handleFinish}
         >
           <Form.Item
-            initialValue={classId}
             name="classId"
             label="Mã lớp"
             rules={[

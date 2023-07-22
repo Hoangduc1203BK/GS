@@ -1,9 +1,20 @@
 import { ApiCreateFeedback } from "@/api/student";
 import { Button, Col, Form, Modal, Row, message, Input } from "antd";
+import { useEffect } from "react";
 
 const { TextArea } = Input;
 export default function PopupCommentStudent({ open, setOpen, info, student, classId }) {
   const [form] = Form.useForm();
+
+
+  useEffect(()=> {
+    if(open){
+    form.setFieldsValue({
+      id: student?.id,
+      name : student?.name,
+    })
+    }
+  },[open])
 
   const handleFinish = async (values) => {
     try {
@@ -43,7 +54,6 @@ export default function PopupCommentStudent({ open, setOpen, info, student, clas
           onFinish={handleFinish}
         >
           <Form.Item
-            initialValue={student?.id}
             name="id"
             label="Mã học sinh"
             rules={[
@@ -53,7 +63,6 @@ export default function PopupCommentStudent({ open, setOpen, info, student, clas
             <Input type="text" readOnly></Input>
           </Form.Item>
           <Form.Item
-            initialValue={student?.name}
             name="name"
             label="Họ và tên"
             rules={[

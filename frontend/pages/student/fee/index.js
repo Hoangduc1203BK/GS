@@ -1,5 +1,5 @@
-import { ApiClassOfStudent, ApiGetListFee, ApiStudentsInClass } from "@/api/student";
-import { GRADE, genderVNConvert } from "@/common/const";
+import { ApiGetListFee } from "@/api/student";
+import { GRADE } from "@/common/const";
 import { formatVND } from "@/common/util";
 import LayoutAdmin from "@/components/LayoutAdmin";
 import { TeamOutlined } from "@ant-design/icons";
@@ -91,7 +91,7 @@ function StudentFeeList({ user }) {
         return (
           <div>
             <Button onClick={()=> router.push('fee/'+record.classId)} className="hover:!bg-violet-600 bg-violet-500 text-white hover:!text-white ml-3">
-              Điểm danh
+              Chi tiết
             </Button>
           </div>
         );
@@ -102,11 +102,11 @@ function StudentFeeList({ user }) {
   const items = [
     {
       key: "1",
-      label: `Học phí`,
+      label: `Danh sách điểm danh`,
       children: (
         <div>
           <div className="text-2xl font-bold mt-1 mb-5">
-            <TeamOutlined /> Danh sách lớp học
+            <TeamOutlined /> Danh sách điểm danh theo lớp học
           </div>
           <Table
             size="middle"
