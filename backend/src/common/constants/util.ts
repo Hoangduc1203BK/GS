@@ -8,6 +8,7 @@ export const ONE_WEEK = 7 * ONE_DAY;
 export const GB = 2 ** 30;
 export const MB = 2 ** 20;
 
+export const DEFAULT_PASSWORD = '12345';
 
 //ROLE
 

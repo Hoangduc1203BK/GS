@@ -3,12 +3,20 @@ import { ListTestLearningDto } from "./dto/list-test-learning.dto";
 import { TestLearningService } from "./test-learning.service";
 import { CreateTestLearningDto } from "./dto/create-test-learning.dto";
 import { UpdateTestLearningDto } from "./dto/update-test-learning.dto";
+import { SearchTestLearningDto } from "./dto/search-test-learning.dto";
 
 @Controller('test-learning')
 export class TestLearningController {
     constructor(
         private readonly testLearningService: TestLearningService,
     ){}
+
+    @Get('/search')
+    async searchTestLearning(@Query() query: SearchTestLearningDto) {
+        const result = await this.testLearningService.searchTestLearning(query);
+        
+        return result;
+    }
 
     @Get('/')
     async listTestLearning(@Query() query: ListTestLearningDto) {

@@ -140,6 +140,16 @@ export class AssigmentService{
     }
 
     //sub-assigment
+    async createSubAssigment(data:any) {
+        await this.getAssigment(data.assigmentId);
+        const doc = {
+            studentId: data.studentId,
+            assigmentId: data.assigmentId,
+            status: SUB_ASSIGMENT_STATUS.PENDING,
+        }
+        await this.subAssigmentRepos.save(doc);
+    }
+
     async listSubAssigment() {
 
     }
@@ -179,7 +189,7 @@ export class AssigmentService{
                 ...subAssigment,
                 ...dto,
             }
-            if(current <= deadline) {
+            if(current <= new Date(deadline)) {
                 doc = {
                     ...doc,
                     status: SUB_ASSIGMENT_STATUS.TURN_IN,

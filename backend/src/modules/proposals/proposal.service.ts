@@ -15,6 +15,7 @@ import { StudentRegisterClass } from "./student-register-class.service";
 import { StudentTerminateClass } from "./student-terminate-class.service";
 import { UpdateProposalDto } from "./dto/update-proposal.dto";
 import { MailService } from "src/core/shared/services/mail/mail.service";
+import { AssigmentService } from "../assigment";
 
 
 @Injectable()
@@ -24,7 +25,8 @@ export class ProposalService {
         @InjectRepository(Proposals) private readonly proposalRepos: Repository<Proposals>,
         private readonly userService: UserService,
         private readonly classService: ClassService,
-        private readonly mailService: MailService
+        private readonly mailService: MailService,
+        private readonly assigmentService: AssigmentService,
     ) { }
 
     setProposalStrategy(type: string) {
@@ -36,7 +38,7 @@ export class ProposalService {
                 this.proposalStrategy = new TeacherTakeBrake(this.proposalRepos, this.userService, this.mailService, this.classService);
                 break;
             case PROPOSAL_TYPE.STUDENT_REGISTER_CLASS:
-                this.proposalStrategy = new StudentRegisterClass(this.proposalRepos, this.classService, this.mailService, this.userService);
+                this.proposalStrategy = new StudentRegisterClass(this.proposalRepos, this.classService, this.mailService, this.userService, this.assigmentService);
                 break;
             case PROPOSAL_TYPE.STUDENT_TERMINATE_CLASS:
                 this.proposalStrategy = new StudentTerminateClass(this.proposalRepos, this.classService, this.mailService, this.userService);

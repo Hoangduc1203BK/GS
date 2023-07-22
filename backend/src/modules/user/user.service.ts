@@ -132,6 +132,90 @@ export class UserService {
 
     return this.getUser(id);
   }
+  
+  async listTimeKeeping(userId: string, query: ListFeetDto) {
+    const user = await this.userRepos.findOne({
+      where: { id: userId}
+    })
+    const current = new Date();
+    let month = current.getMonth() + 1;
+    const currentMonth =  month <=9 ? `0${month}` : month.toString();
+    const startOfMonth = `${current.getFullYear()}-${currentMonth}-01`;
+    const last = new Date(current.getFullYear(), current.getMonth()+1, 0)
+    const endOfMonth = `${current.getFullYear()}-${currentMonth}-${last.getDate()}`;
+
+    const { start= startOfMonth, end = endOfMonth} = query;
+    const qr = `select a.*, c.name as class_name,c.teacher_rate, c.fee as fee, s.name as subject, s.grade as grade from attendance a, "class" c, subjects s where a.class_id  = c.id and c.subject_id = s.id and a."day" >= '` + start + `' and a."day" <= '` + end + `' and a.teacher_of_day = '`+ userId +`'`
+    const attendances = await this.attendanceRepos.query(qr);
+    let classes = attendances.map(el => {
+      return {
+        classId: el.class_id,
+        className: el.class_name,
+        fee: el.fee,
+        teacher_rate: el.teacher_rate,
+        subject: el.subject,
+        grade:el.grade
+      }
+    })
+    let set = new Set(classes.map(JSON.stringify))
+    classes = Array.from(set).map((el) => {
+      return JSON.parse(el as string)
+    })
+    
+    const result = [] as any;
+    for(const c of classes) {
+      const attendances = await this.classService.listAttendance({classId: c.classId, start, end});
+      const totalOfStudy = attendances.length;
+      let numberOfStudy = attendances.filter(el => el.teacher_id == userId).length;
+
+      const item = {
+        ...c,
+        fee: c.teacher_rate != null ? c.teacher_rate * c.fee : c.fee,
+        numberOfStudy: `${numberOfStudy}/${totalOfStudy}`,
+        total:c.teacher_rate != null ?  (c.fee * numberOfStudy*c.teacher_rate)/100: c.fee* numberOfStudy
+      }
+
+      result.push(item)
+    }
+
+    return {
+      ...user,
+      classes: result
+    };
+  }
+
+  async timekeepingDetail(userId: string, query: GetFeeDetailDto) {
+    const { classId, start, end} = query;
+    const classes = await this.classService.getClass(classId);
+    const attendances = await this.attendanceRepos.find({
+      where: {classId: classId}
+    })
+
+    const attends = attendances.filter(el => el.teacherId == userId).length;
+    const numberOfStudy = `${attends}/${attendances.length}`;
+    const attendanceResult = [];
+    for(const a of attendances) {
+      const item = {
+        day: a.day,
+        date: a.date,
+        status: a.teacherId == userId ? true : false,
+      }
+
+      attendanceResult.push(item);
+    }
+
+    return {
+      id: classes.id,
+      name: classes.name,
+      numberOfStudent: classes.numberStudent,
+      subject: classes.subject.name,
+      grade: classes.subject.grade,
+      teacher: classes.user.name,
+      numberOfStudy: numberOfStudy,
+      total: classes.teacherRate != null ? (classes.fee * attends * classes.teacherRate)/100 : classes.fee * attends,
+      attendances: attendanceResult,
+    }
+  }
 
   async listFee(userId: string, query: ListFeetDto) {
     const user = await this.userRepos.findOne({

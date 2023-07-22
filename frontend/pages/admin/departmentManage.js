@@ -150,8 +150,8 @@ const DepartmentManage = () => {
   const [tableParams, setTableParams] = useState({
     page: 1,
     size: 10,
-    maxPages: 1
   });
+  const [totalData, setTotalData] = useState(tableParams.size);
   const [modal, setModal] = useState({
     mode: 0, // 0 - department | 1 - subject,
     checkEdit: false,
@@ -159,6 +159,13 @@ const DepartmentManage = () => {
   });
   const [idUpdate, setIdUpdate] = useState('');
   const [fullDepartment, setFullDepartment] = useState([]);
+
+  function handleChangeTable(pagi) {
+    setTableParams({
+      page: pagi.current,
+      size: pagi.pageSize
+    })
+  }
 
   function showModal(mode, option, open, record) {
     setModal({
@@ -217,14 +224,11 @@ const DepartmentManage = () => {
   useEffect(() => {
     getListDepartment({ page: tableParams?.page, size: tableParams?.size }).then(
       res => {
-        setTableParams({
-          maxPages: res?.data?.maxPages,
-          ...tableParams
-        })
         setDepartments(res?.data?.result)
+        setTotalData(res?.data?.total * res?.data?.maxPages)
       }
     ).catch(err => console.log(err, 'errr'))
-  }, [tableParams?.page, tableParams.size, recall]);
+  }, [tableParams, recall]);
 
   useEffect(() => {
     getListUser({ role: 'teacher', page: 1, size: 999 }).then(
@@ -255,8 +259,7 @@ const DepartmentManage = () => {
               setRecall(!recall)
               setTableParams({
                 page: 1,
-                size: 10,
-                maxPages: 1
+                size: 10
               })
             } else {
               message.error("Cập nhật bộ môn thất bại!")
@@ -277,8 +280,7 @@ const DepartmentManage = () => {
               setRecall(!recall)
               setTableParams({
                 page: 1,
-                size: 10,
-                maxPages: 1
+                size: 10
               })
             } else {
               message.error("Tạo bộ môn thất bại!")
@@ -327,7 +329,7 @@ const DepartmentManage = () => {
       }
     }
   }
-  console.log(modal.checkEdit, 'cekc');
+
   return (
     <>
       <Modal
@@ -497,10 +499,10 @@ const DepartmentManage = () => {
           expandedRowRender,
           onExpand: expandTable,
         }}
+        onChange={handleChangeTable}
         pagination={{
-          hideOnSinglePage: true,
           locale: { items_per_page: "/ trang" },
-          total: departments?.length,
+          total: totalData,
           showTotal: (total, range) => (
             <span>{`${range[0]} - ${range[1]} / ${total}`}</span>
           ),
@@ -508,6 +510,8 @@ const DepartmentManage = () => {
           pageSizeOptions: ["10", "20", "50"],
           defaultPageSize: 10,
           position: ["bottomRight"],
+          current: tableParams.page,
+          pageSize: tableParams.size
         }}
       />
     </>

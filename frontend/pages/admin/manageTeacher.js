@@ -114,7 +114,7 @@ const ManageTeacher = () => {
     getListUser({ role: 'teacher', ...tableParams }).then(
       res => {
         setListTeacher(res?.data?.result);
-        setTotal(res?.data?.perPage * res?.data?.maxPages)
+        setTotal(res?.data?.total * res?.data?.maxPages)
       }
     ).catch(err => message.error("Lấy dữ liệu thất bại!"))
   }, [tableParams, recall]);

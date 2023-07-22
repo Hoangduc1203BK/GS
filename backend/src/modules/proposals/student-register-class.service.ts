@@ -8,6 +8,7 @@ import { MailService } from "src/core/shared/services/mail/mail.service";
 import { UserService } from "../user";
 import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
+import { AssigmentService } from "../assigment";
 
 @Injectable()
 export class StudentRegisterClass implements ProposalStrategy {
@@ -16,6 +17,7 @@ export class StudentRegisterClass implements ProposalStrategy {
         private readonly classService: ClassService,
         private readonly mailService: MailService,
         private readonly userService: UserService,
+        private readonly assigmentService: AssigmentService,
     ) {}
     async handleProposal(dto: UpdateProposalDto, proposal: Proposals) {
         switch (dto.status) {
@@ -35,6 +37,7 @@ export class StudentRegisterClass implements ProposalStrategy {
         const { subData } = proposal;
         const classes = await this.classService.getClass(subData.classId);
         const user = await this.userService.getUser(proposal.userId);
+        const assigments = await this.assigmentService.listAssigment({classId: subData.classId});
         const doc = {
             userId: proposal.userId,
             classId: subData.classId,
@@ -42,6 +45,15 @@ export class StudentRegisterClass implements ProposalStrategy {
         }
 
         await this.classService.createUserClass(doc);
+
+        if(assigments.result.length >0) {
+            const current = new Date();
+            for(const a of assigments.result) {
+                if(current <= new Date(a.deadline)) {
+                    await this.assigmentService.createSubAssigment({studentId: proposal.userId, assigmentId: a.id})
+                }
+            }
+        }
 
         const updateProposal = {
             ...proposal,

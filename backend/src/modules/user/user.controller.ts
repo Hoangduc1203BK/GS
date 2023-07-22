@@ -16,6 +16,26 @@ export class UserController {
         private readonly mailService: MailService,
         private readonly uploadService: UploadService,
     ) {}
+    
+    @UseGuards(JwtAuthGuard)
+    @Get('/timekeeping')
+    async listTimeKeeping(@Req() req: Request, @Query() query: ListFeetDto) {
+        const user = req["user"]
+        const userId = user["id"]
+        const result = await this.userService.listTimeKeeping(userId, query);
+
+        return result;
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get('/timekeeping/detail')
+    async timeKeepingDetail(@Req() req: Request, @Query() query: GetFeeDetailDto) {
+        const user = req["user"]
+        const userId = user["id"]
+        const result = await this.userService.timekeepingDetail(userId,query);
+
+        return result;
+    }
 
     @UseGuards(JwtAuthGuard)
     @Get('/fee')
