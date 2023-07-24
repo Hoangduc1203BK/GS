@@ -61,38 +61,52 @@ export default function Login() {
         <title>Login</title>
       </Head>
       <div
-        style={{
-          backgroundImage: "url(/bg.png)",
-          backgroundRepeat: "no-repeat",
-          backgroundAttachment: "fixed",
-          backgroundSize: "cover",
-          backgroundPosition: "top",
-          height: "100vh",
-          width: "100%",
-        }}
-        className={`${jose.className} h-screen flex justify-center items-center`}
+        // style={{
+        //   backgroundImage: "url(/bg.png)",
+        //   backgroundRepeat: "no-repeat",
+        //   backgroundAttachment: "fixed",
+        //   backgroundSize: "cover",
+        //   backgroundPosition: "top",
+        //   height: "100vh",
+        //   width: "100%",
+        // }}
+        className={`${jose.className} h-screen flex justify-center items-center bg-[#14238A]`}
       >
-        <div className="w-1/2">
-          <div className="h-full flex justify-center">
-            <Image
-              src="/layer.png"
-              alt="QuacQuac Logo"
-              // className="dark:invert"
-              width={600}
-              height={64}
-              priority
-            />
+        <div className="w-1/2 h-full  flex justify-center items-center"
+          style={{
+            backgroundImage: "url(/school.png)",
+            backgroundRepeat: "no-repeat",
+            // backgroundAttachment: "fixed",
+            backgroundSize: "cover",
+            backgroundPosition: "left",
+          }}
+        >
+          <div className="w-[60%] absolute">
+            {/* <img src="https://www.metasolutions.net/wp-content/uploads/2021/06/emis.png" /> */}
+            {/* <div className=" flex justify-center">
+              <Image
+                src="/hust.png"
+                alt="QuacQuac Logo"
+                // className="dark:invert"
+                // fill
+                width={100}
+                height={84}
+                priority
+              />
+            </div> */}
+            <p className="text-[25px] text-white text-center uppercase font-bold">welcome</p>
+            <p className="text-[30px] text-[#13005A] text-center uppercase font-bold">Education Management System</p>
           </div>
         </div>
         <div className=" w-1/2 h-full rounded-sm bg-inherit flex justify-center items-center">
           <div
-            className="px-6 py-16 w-1/2 rounded-md bg-white"
+            className="px-6 py-8 w-[400px] rounded-md bg-white"
             style={{
               boxShadow: "5px 5px 50px 0px rgba(0, 157, 255, 0.5)",
             }}
           >
             <h1 className="text-[30px] text-[#13005A] flex justify-center font-bold">
-              {checkRegister ? "Đăng ký" : "Đăng nhập"}
+              GS App
             </h1>
             <Form
               form={form}
@@ -113,7 +127,7 @@ export default function Login() {
                     },
                   ]}
                 >
-                  <Input prefix={<MailOutlined />} placeholder="Nhập email" />
+                  <Input prefix={<MailOutlined />} placeholder="Enter email" className="h-12" />
                 </Form.Item>
                 <Form.Item
                   label=""
@@ -128,7 +142,8 @@ export default function Login() {
                 >
                   <Input.Password
                     prefix={<LockOutlined />}
-                    placeholder="Nhập mật khẩu"
+                    placeholder="Enter password"
+                    className="h-12"
                   />
                 </Form.Item>
                 {/* <Row justify="end">
@@ -143,10 +158,10 @@ export default function Login() {
 										</Col>
 									</Row> */}
               </>
-              <Row justify="center" className="mt-4">
-                <Col className="text-white">
-                  <Button type="primary" htmlType="submit">
-                    {checkRegister ? "Đăng ký" : "Đăng nhập"}
+              <Row justify="center" className="mt-4 h-12">
+                <Col className="text-white h-full" xs={24}>
+                  <Button className="w-full h-full uppercase text-lg !bg-[#D60A0B] font-medium hover:shadow-buttonHome hover:!bg-[#FABC13] hover:!text-black" type="primary" htmlType="submit">
+                    {checkRegister ? "Đăng ký" : "Login"}
                   </Button>{" "}
                 </Col>
               </Row>

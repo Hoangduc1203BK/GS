@@ -16,6 +16,7 @@ body {
 	width: 100%;
 	height: 100%;
 	font-family: "Josefin Sans";
+	/* font-family: "Poppins"; */
 }
 
 .ant-btn-primary {
@@ -31,12 +32,12 @@ body {
 
 .custom-table table tr th,
 .custom-table table tr td {
-  border: 1px solid;
-  padding: 5px;
-} 
+	border: 1px solid;
+	padding: 5px;
+}
 
-.custom-table table tr th{
-  text-align: left;
+.custom-table table tr th {
+	text-align: left;
 }
 
 .w-subtraction-100 {
@@ -45,36 +46,54 @@ body {
 
 .required-cus::before {
 	display: inline-block;
-    margin-inline-end: 4px;
-    color: #ff4d4f;
-    font-size: 14px;
-    font-family: SimSun,sans-serif;
-    line-height: 1;
-    content: "*";
+	margin-inline-end: 4px;
+	color: #ff4d4f;
+	font-size: 14px;
+	font-family: SimSun, sans-serif;
+	line-height: 1;
+	content: "*";
 }
-
-
 
 .events-fee {
 	margin: 0;
 	padding: 0;
 	list-style: none;
-  }
-  .events-fee .ant-badge-status {
+}
+.events-fee .ant-badge-status {
 	width: 100%;
 	overflow: hidden;
 	font-size: 12px;
 	white-space: nowrap;
 	text-overflow: ellipsis;
-  }
-  .notes-month-fee {
+}
+.notes-month-fee {
 	font-size: 28px;
 	text-align: center;
-  }
-  .notes-month-fee section {
+}
+.notes-month-fee section {
 	font-size: 28px;
-  }
+}
 
-  .custom-calender .ant-picker-calendar-header {
+.custom-calender .ant-picker-calendar-header {
 	display: none;
-  }
+}
+.ant-layout .ant-layout-sider {
+	background-color: #004390;
+}
+
+.ant-menu-dark,
+.ant-menu-dark > .ant-menu {
+	color: white !important;
+	background-color: #004390 !important;
+}
+
+.ant-menu-dark.ant-menu-inline
+	.ant-menu-sub.ant-menu-inline,
+.ant-menu-dark
+	> .ant-menu.ant-menu-inline
+	.ant-menu-sub.ant-menu-inline {
+	/* color: #004390; */
+	color: #fff;
+	/* background-color: #e9f3ff !important; */
+	background-color: rgba(255, 255, 255, 0.3) !important;
+}

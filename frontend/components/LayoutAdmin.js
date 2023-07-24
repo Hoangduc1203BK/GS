@@ -285,7 +285,7 @@ export default function LayoutAdmin({
 					trigger={null}
 					collapsible
 					collapsed={collapsed}
-					theme="light"
+					theme="dark"
 					collapsedWidth={widthMenu}
 					width={widthMenu}
 					style={{
@@ -299,15 +299,19 @@ export default function LayoutAdmin({
 						width: widthMenu,
 					}}
 				>
-					<div className="h-16 flex justify-center items-center border-r border-b">
-						<p className="uppercase p-4">
-							{!collapsed ? "Trung tâm gia sư" : "GS"}
-						</p>
+					<div className="h-16  p-4 flex justify-center items-center"
+						style={{
+							backgroundColor: 'bisque'
+						}}>
+						{/* <p className="uppercase text-black font-semibold p-4"> */}
+						{/* {!collapsed ? "Trung tâm gia sư" : "GS"} */}
+						<img className="w-[80px]" src="https://www.metasolutions.net/wp-content/uploads/2021/06/emis.png" />
+						{/* </p> */}
 					</div>
 					{
 						user?.role == "admin" &&
 						<Menu
-							theme="light"
+							theme="dark"
 							mode="inline"
 							defaultSelectedKeys={["1"]}
 							items={itemsSlider}
