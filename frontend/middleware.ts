@@ -12,7 +12,7 @@ export async function middleware(request: NextRequest) {
     return resp
   }
   else {
-    if(role.value === 'admin') {
+    if(role?.value === 'admin') {
       if(url.pathname.includes('/teacher') || url.pathname.includes('/student') || url.pathname == '/' || url.pathname == '/admin'){
         url.pathname = "/admin/departmentManage"
         const resp = NextResponse.redirect(url)
@@ -21,7 +21,7 @@ export async function middleware(request: NextRequest) {
       } else {
         return NextResponse.next()
       }
-    } else if(role.value === 'teacher'){
+    } else if(role?.value === 'teacher'){
       if(url.pathname.includes('/admin') || url.pathname.includes('/student') || url.pathname == '/'|| url.pathname == '/admin'){
         url.pathname = "/teacher"
         const resp = NextResponse.redirect(url)

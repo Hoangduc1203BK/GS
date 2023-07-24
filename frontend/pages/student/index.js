@@ -43,7 +43,7 @@ const Dashboard = ({ user }) => {
 
   const getSchedule = async () => {
     const response = await ApiGetListSchedule();
-    setSchedule(Object.entries(response?.data).map(([key, value]) => value));
+    setSchedule(Object.entries(response?.data|| {}).map(([key, value]) => value));
   };
   return (
     <div className="flex">

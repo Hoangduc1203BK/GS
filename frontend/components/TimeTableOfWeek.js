@@ -1,3 +1,4 @@
+import { COLORS } from "@/common/const";
 import { dayOfWeekVn } from "@/common/util";
 import { CalendarOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
@@ -11,8 +12,11 @@ export default function LayoutTimeTables({ schedule }) {
       <div className="mt-1 p-4">
         {schedule.map((el, index) => (
           <div
-            className="mb-3 cursor-pointer bg-gray-200 hover:bg-gray-300 hover:scale-105  transition duration-700 ease-in-out hover:border-2 border-solid hover:border-black border-[1px] py-1 px-2 rounded-md shadow-md"
+            // className={`mb-4 shadow-blue-400 border-1 border-black text-white cursor-default bg-blue-600 hover:bg-blue-700 hover:scale-105  transition duration-700 ease-in-out hover:border-2 border-solid hover:border-black border-[1px] py-1 px-2 rounded-md shadow-lg `}
+
+            className={`mb-3 cursor-pointer  hover:scale-105  transition hover:border-2 border-solid border-black border-[1px] py-1 px-2 rounded-md shadow-lg`}
             key={index}
+            style={{ borderColor: COLORS[index] }}
           >
             <div>
               <b>
@@ -36,10 +40,7 @@ export default function LayoutTimeTables({ schedule }) {
                       Giáo viên: {e.teacher} - {e.room}{" "}
                     </div>
                   </div>
-                  <div className="w-2/12 text-end">
-                    <div> Buổi {idx + 1}</div>
-                    <div className="text-xs">2 tiếng</div>
-                  </div>
+      
                 </div>
               ))
             ) : (
