@@ -320,7 +320,7 @@ export default function LayoutAdmin({
 					{
 						user?.role == "teacher" &&
 						<Menu
-							theme="light"
+							theme="dark"
 							mode="inline"
 							defaultSelectedKeys={["1"]}
 							items={itemsTeacher}
@@ -329,7 +329,7 @@ export default function LayoutAdmin({
 					{
 						user?.role == "user" &&
 						<Menu
-							theme="light"
+							theme="dark"
 							mode="inline"
 							defaultSelectedKeys={["1"]}
 							items={itemStudent}

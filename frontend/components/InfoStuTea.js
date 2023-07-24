@@ -1,22 +1,24 @@
 import { useEffect, useState } from "react";
 
-import { Card, Col, Image, Row } from "antd";
+import { Avatar, Card, Col, Image, Row } from "antd";
 import dayjs from "dayjs";
 import { getListDepartment } from "@/api/address";
 
-const logoMale = require("../public/userMale.png")
-const logoFemale = require("../public/userFemale.png")
-
 export default function InfoStuTea({ children, info, mode }) {
   const [listDepartment, setListDepartment] = useState([]);
-
   useEffect(() => {
-    getListDepartment().then(
-      res => {
+    getListDepartment()
+      .then((res) => {
         setListDepartment(res?.data?.result);
-      }
-    ).catch(err => console.log(err, 'errr'))
+      })
+      .catch((err) => console.log(err, "errr"));
   }, []);
+
+  const renderAvtar = (avatar,gender) => {
+    if(avatar) return avatar;
+    else return gender == "male" ? "/userMale.png" : "/userFemale.png"
+  }
+
   return (
     <div className="p-4">
       <Card
@@ -27,9 +29,7 @@ export default function InfoStuTea({ children, info, mode }) {
               <Col xs={14}>
                 <p className="uppercase text-sm font-bold">
                   Trường{" "}
-                  {mode === 1
-                    ? info.teacher_school
-                    : info.student_school}
+                  {mode === 1 ? info.teacher_school : info.student_school}
                 </p>
               </Col>
               <Col xs={10} className="text-center">
@@ -56,9 +56,7 @@ export default function InfoStuTea({ children, info, mode }) {
             <div className="mb-2">
               <p className="text-[9px]">Ngày sinh / Date of Birth</p>
               <p className="text-sm font-medium">
-                {info.birthDay
-                  ? dayjs(info.birthDay).format("DD-MM-YYYY")
-                  : ""}
+                {info.birthDay ? dayjs(info.birthDay).format("DD-MM-YYYY") : ""}
               </p>
             </div>
             <div className="mb-2">
@@ -81,17 +79,18 @@ export default function InfoStuTea({ children, info, mode }) {
               }`}</p>
               <p className="text-sm font-medium">{`${
                 mode === 1
-                  ? listDepartment?.find(
-                      (i) => i.id === info?.departmentId
-                    )?.name || ""
+                  ? listDepartment?.find((i) => i.id === info?.departmentId)
+                      ?.name || ""
                   : "Khối " + (info?.grade || "...")
               }`}</p>
             </div>
           </Col>
           <Col xs={8}>
             <Image
-              src={info?.gender == "male" ? '/userMale.png' : '/userFemale.png' }
+              src={renderAvtar(info?.avatar,info?.gender)}
               alt="Logo user"
+              className="rounded-full"
+              priority
             />
             <p className="text-[9px] text-center">
               {`${mode === 1 ? "MGV" : "MSSV"}`} / ID No
