@@ -15,3 +15,5 @@ export * from './proposals';
 export * from './/assigment';
 export * from './sub-assigment';
 export * from './feedback';
+export * from './bill';
+export * from './sub-bill';

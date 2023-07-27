@@ -9,6 +9,7 @@ import { Exam } from './exam';
 import { TestLearning } from './test-learning';
 import { Proposals } from './proposals';
 import { Feedback } from './feedback';
+import { Bill } from './bill';
 
 @Entity('users')
 export class User {
@@ -243,4 +244,8 @@ export class User {
 
     @OneToMany(() => Feedback, f => f.fromUser)
     feedbackTos: Feedback[];
+
+    //bill
+    @OneToMany(() => Bill, b => b.user)
+    bills: Bill[];
 }

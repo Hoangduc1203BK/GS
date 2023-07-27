@@ -9,6 +9,7 @@ import { Attendance } from './attendance';
 import { TestLearning } from './test-learning';
 import { Assigment } from './assigment';
 import { Feedback } from './feedback';
+import { SubBill } from './sub-bill';
 
 @Entity('class')
 export class Classes {
@@ -147,5 +148,9 @@ export class Classes {
     //feedback
     @OneToMany(() => Feedback, f => f.classes)
     feedbacks: Feedback;
+
+    //bill
+    @OneToMany(() => SubBill, sb => sb.classes)
+    subBills: SubBill[];
 }
 

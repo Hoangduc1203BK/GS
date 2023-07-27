@@ -84,6 +84,13 @@ export enum FEEDBACK_TYPE {
     STUDENT = 'student',
     TEACHER = 'teacher',
 }
+
+export enum BILL_TYPE {
+  IN_CASH = 'in-cash',
+  BANK  = 'bank',
+}
+
+
 export function getDayOfMonth(day: string) {
     const today = new Date(); // Lấy ngày hiện tại
     const currentDay = today.getDay();

@@ -8,6 +8,7 @@ import { SubjectModule } from "./subject";
 import { TestLearningModule } from "./test-learning";
 import { UserModule } from "./user";
 import { FeedbackModule } from "./feedback";
+import { BillModule } from "./bill";
 
 export const MODULES = [
     UserModule,
@@ -20,4 +21,5 @@ export const MODULES = [
     ProposalModule,
     AssigmentModule,
     FeedbackModule,
+    BillModule,
 ]
