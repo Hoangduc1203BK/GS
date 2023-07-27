@@ -58,7 +58,7 @@ function StudentFeeList({ user }) {
     {
       title: "Khối",
       render: (text, record, index) => {
-        return <div>{GRADE.find(el=> el.value == record?.grade).label}</div>;
+        return <div>{GRADE.find(el => el.value == record?.grade).label}</div>;
       },
     },
     {
@@ -79,7 +79,7 @@ function StudentFeeList({ user }) {
       render: (text, record, index) => {
         return <div>{formatVND(record?.fee)}</div>;
       },
-    },    {
+    }, {
       title: "Tổng tiền",
       render: (text, record, index) => {
         return <div>{formatVND(record?.total)}</div>;
@@ -90,7 +90,7 @@ function StudentFeeList({ user }) {
       render: (text, record, index) => {
         return (
           <div>
-            <Button onClick={()=> router.push('fee/'+record.classId)} className="hover:!bg-violet-600 bg-violet-500 text-white hover:!text-white ml-3">
+            <Button onClick={() => router.push('fee/' + record.classId)} className="hover:!bg-violet-600 bg-violet-500 text-white hover:!text-white ml-3">
               Chi tiết
             </Button>
           </div>
@@ -117,7 +117,6 @@ function StudentFeeList({ user }) {
             pagination={false}
             loading={isFetchClass}
           />
-          ;
         </div>
       ),
     },
