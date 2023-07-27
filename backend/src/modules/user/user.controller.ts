@@ -37,6 +37,13 @@ export class UserController {
         return result;
     }
 
+    @Get('/admin/fee')
+    async listFeeOfStudent(@Query('userId') userId:string) {
+        const result = await this.userService.listFee(userId, {});
+
+        return result;
+    }
+
     @UseGuards(JwtAuthGuard)
     @Get('/fee')
     async listFee(@Req() req: Request, @Query() query: ListFeetDto) {
