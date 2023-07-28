@@ -1,14 +1,17 @@
-import { getListDepartment, getListUser } from "@/api/address";
+import { getFee, getListDepartment, getListUser } from "@/api/address";
 import { COLORS, GRADE } from "@/common/const";
+import { formatVND } from "@/common/util";
 import AddEditTs from "@/components/AddEditTS";
 import LayoutAdmin from "@/components/LayoutAdmin";
-import { PlusCircleOutlined, ProfileOutlined, RetweetOutlined, SearchOutlined } from "@ant-design/icons";
-import { Badge, Button, Col, Empty, Form, Input, Row, Select, Space, Table, Tooltip } from "antd";
+import { CheckCircleOutlined, PlusCircleOutlined, ProfileOutlined, RedEnvelopeOutlined, RetweetOutlined, SearchOutlined, TeamOutlined } from "@ant-design/icons";
+import { Badge, Button, Col, Empty, Form, Input, Modal, Row, Select, Space, Table, Tooltip, message } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 
 const ManageStudent = () => {
-
+  const [modal, setModal] = useState({
+    open: false
+  });
   const columns = [
     {
       title: "STT",
@@ -79,12 +82,67 @@ const ManageStudent = () => {
                 onClick={() => handleOpenForm(true, true, record)}
               />
             </Tooltip>
+            <Tooltip title="Nộp học phí">
+              <RedEnvelopeOutlined
+                style={{
+                  color: "green"
+                }}
+                className="text-base cursor-pointer"
+                onClick={() => fee(record)}
+              />
+            </Tooltip>
           </Space>
         </div>;
       },
       align: "center",
     },
   ]
+
+  const columnsFee = [
+    // {
+    //   title: "STT",
+    //   render: (text, record, index) => {
+    //     return <div>{index + 1}</div>;
+    //   },
+    // },
+    {
+      title: "Tên lớp",
+      render: (text, record, index) => {
+        return <div>{record?.className}</div>;
+      },
+    },
+    {
+      title: "Khối",
+      render: (text, record, index) => {
+        return <div>{GRADE.find(el => el.value == record?.grade).label}</div>;
+      },
+    },
+    {
+      title: "Môn học",
+      render: (text, record, index) => {
+        return <div>{record.subject}</div>;
+      },
+    },
+
+    {
+      title: "Buổi học",
+      render: (text, record, index) => {
+        return <div>{record.numberOfStudy}</div>;
+      },
+    },
+    {
+      title: "Học phí",
+      render: (text, record, index) => {
+        return <div>{formatVND(record?.fee)}</div>;
+      },
+    }, {
+      title: "Tổng tiền",
+      render: (text, record, index) => {
+        return <div>{formatVND(record?.total)}</div>;
+      },
+    },
+  ];
+
   const [recall, setRecall] = useState(false);
   const [tableParams, setTableParams] = useState({
     page: 1,
@@ -100,6 +158,23 @@ const ManageStudent = () => {
     checkEdit: false
   });
   const [dataEdit, setDataEdit] = useState({});
+
+  const [dataFee, setDataFee] = useState({});
+
+  async function fee(record) {
+    getFee(record.id).then(
+      res => {
+        console.log(res, 'resss');
+        if (res?.data?.id) {
+          setDataFee(res?.data)
+          setModal({
+            open: true
+          })
+        }
+      }
+    ).catch(err => message.error("Có lỗi xảy ra! Vui lòng kiểm tra lại." + err))
+  }
+
   function handleOpenForm(open, edit, record) {
     setCheck({
       open: open,
@@ -130,7 +205,6 @@ const ManageStudent = () => {
   const [form] = Form.useForm()
 
   function submitSearch(values) {
-    console.log(values, 'valiess');
     setTableParams({
       page: 1,
       size: 10,
@@ -138,8 +212,60 @@ const ManageStudent = () => {
     })
   }
 
+  const [idSelect, setIdSelect] = useState([]);
+
+  async function confirm() {
+    console.log(idSelect, 'iddd');
+  }
+
   return (
     <>
+      <Modal
+        open={modal.open}
+        title={dataFee?.name}
+        width={"70%"}
+        onCancel={() => {
+          setModal({
+            open: false
+          })
+          setDataFee({})
+        }}
+        footer={null}
+      >
+        <div className="text-2xl font-bold mt-1 mb-5">
+          <TeamOutlined /> Danh sách học phí theo lớp học
+        </div>
+        <Table
+          rowSelection={{
+            type: 'checkbox',
+            selectedRowKeys: idSelect,
+            onChange: (selectedRowKeys, selectedRows) => {
+              setIdSelect(selectedRowKeys)
+            }
+          }}
+          size="middle"
+          dataSource={dataFee?.classes?.map(i => ({ ...i, key: i?.classId }))}
+          columns={columnsFee}
+          bordered
+          scroll={{ x: 700 }}
+          pagination={false}
+        />
+        <Row gutter={[8, 8]} justify="end" className="mt-5">
+          <Col>
+            <Button disabled={idSelect.length !== 1} icon={<CheckCircleOutlined />} type="primary"
+              onClick={confirm}
+            >Xác nhận</Button>
+          </Col>
+          <Col>
+            <Button onClick={() => {
+              setModal({
+                open: false
+              })
+              setDataFee({})
+            }}>Hủy</Button>
+          </Col>
+        </Row>
+      </Modal>
       {
         check.open ? <AddEditTs dataEdit={dataEdit} checkEdit={check.checkEdit} mode={2} handleOpenForm={handleOpenForm} />
           :

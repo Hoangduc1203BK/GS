@@ -225,7 +225,7 @@ export default function LayoutAdmin({
 			children: [
 				{
 					label: (
-						<Link href="/admin">Báo cáo tổng quát</Link>
+						<Link href="/admin/reportGeneral">Báo cáo tổng quát</Link>
 					),
 					key: "generalReport",
 				},
@@ -234,10 +234,6 @@ export default function LayoutAdmin({
 						<Link href="/admin">Báo cáo theo lớp</Link>
 					),
 					key: "classReport",
-				},
-				{
-					label: <Link href="/admin">Đăng ký lớp</Link>,
-					key: "regisClassReport",
 				},
 			],
 		},

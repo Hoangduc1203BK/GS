@@ -232,3 +232,7 @@ export function uploadAvatar(file) {
 	const newAxios = axios.create()
 	return newAxios(option)
 }
+
+export const getFee = (id) => {
+	return axios.get(`/user/admin/fee?userId=${id}`)
+}
