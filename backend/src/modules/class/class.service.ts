@@ -669,6 +669,14 @@ export class ClassService {
     }
   }
 
+  async getSubAttendance(attendanceId: string, userId: string, status: boolean) {
+    const result = await this.subAttendanceRepos.findOne({
+      where: {attendanceId: attendanceId, status: status, studentId: userId}
+    })
+
+    return result;
+  }
+
   async deleteSubAttendance(id: number) {
     await this.subAttendanceRepos.delete(id)
 

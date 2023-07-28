@@ -36,6 +36,13 @@ export class SubBill {
     numberStudy: string;
 
     @Column({
+        type: 'boolean',
+        name: 'status',
+        nullable: false,
+    })
+    status: boolean;
+
+    @Column({
         type: 'decimal',
         precision: 10,
         scale: 2,
