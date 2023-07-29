@@ -41,7 +41,13 @@ export class BillService {
         })
 
         if(bills.length==0) {
-            throw new Error('Bill của học sinh với id:' + userId + ' không tồn tại')
+            const result = {
+                status: 400,
+                data: null,
+                message:'Bill của học sinh với id:' + userId + ' không tồn tại'
+            }
+
+            return result;
         }
 
         const bill = bills[bills.length-1];
@@ -104,7 +110,7 @@ export class BillService {
             })
         }
 
-        return this.getBill(bill.id);
+        return this.getBill(dto.userId);
     }
 
     async updateBill(id: string, dto: UpdateBillDto) {
@@ -113,7 +119,14 @@ export class BillService {
         })
 
         if (!bill) {
-            throw new Error('Không tìm thấy hóa đơn với id:' + id);
+            // throw new Error('Không tìm thấy hóa đơn với id:' + id);
+            const result = {
+                status: 400,
+                data: null,
+                message:'Bill với id:' + id + ' không tồn tại'
+            }
+
+            return result;
         }
 
         const { subBills, ...rest } = dto;
@@ -157,7 +170,7 @@ export class BillService {
             await this.billRepos.save({id: id, ...doc});
         }
 
-        return this.getBill(id);
+        return this.getBill(bill.userId);
     }
 
     async listBill(dto: ListBillDto) {
