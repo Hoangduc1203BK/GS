@@ -1,7 +1,8 @@
-import { getListClass } from '@/api/address';
+import { getListClass, getStatistic } from '@/api/address';
+import { formatVND, removeVietnameseTones } from '@/common/util';
 import LayoutAdmin from '@/components/LayoutAdmin';
 import { RetweetOutlined, SearchOutlined } from '@ant-design/icons';
-import { Button, Col, Divider, Row, Select, Table } from 'antd';
+import { Button, Col, Divider, Empty, Input, Row, Select, Table } from 'antd';
 import React, { useEffect, useState } from 'react'
 
 function ReportGeneral() {
@@ -23,133 +24,91 @@ function ReportGeneral() {
       align: "center",
     },
     {
-      title: "Sỹ số",
-      render: (text, record) => {
-        return <div> {null} </div>;
-      },
-      align: "center",
-    },
-    {
       title: "Số buổi đã học",
       render: (text, record) => {
-        return <div> {null} </div>;
-      },
-      align: "center",
-    },
-    {
-      title: "Ngày bắt đầu",
-      render: (text, record) => {
-        return <div> {null} </div>;
+        return <div> {record?.numberOfStudy} </div>;
       },
       align: "center",
     },
     {
       title: "Ngày kết thúc",
       render: (text, record) => {
-        return <div> {null} </div>;
+        return <div> {record?.endDate} </div>;
       },
       align: "center",
     },
     {
       title: "Tổng học phí",
       render: (text, record) => {
-        return <div> {null} </div>;
+        return <div> {formatVND(+record?.totalFee)}</div>;
       },
       align: "center",
     },
     {
       title: "Học phí đã đóng",
       render: (text, record) => {
-        return <div> {null} </div>;
+        return <div> {formatVND(+record?.totalDone)} </div>;
       },
       align: "center",
     },
     {
       title: "Lương giáo viên",
       render: (text, record) => {
-        return <div> {null} </div>;
+        return <div> {formatVND(+record?.teacherSalary)} </div>;
       },
       align: "center",
     },
-    // {
-    //   title: "Thao tác",
-    //   render: (text, record) => {
-    //     return <div >
-    //       <Space size="small">
-    //         <Tooltip title="Chi tiết">
-    //           <ProfileOutlined style={{
-    //             color: "red"
-    //           }} className="text-base cursor-pointer"
-    //             onClick={() => handleOpenForm(true, true, record)}
-    //           />
-    //         </Tooltip>
-    //         <Tooltip title="Nộp học phí">
-    //           <RedEnvelopeOutlined
-    //             style={{
-    //               color: "green"
-    //             }}
-    //             className="text-base cursor-pointer"
-    //             onClick={() => fee(record)}
-    //           />
-    //         </Tooltip>
-    //       </Space>
-    //     </div>;
-    //   },
-    //   align: "center",
-    // },
   ]
 
-  const [listClass, setListClass] = useState([]);
+  const [listStatistics, setListStatistics] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filterClass, setFilterClass] = useState("");
+
   useEffect(() => {
-    getListClass().then(
+    getStatistic().then(
       res => {
-        setListClass(res?.data?.map(i => ({ ...i, key: i?.id, label: i?.name, value: i?.id })));
+        setListStatistics(res?.data)
+        setLoading(false)
 
       }
-    ).catch(err => console.log('get list class err' + err))
+    ).catch(err => console.log('get list statistic err' + err))
   }, []);
-
+  function handleChangeInput(e) {
+    setFilterClass(e.target.value)
+  }
   return (
     <div>
       <p className='font-semibold text-lg'>Báo cáo tổng quát lớp học</p>
       <Divider />
       <Row gutter={[8, 8]}>
         <Col xs={24} md={12}>
-          <Select
-            placeholder="-- Chọn --"
-            options={listClass}
+          <Input
+            placeholder="-- Nhập tên lớp--"
             className='w-full'
-          >
-          </Select>
-        </Col>
-        <Col xs={24} md={12} className='flex gap-3'>
-          <Button icon={<RetweetOutlined />}>Hủy</Button>
-          <Button icon={<SearchOutlined />} type='primary' >Tìm kiếm</Button>
+            onChange={handleChangeInput}
+            disabled={listStatistics?.length === 0}
+          />
         </Col>
       </Row>
       <Table
-        // locale={{
-        //   emptyText: <div style={{ marginTop: '20px' }}>{listStudent?.length === 0 ? <Empty description="Không có dữ liệu!" /> : null}</div>,
-        // }}
-        // title={titleTable}
+        locale={{
+          emptyText: <div style={{ marginTop: '20px' }}>{listStatistics?.length === 0 ? <Empty description="Không có dữ liệu!" /> : null}</div>,
+        }}
+        loading={loading}
         size="middle"
         style={{
           margin: '20px 0px',
           width: '100%'
         }}
-        dataSource={[]}
+        dataSource={listStatistics?.filter(e => removeVietnameseTones(e?.name?.toLowerCase()).includes(removeVietnameseTones(filterClass?.toLowerCase())))?.map(i => ({ ...i, key: i?.id }))}
         columns={columns}
         bordered
-        // onChange={handleChangeTable}
         pagination={{
           hideOnSinglePage: true,
           locale: { items_per_page: "/ trang" },
-          // total: total,
           showTotal: (total, range) => (
             <span>{`${range[0]} - ${range[1]} / ${total}`}</span>
           ),
-          // current: tableParams?.page,
-          // pageSize: tableParams.size,
           showSizeChanger: true,
           pageSizeOptions: ["10", "20", "50"],
           defaultPageSize: 10,

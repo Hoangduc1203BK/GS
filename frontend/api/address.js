@@ -236,3 +236,20 @@ export function uploadAvatar(file) {
 export const getFee = (id) => {
 	return axios.get(`/user/admin/fee?userId=${id}`)
 }
+export const getBill = (id) => {
+	return axios.get(`/bill/${id}`)
+}
+
+export const updateBill = (params, id) => {
+	return axios.patch(`/bill/${id}`, params)
+}
+
+export const createBill = (params) => {
+	return axios.post(`/bill`, params)
+}
+
+
+
+export const getStatistic = () => {
+	return axios.get(`/bill/statistic`)
+}
