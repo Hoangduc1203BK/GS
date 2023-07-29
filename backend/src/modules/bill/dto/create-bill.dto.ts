@@ -19,10 +19,10 @@ export class CreateBillDto {
 	@IsString()
 	description: string;
 
-    @ApiProperty({ required: true })
-	@IsNotEmpty()
-	@IsNumber()
-	total: number;
+    // @ApiProperty({ required: true })
+	// @IsNotEmpty()
+	// @IsNumber()
+	// total: number;
 
     @ApiProperty({ required: false })
 	@IsNotEmpty()

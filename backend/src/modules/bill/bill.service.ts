@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Attendance, Bill, Classes, SubAttendance, SubBill, UserClass } from "src/databases/entities";
-import { DataSource, In, IsNull, Repository } from "typeorm";
+import { DataSource, In, IsNull, LessThan, MoreThan, Repository } from "typeorm";
 import { UserService } from "../user";
 import { ClassService } from "../class";
 import { GeneratorService } from "src/core/shared/services";
@@ -25,25 +25,41 @@ export class BillService {
         private readonly generatorService: GeneratorService,
     ) { }
 
-    async getBill(id: string) {
-        const bill = await this.billRepos.findOne({
-            where: { id },
+    async getBill(userId: string) {
+        const current = new Date();
+        let month = current.getMonth() + 1;
+        const currentMonth =  month <=9 ? `0${month}` : month.toString();
+        const startOfMonth = `${current.getFullYear()}-${currentMonth}-01`;
+        const last = new Date(current.getFullYear(), current.getMonth()+1, 0)
+        const endOfMonth = `${current.getFullYear()}-${currentMonth}-${last.getDate()}`;
+        const bills = await this.billRepos.find({
+            where: { 
+                userId: userId,
+                day: LessThan(endOfMonth),
+             },
             relations: ['user', 'subBills', 'subBills.classes']
         })
 
-        if (!bill) {
-            throw new Error('Bill với Id:' + id + 'không tồn tại')
+        if(bills.length==0) {
+            throw new Error('Bill của học sinh với id:' + userId + ' không tồn tại')
         }
+
+        const bill = bills[bills.length-1];
 
         const { user, subBills, ...rest } = bill;
         const subBillResult = subBills.map(el => {
             const { classes, ...rest1 } = el;
 
-            return {
+            const item = {
                 ...rest1,
+                numberOfStudy: rest1.numberStudy,
                 className: classes.name,
                 fee: classes.fee,
             }
+
+            delete item.numberStudy
+
+            return item;
         })
 
         const result = {
