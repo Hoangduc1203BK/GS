@@ -97,3 +97,54 @@ body {
 	/* background-color: #e9f3ff !important; */
 	background-color: rgba(255, 255, 255, 0.3) !important;
 }
+
+.ant-popover-content {
+	width: 150%;
+}
+.ant-popconfirm-message-text {
+	width: 100%;
+}
+/* 
+.ant-table-cell {
+	border: 0.5px solid rgb(113, 109, 109) !important;
+} */
+
+.ant-table-container {
+	border-left: 1px solid #bbbbbb !important;
+}
+
+.ant-table-content > table,
+.ant-table-header > table > thead > tr > th {
+	border-top: 1px solid #bbbbbb !important;
+}
+
+.ant-table-content > table > thead > tr > th,
+.ant-table-content > table > tbody > tr > td,
+.ant-table-content > table > tfoot > tr > td,
+.ant-table-header > table > thead > tr > th,
+.ant-table-body > table > tbody > tr > td {
+	border-right: 1px solid #bbbbbb !important;
+}
+
+.ant-table-thead > tr > th,
+.ant-table-tbody > tr > td,
+.ant-table-summary > tr > td {
+	border-bottom: 1px solid #bbbbbb !important;
+}
+
+.ant-table-wrapper
+	.ant-table
+	.ant-table-title
+	+ .ant-table-container
+	table
+	> thead
+	> tr:first-child
+	td:first-child {
+	border-right: 1px solid #bbbbbb !important;
+	border-bottom: 1px solid #bbbbbb !important;
+}
+
+/* .ant-table-small .ant-table-thead > tr > th,
+.ant-table-thead > tr > th {
+	background-color: #998c76 !important;
+} */

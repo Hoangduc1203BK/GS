@@ -1,16 +1,17 @@
-import { getFee, getListDepartment, getListUser } from "@/api/address";
+import { createBill, getBill, getFee, getListDepartment, getListUser, updateBill } from "@/api/address";
 import { COLORS, GRADE } from "@/common/const";
 import { formatVND } from "@/common/util";
 import AddEditTs from "@/components/AddEditTS";
 import LayoutAdmin from "@/components/LayoutAdmin";
-import { CheckCircleOutlined, PlusCircleOutlined, ProfileOutlined, RedEnvelopeOutlined, RetweetOutlined, SearchOutlined, TeamOutlined } from "@ant-design/icons";
-import { Badge, Button, Col, Empty, Form, Input, Modal, Row, Select, Space, Table, Tooltip, message } from "antd";
+import { CheckCircleOutlined, CloseCircleOutlined, DollarOutlined, PlusCircleOutlined, ProfileOutlined, RedEnvelopeOutlined, RetweetOutlined, SearchOutlined, SyncOutlined, TeamOutlined } from "@ant-design/icons";
+import { Badge, Button, Col, DatePicker, Empty, Form, Input, Modal, Popconfirm, Row, Select, Space, Table, Tag, Tooltip, Tour, message } from "antd";
 import dayjs from "dayjs";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const ManageStudent = () => {
   const [modal, setModal] = useState({
-    open: false
+    open: false,
+    check: true, // true = co | false = khong
   });
   const columns = [
     {
@@ -99,22 +100,16 @@ const ManageStudent = () => {
   ]
 
   const columnsFee = [
-    // {
-    //   title: "STT",
-    //   render: (text, record, index) => {
-    //     return <div>{index + 1}</div>;
-    //   },
-    // },
+    {
+      title: "Trạng thái",
+      render: (text, record) => {
+        return <div>{<Tag color={idSelect?.includes(record.classId) ? "green" : "blue"} icon={idSelect?.includes(record.classId) ? <CheckCircleOutlined /> : <SyncOutlined spin />}>{idSelect?.includes(record.classId) ? "Đã thanh toán" : "Chờ thanh toán"}</Tag>}</div>;
+      },
+    },
     {
       title: "Tên lớp",
       render: (text, record, index) => {
         return <div>{record?.className}</div>;
-      },
-    },
-    {
-      title: "Khối",
-      render: (text, record, index) => {
-        return <div>{GRADE.find(el => el.value == record?.grade).label}</div>;
       },
     },
     {
@@ -133,12 +128,12 @@ const ManageStudent = () => {
     {
       title: "Học phí",
       render: (text, record, index) => {
-        return <div>{formatVND(record?.fee)}</div>;
+        return <div>{formatVND(+record?.fee)}</div>;
       },
     }, {
       title: "Tổng tiền",
       render: (text, record, index) => {
-        return <div>{formatVND(record?.total)}</div>;
+        return <div>{formatVND(+record?.total)}</div>;
       },
     },
   ];
@@ -162,17 +157,42 @@ const ManageStudent = () => {
   const [dataFee, setDataFee] = useState({});
 
   async function fee(record) {
-    getFee(record.id).then(
+    setDataFee({})
+    await getBill(record.id).then(
       res => {
-        console.log(res, 'resss');
         if (res?.data?.id) {
           setDataFee(res?.data)
+          const selectedId = res?.data?.subBills?.filter(i => i?.status)
+          setIdSelect(selectedId?.map(i => i?.classId))
           setModal({
-            open: true
+            open: true,
+            check: true
           })
+          setTimeout(() => {
+            setOpenTour(true)
+          }, 500)
+        } else {
+          getFee(record.id).then(
+            res => {
+              if (res?.data?.id) {
+                setDataFee(res?.data)
+                setIdSelect([])
+                setModal({
+                  open: true,
+                  check: false
+                })
+                setTimeout(() => {
+                  setOpenTour(true)
+                }, 500)
+              }
+            }
+          ).catch(err => message.error("Có lỗi xảy ra! Vui lòng kiểm tra lại." + err))
         }
+
       }
-    ).catch(err => message.error("Có lỗi xảy ra! Vui lòng kiểm tra lại." + err))
+    ).catch(err => {
+      console.log(err, 'errr gets');
+    })
   }
 
   function handleOpenForm(open, edit, record) {
@@ -214,12 +234,108 @@ const ManageStudent = () => {
 
   const [idSelect, setIdSelect] = useState([]);
 
-  async function confirm() {
-    console.log(idSelect, 'iddd');
+  const [formFee] = Form.useForm()
+  const [loadingButton, setLoadingButton] = useState(false);
+  const [openPop, setOpenPop] = useState(false);
+  function handleOpenPop() {
+    setOpenPop(true)
+    if (modal.check) {
+      formFee.setFieldsValue({
+        type: dataFee?.type,
+        description: dataFee?.description,
+        day: dayjs(dataFee?.day)
+      })
+    } else {
+      formFee.resetFields()
+    }
   }
 
+  async function confirm() {
+    setLoadingButton(true)
+    const params = {
+      day: dayjs(formFee.getFieldValue("day")).format('YYYY-MM-DD'),
+      type: formFee.getFieldValue("type"),
+      description: formFee.getFieldValue("description"),
+    }
+    if (modal.check) {
+      const bills = dataFee?.subBills?.map(i => ({
+        classId: i?.classId,
+        numberStudy: i?.numberOfStudy,
+        total: +i?.total,
+        status: idSelect?.includes(i?.classId)
+      }))
+      params.subBills = bills
+      setOpenPop(false)
+      await updateBill(params, dataFee?.id).then(
+        res => {
+          if (res?.data?.id) {
+            message.success("Cập nhật thông tin thanh toán thành công!")
+            setModal({
+              open: false,
+              check: true
+            })
+            setLoadingButton(false)
+          } else {
+            message.error("Cập nhật thông tin thanh toán thất bại!")
+          }
+        }
+      ).catch(err => message.error("Có lỗi xảy ra! Vui lòng kiểm tra lại." + err))
+    } else {
+      params.userId = dataFee.id
+      const bills = dataFee?.classes?.map(i => ({
+        classId: i?.classId,
+        numberStudy: i?.numberOfStudy,
+        total: +i?.total,
+        status: idSelect?.includes(i?.classId)
+      }))
+      params.subBills = bills
+      setOpenPop(false)
+      await createBill(params).then(
+        res => {
+          if (res?.data?.id) {
+            message.success("Cập nhật thông tin thanh toán thành công!")
+            setModal({
+              open: false,
+              check: true
+            })
+            setLoadingButton(false)
+          } else {
+            message.error("Cập nhật thông tin thanh toán thất bại!")
+          }
+        }
+      ).catch(err => message.error("Có lỗi xảy ra! Vui lòng kiểm tra lại." + err))
+    }
+  }
+
+  const ref1 = useRef(null);
+  const ref2 = useRef(null);
+  const [openTour, setOpenTour] = useState(false);
+  const steps = [
+    {
+      title: 'DANH SÁCH THÔNG TIN HỌC PHÍ',
+      description: <>
+        <p>Đây là danh sách học phí. </p>
+        <p className="text-red-500 text-lg font-semibold">VUI LÒNG CHỌN LỚP ĐỂ CẬP NHẬT TRẠNG THÁI ĐÓNG HỌC PHÍ ( TICK CHỌN: ĐÓNG HỌC PHÍ, KHÔNG TICK CHỌN: CHƯA ĐÓNG HỌC PHÍ )!</p>
+      </>,
+      // cover: (
+      //   <img
+      //     alt="tour.png"
+      //     src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
+      //   />
+      // ),
+      target: () => ref1.current,
+    },
+    {
+      title: 'XÁC NHẬN',
+      description: 'Sau khi lựa chọn lớp, vui lòng bấm xác nhận và điền đầy đủ thông tin yêu cầu.',
+      target: () => ref2.current,
+    },
+  ];
   return (
     <>
+      <Tour open={openTour} onClose={() => {
+        setOpenTour(false)
+      }} steps={steps} />
       <Modal
         open={modal.open}
         title={dataFee?.name}
@@ -235,26 +351,82 @@ const ManageStudent = () => {
         <div className="text-2xl font-bold mt-1 mb-5">
           <TeamOutlined /> Danh sách học phí theo lớp học
         </div>
-        <Table
-          rowSelection={{
-            type: 'checkbox',
-            selectedRowKeys: idSelect,
-            onChange: (selectedRowKeys, selectedRows) => {
-              setIdSelect(selectedRowKeys)
-            }
-          }}
-          size="middle"
-          dataSource={dataFee?.classes?.map(i => ({ ...i, key: i?.classId }))}
-          columns={columnsFee}
-          bordered
-          scroll={{ x: 700 }}
-          pagination={false}
-        />
+        <div ref={ref1}>
+          <Table
+            rowSelection={{
+              type: 'checkbox',
+              selectedRowKeys: idSelect,
+              onChange: (selectedRowKeys, selectedRows) => {
+                setIdSelect(selectedRowKeys)
+              }
+            }}
+            size="middle"
+            dataSource={modal.check ? dataFee?.subBills?.map(i => ({ ...i, key: i?.classId })) : dataFee?.classes?.map(i => ({ ...i, key: i?.classId }))}
+            columns={columnsFee}
+            bordered
+            scroll={{ x: 700 }}
+            pagination={false}
+          />
+        </div>
         <Row gutter={[8, 8]} justify="end" className="mt-5">
           <Col>
-            <Button disabled={idSelect.length !== 1} icon={<CheckCircleOutlined />} type="primary"
-              onClick={confirm}
-            >Xác nhận</Button>
+            <Popconfirm
+              title="Thanh toán học phí"
+              placement="topRight"
+              okButtonProps={{
+                className: '!hidden'
+              }}
+              open={openPop}
+              cancelButtonProps={{
+                className: '!hidden'
+              }}
+              // onOpenChange={handleOpenPop}
+              onCancel={() => {
+                setOpenPop(false)
+                formFee.resetFields()
+              }}
+              description={
+                <Form
+                  form={formFee}
+                  labelCol={{
+                    span: 8
+                  }}
+                  onFinish={confirm}
+                >
+                  <Form.Item name="day" label="Ngày" rules={[
+                    { required: true, message: "Đây là trường dữ liệu bắt buộc!" }
+                  ]}>
+                    <DatePicker placeholder="--Chọn ngày--" className="w-full" />
+                  </Form.Item>
+                  <Form.Item name="type" label="Loại thanh toán"
+                    rules={[
+                      { required: true, message: "Đây là trường dữ liệu bắt buộc!" }
+                    ]}
+                  >
+                    <Select
+                      placeholder="--Chọn--"
+                    >
+                      <Select.Option value="in-cash">Tiền mặt</Select.Option>
+                      <Select.Option value="bank">Chuyển khoản</Select.Option>
+                    </Select>
+                  </Form.Item>
+                  <Form.Item label="Ghi chú" name="description"
+                  // rules={[
+                  //   { required: true, message: "Đây là trường dữ liệu bắt buộc!" }
+                  // ]}
+                  >
+                    <Input placeholder="Nhập ghi chú" />
+                  </Form.Item>
+                  <Row gutter={[8, 8]} justify="end">
+                    <Col>
+                      <Button loading={loadingButton} htmlType="submit" type="primary" icon={<DollarOutlined />}>Thanh toán</Button>
+                    </Col>
+                  </Row>
+                </Form>
+              }
+            >
+              <Button ref={ref2} icon={<CheckCircleOutlined />} onClick={handleOpenPop} loading={loadingButton} type="primary">Xác nhận</Button>
+            </Popconfirm>
           </Col>
           <Col>
             <Button onClick={() => {
@@ -262,7 +434,9 @@ const ManageStudent = () => {
                 open: false
               })
               setDataFee({})
-            }}>Hủy</Button>
+
+            }}
+              loading={loadingButton} icon={<CloseCircleOutlined />}>Hủy</Button>
           </Col>
         </Row>
       </Modal>
