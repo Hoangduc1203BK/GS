@@ -37,7 +37,7 @@ export class BillService {
                 userId: userId,
                 day: LessThan(endOfMonth),
              },
-            relations: ['user', 'subBills', 'subBills.classes']
+            relations: ['user', 'subBills', 'subBills.classes', 'subBills.classes.subject']
         })
 
         if(bills.length==0) {
