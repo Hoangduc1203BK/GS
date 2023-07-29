@@ -60,6 +60,7 @@ export class BillService {
                 ...rest1,
                 numberOfStudy: rest1.numberStudy,
                 className: classes.name,
+                subject: classes.subject.name,
                 fee: classes.fee,
             }
 
