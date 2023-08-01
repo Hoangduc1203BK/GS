@@ -7,6 +7,7 @@ import { UserModule, UserService } from "../user";
 import { GeneratorService } from "src/core/shared/services";
 import { ClassModule, ClassService } from "../class";
 import { SubjectModule } from "../subject";
+import { RedisCacheModule } from "src/core/redis/redis.module";
 
 @Module({
     imports: [
@@ -14,6 +15,7 @@ import { SubjectModule } from "../subject";
         forwardRef(() => UserModule),
         forwardRef(() => ClassModule),
         forwardRef(() => SubjectModule),
+        forwardRef(() => RedisCacheModule),
     ],
     controllers: [ExamController],
     providers: [ExamService, GeneratorService],

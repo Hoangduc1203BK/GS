@@ -8,8 +8,10 @@ import { ClassService } from "../class";
 import { GeneratorService } from "src/core/shared/services";
 import { DEFAULT_PAGING } from "src/common/constants/paging";
 import { paginate } from "src/common/interfaces/paginate";
-import { EXAM_RESULT, STANDARD_SCORE } from "src/common/constants";
+import { EXAM_RESULT, QUEUE_JOB, STANDARD_SCORE } from "src/common/constants";
 import { SubjectService } from "../subject";
+import { Queue } from "bull";
+import { InjectQueue } from "@nestjs/bull";
 
 
 @Injectable()
@@ -22,6 +24,8 @@ export class ExamService {
         private readonly classService: ClassService,
         private readonly subjectService: SubjectService,
         private readonly datasource: DataSource,
+        @InjectQueue(QUEUE_JOB.SEND_MAIL) private readonly queue: Queue,
+
     ) { }
 
     async listExam(query: ListExamDto) {
@@ -135,7 +139,7 @@ export class ExamService {
     async updateExam(id: number, dto: UpdateExamDto) {
         const { subjects, ...rest } = dto;
         const exam = await this.examRepos.findOne({
-            where: { id }
+            where: { id },
         })
 
         if(!exam) {
@@ -210,6 +214,23 @@ export class ExamService {
         }
 
         await this.examRepos.save({id: id, ...doc});
+
+        if(dto.date || dto.hour || dto.teacherId || dto.roomId) {
+            const student = await this.userService.getUser(exam.studentId);
+            const subExams = await this.subExamRepos.find({
+                where: { examId: id},
+                relations: ['subject']
+            })
+
+            if(subExams.length>0) {
+                const subjects = subExams.map(el => el.subject.name);
+                let hour = dto.hour ? dto.hour : exam.hour;
+                let roomId = dto.roomId ? dto.roomId : exam.roomId;
+                let date = dto.date ? dto.date : exam.date;
+
+                await this.queue.add({mail: student.email,name: student.name, date, hour, roomId, subjects})
+            }
+        }
 
         return this.getExam(id);
     }

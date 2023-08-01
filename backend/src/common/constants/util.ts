@@ -114,3 +114,7 @@ export function getDayOfMonth(day: string) {
       return `${currentDate+offset}-${today.getMonth()+1}`
     }
   }
+
+export enum QUEUE_JOB {
+  SEND_MAIL = 'send-mail'
+}

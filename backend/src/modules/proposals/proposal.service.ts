@@ -5,7 +5,7 @@ import { Repository } from "typeorm";
 import { ListProposalDto } from "./dto/list-proposal.dto";
 import { DEFAULT_PAGING } from "src/common/constants/paging";
 import { UserService } from "../user";
-import { CLASS_TYPE, PROPOSAL_STATUS, PROPOSAL_TYPE, ROLE, USER_CLASS_TYPE } from "src/common/constants";
+import { CLASS_TYPE, PROPOSAL_STATUS, PROPOSAL_TYPE, QUEUE_JOB, ROLE, USER_CLASS_TYPE } from "src/common/constants";
 import { CreateProposalDto } from "./dto/create-proposal.dto";
 import { ClassService } from "../class";
 import { ProposalStrategy } from "src/common/interfaces/proposals";
@@ -16,6 +16,8 @@ import { StudentTerminateClass } from "./student-terminate-class.service";
 import { UpdateProposalDto } from "./dto/update-proposal.dto";
 import { MailService } from "src/core/shared/services/mail/mail.service";
 import { AssigmentService } from "../assigment";
+import { InjectQueue } from "@nestjs/bull";
+import { Queue } from "bull";
 
 
 @Injectable()
@@ -27,6 +29,7 @@ export class ProposalService {
         private readonly classService: ClassService,
         private readonly mailService: MailService,
         private readonly assigmentService: AssigmentService,
+        @InjectQueue(QUEUE_JOB.SEND_MAIL) private readonly queue: Queue,
     ) { }
 
     setProposalStrategy(type: string) {
@@ -162,7 +165,6 @@ export class ProposalService {
         }
 
         const result = await this.proposalRepos.save(doc);
-        console.log(result)
 
         return this.getProposal(result.id);
     }
@@ -178,13 +180,7 @@ export class ProposalService {
             throw new Error('Đề xuất này có trạng thái:' + proposal.status + ' và không thể sửa đổi');
         }
 
-        this.setProposalStrategy(proposal.type);
-
-        if (proposal.type == PROPOSAL_TYPE.TEACHER_TAKE_BRAKE) {
-            await this.proposalStrategy.handleProposal(dto, proposal, dto.subData);
-        } else {
-            await this.proposalStrategy.handleProposal(dto, proposal);
-        }
+        await this.queue.add({dto: dto, proposal: proposal})
 
         return true;
     }
