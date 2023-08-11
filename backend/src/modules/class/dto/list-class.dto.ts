@@ -62,4 +62,10 @@ export class ListClassDto {
 	@IsNotEmpty()
 	@IsString()
 	end?: string;
+
+	@ApiProperty({ required: true })
+    @IsOptional()
+	@IsNotEmpty()
+	@IsString()
+	startDate?: string;
 }

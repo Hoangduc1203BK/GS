@@ -136,6 +136,7 @@ export class ClassService {
       date,
       start,
       end,
+      startDate
     } = query;
     let classFilter = {
       type: "'" + CLASS_TYPE.ACTIVE + "'",
@@ -166,6 +167,10 @@ export class ClassService {
       classFilter.type = "'" + type + "'";
     }
 
+    if(startDate) {
+      classFilter.start_date = "'"+startDate+"'";
+    }
+
     if (roomId) {
       scheduleFilter['room_id'] = roomId;
     }
@@ -189,7 +194,18 @@ export class ClassService {
 
     if (Object.keys(classFilter).length > 0) {
       for (const [k, v] of Object.entries(classFilter)) {
-        classArr.push(' c.' + `"${k}" = ` + `${v} `);
+        if(k == "start_date") {
+          var year = new Date().getFullYear();
+          let month = startDate[0] == '0' ? parseInt(startDate[1]) : parseInt(startDate);
+          const startOfMonth = `${year}-${startDate}-01`;
+          const last = new Date(year, month, 0)
+          const endOfMonth = `${year}-${startDate}-${last.getDate()}`;
+
+          classArr.push('c.'+`"${k}" >= '` + startOfMonth + `'` );
+          classArr.push('c.' + `"${k}" <= '` + endOfMonth + `'`);
+        }else {
+          classArr.push(' c.' + `"${k}" = ` + `${v} `);
+        }
       }
     }
     if (Object.keys(scheduleFilter).length > 0) {
