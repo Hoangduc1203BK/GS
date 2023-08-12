@@ -1,7 +1,7 @@
-import { ApiClassOfStudent, ApiStudentsInClass } from "@/api/student";
+import { ApiClassOfStudent, ApiCreateFeedback, ApiStudentsInClass } from "@/api/student";
 import { genderVNConvert } from "@/common/const";
-import { TeamOutlined } from "@ant-design/icons";
-import { Button, Table, message } from "antd";
+import { SolutionOutlined, TeamOutlined, UserOutlined } from "@ant-design/icons";
+import { Button, Form, Input, Modal, Table, message } from "antd";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
@@ -117,6 +117,17 @@ export default function StudentsInClass({ info }) {
     );
   };
 
+  const [modal, setModal] = useState({
+    open: false,
+    record: null
+  });
+
+  function handleModal(record) {
+    setModal({
+      open: true,
+      record: record
+    })
+  }
   const columns = [
     {
       title: "STT",
@@ -156,8 +167,7 @@ export default function StudentsInClass({ info }) {
             {record?.classes?.timeTables
               ?.map(
                 (item) =>
-                  `Thứ ${+item?.date + 1} ( ${item?.start} : ${item?.end} ) - ${
-                    item?.room?.name
+                  `Thứ ${+item?.date + 1} ( ${item?.start} : ${item?.end} ) - ${item?.room?.name
                   }`
               )
               ?.join(", ")}
@@ -170,12 +180,19 @@ export default function StudentsInClass({ info }) {
       title: "Tùy chọn",
       render: (text, record, index) => {
         return (
-          <div>
+          <div className="flex gap-2">
             <Button
               type="primary"
               onClick={() => router.push(`/student/homework/${record.classId}`)}
             >
               Bài tập
+            </Button>
+            <Button
+              // type="primary"
+              className="hover:!bg-violet-600 bg-violet-500 text-white hover:!text-white "
+              onClick={() => handleModal(record)}
+            >
+              Góp ý
             </Button>
           </div>
         );
@@ -183,8 +200,57 @@ export default function StudentsInClass({ info }) {
     },
   ];
 
+  const [feedback, setFeedback] = useState('');
+  async function saveFeedback() {
+    if (!feedback) {
+      message.error("Vui lòng nhập nhận xét!")
+    } else {
+      const params = {
+        classId: modal?.record?.classes?.id,
+        from: modal?.record?.userId,
+        to: modal?.record?.classes?.teacher,
+        type: "student",
+        feedback: feedback
+      }
+      ApiCreateFeedback(params).then(res => {
+        console.log(res, 'resss');
+        if (res?.data?.id) {
+          message.success("Gửi nhận xét thành công!")
+          setModal({
+            open: false,
+            record: null
+          })
+          setFeedback("")
+        } else {
+          message.error("Nhận xét không thành công! Vui lòng thử lại sau!")
+        }
+      }).catch(err => message.error("Có lỗi kỹ thuật! Vui lòng kiểm tra lại! " + err))
+    }
+  }
   return (
     <div>
+      <Modal
+        open={modal.open}
+        title={"Góp ý"}
+        footer={null}
+        onCancel={() => setModal({
+          open: false,
+          record: null
+        })}
+      >
+        <p className="text-lg my-4"><SolutionOutlined /> Lớp: {modal?.record?.classes?.name}</p>
+        <p className="text-lg mb-4"><UserOutlined /> Giáo viên: {modal?.record?.classes?.user?.name}</p>
+        <Form.Item label="Nhận xét" required>
+          <Input.TextArea value={feedback} onChange={(e) => setFeedback(e.target.value)} rows={4} placeholder="Nhận xét tại đây..." />
+        </Form.Item>
+        <div className="flex justify-center gap-2">
+          <Button type="primary" onClick={saveFeedback} >Lưu</Button>
+          <Button onClick={() => setModal({
+            open: false,
+            record: null
+          })}>Hủy</Button>
+        </div>
+      </Modal>
       <div className="text-2xl font-bold mt-1 mb-5">
         <TeamOutlined /> Danh sách lớp học
       </div>

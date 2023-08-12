@@ -1,8 +1,9 @@
 
 import { getAttendance, getListAttendance, getListClass, getListSubject, getListUser, getListUserInClass } from "@/api/address";
+import { ApiGetFeedbacks } from "@/api/student";
 import { COLORS } from "@/common/const";
 import LayoutAdmin from "@/components/LayoutAdmin";
-import { CheckCircleFilled, CloseCircleFilled, DeleteOutlined, EditOutlined, EllipsisOutlined, EyeOutlined, HistoryOutlined, ProfileOutlined, SnippetsOutlined, TeamOutlined } from "@ant-design/icons";
+import { CheckCircleFilled, CloseCircleFilled, CommentOutlined, DeleteOutlined, EditOutlined, EllipsisOutlined, EyeOutlined, HistoryOutlined, MessageOutlined, ProfileOutlined, SnippetsOutlined, TeamOutlined } from "@ant-design/icons";
 import { Avatar, Badge, Button, Col, Empty, Input, List, Modal, Row, Select, Space, Table, Tabs, Tooltip, Tour, message } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useRef, useState } from "react";
@@ -65,17 +66,20 @@ const ListClass = () => {
       render: (text, record) => {
         return <div >
           <Space size="small">
-            {/* <Tooltip title="Chi tiết">
-              <EyeOutlined style={{
-                color: "#b9db84"
-              }} className="text-base cursor-pointer" />
-            </Tooltip> */}
             <Tooltip title="Lịch sử điểm danh">
               <SnippetsOutlined
                 onClick={() => watchHistory(record)}
                 style={{
                   color: "#fc4a6c"
                 }} className="text-base cursor-pointer" />
+            </Tooltip>
+            <Tooltip title="Góp ý">
+              <MessageOutlined
+                onClick={() => getFeedbacks(record)}
+                style={{
+                  color: "#b9db84"
+                }}
+                className="text-base cursor-pointer" />
             </Tooltip>
           </Space>
         </div>;
@@ -263,7 +267,26 @@ const ListClass = () => {
       }
     ).catch(err => console.log('get list class err' + err))
   }
-
+  const [listFeedback, setListFeedback] = useState([]);
+  async function getFeedbacks(record) {
+    const params = {
+      classId: record?.id,
+      type: "student"
+    }
+    ApiGetFeedbacks(params).then(
+      res => {
+        if (res?.data?.length == 0) {
+          message.error("Chưa có góp ý!")
+        } else {
+          setListFeedback(res?.data?.map((el, i) => ({
+            ...el,
+            avatar: `https://xsgames.co/randomusers/avatar.php?g=pixel&key=${i}`
+          })))
+          setActiveTab('3')
+        }
+      }
+    ).catch(err => console.log(err, 'errr get feedback'))
+  }
 
   useEffect(() => {
     getListSubject({ page: 1, size: 9999 }).then(
@@ -309,7 +332,7 @@ const ListClass = () => {
   ];
 
   useEffect(() => {
-    if (listSubject.length > 0) {
+    if (listSubject?.length > 0) {
       setOpen(true)
     }
   }, [listSubject]);
@@ -512,6 +535,63 @@ const ListClass = () => {
                   }}
                 />
               </div>
+            </>
+          },
+          {
+            disabled: true,
+            label: (
+              <span>
+                <CommentOutlined />
+                Góp ý
+              </span>
+            ),
+            key: '3',
+            children: <>
+              <List
+                className="w-1/2 m-auto"
+                itemLayout="vertical"
+                size="small"
+                // pagination={{
+                //   onChange: (page) => {
+                //     console.log(page);
+                //   },
+                //   pageSize: 3,
+                // }}
+                dataSource={listFeedback}
+                footer={
+                  <div>
+                    Lớp: <b>{listFeedback.length > 0 && listFeedback[0].className}</b> - Giáo viên: <b>{listFeedback.length > 0 && listFeedback[0].toUser}</b>
+                  </div>
+                }
+                renderItem={(item) => (
+                  <List.Item
+                    className="rounded-lg"
+                    style={{
+                      boxShadow: "5px 5px 10px 0px rgba(0, 157, 255, 0.5)",
+                    }}
+                    key={item?.id}
+                  // actions={[
+                  //   <IconText icon={StarOutlined} text="156" key="list-vertical-star-o" />,
+                  //   <IconText icon={LikeOutlined} text="156" key="list-vertical-like-o" />,
+                  //   <IconText icon={MessageOutlined} text="2" key="list-vertical-message" />,
+                  // ]}
+                  // extra={
+                  //   <img
+                  //     width={272}
+                  //     alt="logo"
+                  //     src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
+                  //   />
+                  // }
+                  >
+                    <List.Item.Meta
+                      avatar={<Avatar src={item.avatar} />}
+                      title={item?.fromUser}
+                      description={dayjs(item?.ctime).format("DD/MM/YYYY HH:mm")}
+                    />
+                    {item.feedback}
+                  </List.Item>
+                )}
+              />
             </>
           }
         ]}
