@@ -20,6 +20,12 @@ import { QUEUE_JOB } from 'src/common/constants';
 			{
 				name: QUEUE_JOB.SEND_MAIL,
 			},
+			{
+				name: QUEUE_JOB.EXAM
+			},
+			{
+				name: QUEUE_JOB.TEST_LEARNING
+			}
 		),
 	],
 	controllers: [],

@@ -55,8 +55,8 @@ export class ProposalService {
         let month = current.getMonth() + 1;
         const year = current.getFullYear();
         const lastDay = new Date(year, month + 1, 0);
-        // let formatMonth = month <= 9 ? `0${month}` : month.toString();
-         let formatMonth = month <= 9 ? `07` : month.toString();
+        let formatMonth = month <= 9 ? `0${month}` : month.toString();
+        //  let formatMonth = month <= 9 ? `0` : month.toString();
         const startDate = `${year}-${formatMonth}-01`;
         const endDate = `${year}-${formatMonth}-${lastDay.getDate()}`;
         const { page = DEFAULT_PAGING.PAGE, size = DEFAULT_PAGING.LIMIT, start = startDate, end = endDate,role, ...rest } = dto;

@@ -46,7 +46,7 @@ export class Department {
 
   @Column({
     type: 'varchar',
-    length: '50',
+    length: '100',
     name: 'description',
     nullable: false,
   })

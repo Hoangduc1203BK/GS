@@ -24,7 +24,7 @@ export class ExamService {
         private readonly classService: ClassService,
         private readonly subjectService: SubjectService,
         private readonly datasource: DataSource,
-        @InjectQueue(QUEUE_JOB.SEND_MAIL) private readonly queue: Queue,
+        @InjectQueue(QUEUE_JOB.EXAM) private readonly queue: Queue,
 
     ) { }
 

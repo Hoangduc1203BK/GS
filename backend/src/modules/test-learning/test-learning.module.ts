@@ -7,15 +7,17 @@ import { ClassModule } from "../class";
 import { UserModule } from "../user";
 import { Subject } from "rxjs";
 import { SubjectModule } from "../subject";
+import { RedisCacheModule } from "src/core/redis/redis.module";
+import { TestLearningConsumer } from "./test-learning.processor";
 @Module({
     imports: [
         TypeOrmModule.forFeature([TestLearning, Exam]),
         forwardRef(() => ClassModule),
         forwardRef(() => UserModule),
-        // forwardRef(() => SubjectModule),
+        forwardRef(() => RedisCacheModule),
     ],
     controllers: [TestLearningController],
-    providers: [TestLearningService],
+    providers: [TestLearningService, TestLearningConsumer],
     exports: [TestLearningService]
 })
 export class TestLearningModule { };

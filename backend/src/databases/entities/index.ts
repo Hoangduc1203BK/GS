@@ -17,3 +17,4 @@ export * from './sub-assigment';
 export * from './feedback';
 export * from './bill';
 export * from './sub-bill';
+export * from './history-price';

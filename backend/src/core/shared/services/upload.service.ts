@@ -7,7 +7,7 @@ export class UploadService {
 	private s3: S3;
 	constructor(private configService: ApiConfigService) {
 		const { accessKeyId, secretAccessKey } = this.configService.getS3Config();
-		AWS.config.update({ accessKeyId: 'AKIA53D7VHNA7XRNZMGB', secretAccessKey: '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' });
+		AWS.config.update({ accessKeyId: 'AKIA4KG6Q2VYQNAXQGMV', secretAccessKey: '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' });
 		this.s3 = new S3();
 	}
 

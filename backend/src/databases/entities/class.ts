@@ -10,6 +10,7 @@ import { TestLearning } from './test-learning';
 import { Assigment } from './assigment';
 import { Feedback } from './feedback';
 import { SubBill } from './sub-bill';
+import { HistoryPrice } from './history-price';
 
 @Entity('class')
 export class Classes {
@@ -152,5 +153,8 @@ export class Classes {
     //bill
     @OneToMany(() => SubBill, sb => sb.classes)
     subBills: SubBill[];
-}
 
+    //history price
+    @OneToMany(() => HistoryPrice, h => h.classes)
+    histories: SubBill[];
+}

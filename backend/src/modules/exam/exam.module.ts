@@ -8,6 +8,7 @@ import { GeneratorService } from "src/core/shared/services";
 import { ClassModule, ClassService } from "../class";
 import { SubjectModule } from "../subject";
 import { RedisCacheModule } from "src/core/redis/redis.module";
+import { ExamConsumer } from "./exam.processor";
 
 @Module({
     imports: [
@@ -18,7 +19,7 @@ import { RedisCacheModule } from "src/core/redis/redis.module";
         forwardRef(() => RedisCacheModule),
     ],
     controllers: [ExamController],
-    providers: [ExamService, GeneratorService],
+    providers: [ExamService, ExamConsumer, GeneratorService],
     exports: [ExamService],
 })
 export class ExamModule{};

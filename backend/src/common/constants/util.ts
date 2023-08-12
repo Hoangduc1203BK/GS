@@ -116,5 +116,7 @@ export function getDayOfMonth(day: string) {
   }
 
 export enum QUEUE_JOB {
-  SEND_MAIL = 'send-mail'
+  SEND_MAIL = 'send-mail',
+  EXAM = 'exam',
+  TEST_LEARNING = 'test-learning'
 }

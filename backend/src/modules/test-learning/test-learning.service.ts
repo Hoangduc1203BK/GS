@@ -9,11 +9,13 @@ import { paginate } from "src/common/interfaces/paginate";
 import { CreateTestLearningDto } from "./dto/create-test-learning.dto";
 import { UserService } from "../user";
 import { UpdateTestLearningDto } from "./dto/update-test-learning.dto";
-import { DEFAULT_PASSWORD, EXAM_RESULT, TEST_LEARNING_STATUS } from "src/common/constants";
+import { DEFAULT_PASSWORD, EXAM_RESULT, QUEUE_JOB, TEST_LEARNING_STATUS } from "src/common/constants";
 import { ExamService } from "../exam";
 import { SubjectService } from "../subject";
 import { SearchTestLearningDto } from "./dto/search-test-learning.dto";
 import { MailService } from "src/core/shared/services/mail/mail.service";
+import { InjectQueue } from "@nestjs/bull";
+import { Queue } from "bull";
 
 @Injectable()
 export class TestLearningService {
@@ -23,6 +25,7 @@ export class TestLearningService {
         private readonly userService: UserService,
         @InjectRepository(Exam) private readonly examRepos: Repository<Exam>,
         private readonly mailService: MailService,
+        @InjectQueue(QUEUE_JOB.TEST_LEARNING) private readonly queue: Queue,
     ){}
 
     async listTestLearning(dto: ListTestLearningDto) {
@@ -208,19 +211,30 @@ export class TestLearningService {
 
         if(dto.status == TEST_LEARNING_STATUS.ACTIVE) {
             const testLearningResult = await this.getTestLearning(id);
-            await this.mailService.sendMail(
-                user.email,
-                'Thông báo trúng tuyển',
-                './test-learning',
-                {
-                    name: user.name,
-                    className: testLearningResult.class,
-                    date: testLearningResult.timeTable.date + 1,
-                    day: testLearningResult.day,
-                    email: user.email,
-                    password: DEFAULT_PASSWORD
-                }
-            )
+            
+            const job = {
+                name: user.name,
+                className: testLearningResult.class,
+                date: testLearningResult.timeTable.date + 1,
+                day: dto?.day,
+                mail: user.email,
+                password: DEFAULT_PASSWORD
+            }
+
+            await this.queue.add(job)
+            // await this.mailService.sendMail(
+            //     user.email,
+            //     'Thông báo trúng tuyển',
+            //     './test-learning',
+            //     {
+            //         name: user.name,
+            //         className: testLearningResult.class,
+            //         date: testLearningResult.timeTable.date + 1,
+            //         day: testLearningResult.day,
+            //         email: user.email,
+            //         password: DEFAULT_PASSWORD
+            //     }
+            // )
         }
 
         const doc = {

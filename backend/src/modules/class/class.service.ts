@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import {
   Attendance,
   Classes,
+  HistoryPrice,
   Room,
   SubAttendance,
   Subject,
@@ -42,6 +43,7 @@ export class ClassService {
     private readonly userClassRepos: Repository<UserClass>,
     @InjectRepository(Attendance) private readonly attendanceRepos: Repository<Attendance>,
     @InjectRepository(SubAttendance) private readonly subAttendanceRepos: Repository<SubAttendance>,
+    @InjectRepository(HistoryPrice) private readonly historyPriceRepos: Repository<HistoryPrice>,
     private readonly datasource: DataSource,
     private readonly generatorService: GeneratorService,
     @Inject(forwardRef(() => UserService))
@@ -143,7 +145,7 @@ export class ClassService {
     } as any;
 
     let scheduleFilter = {
-      date: "'0','1','2','3','4','5','6'",
+      date: "'0','1','2','3','4','5','6','7'",
       start: 7.5,
       end: 21.5,
     } as any;
@@ -337,6 +339,16 @@ export class ClassService {
       ...classes,
       ...rest,
     };
+
+    if(dto.fee) {
+      const historyPrice = {
+        classId: id,
+        oldPrice: classes.fee,
+        newPrice : dto.fee
+      }
+
+      await this.historyPriceRepos.save(historyPrice);
+    }
 
     const updateDoc = await this.classRepos.save(doc);
 
@@ -560,6 +572,15 @@ export class ClassService {
           };
 
           await manager.save(TimeTable, data);
+
+          //create history price
+          const historyPrice = {
+            classId: id,
+            oldPrice: dto.fee,
+            newPrice: dto.fee,
+          }
+          await manager.save(HistoryPrice, historyPrice);
+
         }
       });
     }
