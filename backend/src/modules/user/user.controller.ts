@@ -44,7 +44,7 @@ export class UserController {
         return result;
     }
 
-    @UseGuards(JwtAuthGuard)
+    // @UseGuards(JwtAuthGuard)
     @Get('/fee')
     async listFee(@Req() req: Request, @Query() query: ListFeetDto) {
         const user = req["user"]
@@ -53,7 +53,7 @@ export class UserController {
         return result;
     }
 
-    @UseGuards(JwtAuthGuard)
+    // @UseGuards(JwtAuthGuard)
     @Get('/fee/detail')
     async getFeeDetail(@Req() req: Request, @Query() query: GetFeeDetailDto) {
         const user = req["user"]

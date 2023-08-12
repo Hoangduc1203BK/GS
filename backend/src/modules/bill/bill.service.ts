@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Attendance, Bill, Classes, SubAttendance, SubBill, UserClass } from "src/databases/entities";
+import { Attendance, Bill, Classes, HistoryPrice, SubAttendance, SubBill, UserClass } from "src/databases/entities";
 import { DataSource, In, IsNull, LessThan, MoreThan, Repository } from "typeorm";
 import { UserService } from "../user";
 import { ClassService } from "../class";
@@ -19,6 +19,7 @@ export class BillService {
         @InjectRepository(SubAttendance) private readonly subAttendanceRepos: Repository<SubAttendance>,
         @InjectRepository(Attendance) private readonly attendanceRepos: Repository<Attendance>,
         @InjectRepository(UserClass) private readonly userClassRepos: Repository<UserClass>,
+        @InjectRepository(HistoryPrice) private readonly historyRepos: Repository<HistoryPrice>,
         private readonly dataSource: DataSource,
         private readonly userService: UserService,
         private readonly classService: ClassService,
@@ -53,7 +54,13 @@ export class BillService {
         const bill = bills[bills.length-1];
 
         const { user, subBills, ...rest } = bill;
-        const subBillResult = subBills.map(el => {
+        const subBillResult = subBills.map(async(el) => {
+            const histories = await this.historyRepos.find({
+                where: {
+                    ctime: LessThan(el.mtime)
+                }
+            });
+
             const { classes, ...rest1 } = el;
 
             const item = {
@@ -61,7 +68,7 @@ export class BillService {
                 numberOfStudy: rest1.numberStudy,
                 className: classes.name,
                 subject: classes.subject.name,
-                fee: classes.fee,
+                fee: rest1.status == true ? histories[histories.length - 1].newPrice : classes.fee,
             }
 
             delete item.numberStudy
