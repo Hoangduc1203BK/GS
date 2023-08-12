@@ -175,11 +175,11 @@ const ListClass = () => {
         dataIndex: 'phoneNumber',
         key: 'phoneNumber',
       },
-      {
-        title: 'Nhận xét',
-        dataIndex: 'comment',
-        key: 'comment',
-      },
+      // {
+      //   title: 'Nhận xét',
+      //   dataIndex: 'comment',
+      //   key: 'comment',
+      // },
       // {
       //   title: 'Thao tác',
       //   dataIndex: 'action',
