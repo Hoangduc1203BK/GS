@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
+import { CanActivate, ExecutionContext, Injectable, mixin } from "@nestjs/common";
 import { Observable, throwError } from "rxjs";
 import { ClassService } from "src/modules/class";
 import { GeneratorService } from "../shared/services";
@@ -32,15 +32,23 @@ export class AttendanceGuard implements CanActivate {
             const currentDay = new Date().getDay();
             const schedule = schedules.find(el => Number(el.date) == currentDay);
             if (!schedule) {
-                throw new Error('Hiện không phải thời gian điểm danh của lớp với id:' + classId + `\n Thời gian điểm danh là ${errorMessage}`);
-            }
+                const strMess = `Hiện không phải thời gian điểm danh của lớp. Thời gian điểm danh là ${errorMessage}`;
+                req["errorMessage"] = strMess;
 
+                return true;
+
+                // throw new Error('Hiện không phải thời gian điểm danh của lớp với id:' + classId + `\n Thời gian điểm danh là ${errorMessage}`);
+            }
             let currentTime = new Date().toLocaleTimeString('it-IT');
             let time = moment.duration(currentTime).asHours();
             if (time >= schedule.start && time <= schedule.end) {
                 return true
             } else {
-                throw new Error('Hiện không phải thời gian điểm danh của lớp với id:' + classId + `\n Thời gian điểm danh là ${errorMessage}`)
+                const strMess = `Hiện không phải thời gian điểm danh của lớp. Thời gian điểm danh là ${errorMessage}`;
+                req["errorMessage"] = strMess;
+
+                return true;
+                // throw new Error(`Hiện không phải thời gian điểm danh của lớp. Thời gian điểm danh là ${errorMessage}`)
             }
         }
 

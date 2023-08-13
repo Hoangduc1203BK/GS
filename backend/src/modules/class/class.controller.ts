@@ -56,26 +56,34 @@ export class ClassController {
 
   @Post('/attendance')
   @UseGuards(AttendanceGuard)
-  async createAttendance(@Body() createAttendanceDto: CreateAttendanceDto) {
-    const result = await this.classService.createAttendance(
+  async createAttendance(@Req() req: Request, @Body() createAttendanceDto: CreateAttendanceDto) {
+    if(req["errorMessage"]!=null) {
+      return req["errorMessage"]
+    }else {
+      const result = await this.classService.createAttendance(
       createAttendanceDto,
     );
 
     return result;
+    }
   }
 
   @Patch('/attendance')
   @UseGuards(AttendanceGuard)
   async updateAttendance(
+    @Req() req: Request,
     @Query() query: any,
     @Body() updateAttendanceDto: UpdateAttendanceDto,
   ) {
-    const result = await this.classService.updateAttendance(
-      query,
-      updateAttendanceDto,
+    if(req["errorMessage"]!=null) {
+      return req["errorMessage"]
+    }else {
+      const result = await this.classService.updateAttendance(
+      query, updateAttendanceDto
     );
 
     return result;
+    }
   }
 
   @Get('/room')
