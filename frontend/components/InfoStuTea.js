@@ -34,7 +34,7 @@ export default function InfoStuTea({ children, info, mode }) {
               </Col>
               <Col xs={10} className="text-center">
                 <p className="uppercase text-sm font-bold">
-                  Thông tin {`${mode === 1 ? "giáo viên" : "sinh viên"}`}
+                  Thông tin {`${mode === 1 ? "giáo viên" : "học viên"}`}
                 </p>
                 <p className="text-xs">
                   {`${mode === 1 ? "Teacher" : "Student"}`} card

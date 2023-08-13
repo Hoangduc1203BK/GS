@@ -166,7 +166,7 @@ const AddEditTs = ({ checkEdit, dataEdit, mode, handleOpenForm }) => {
                   <p className="uppercase text-sm font-bold">Trường {mode === 1 ? valueForm.teacher_school : valueForm.student_school}</p>
                 </Col>
                 <Col xs={10} className="text-center">
-                  <p className="uppercase text-sm font-bold">Thông tin {`${mode === 1 ? "giáo viên" : "sinh viên"}`}</p>
+                  <p className="uppercase text-sm font-bold">Thông tin {`${mode === 1 ? "giáo viên" : "học viên"}`}</p>
                   <p className="text-xs">{`${mode === 1 ? "Teacher" : "Student"}`} card</p>
                 </Col>
               </Row>
