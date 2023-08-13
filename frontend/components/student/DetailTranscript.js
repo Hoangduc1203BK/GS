@@ -242,6 +242,10 @@ export default function DetailTranscript({ setShowDetail, detail }) {
             <div className="text-lg font-bold">
               {detailSubAssigment?.point || "Chưa có điểm"}
             </div>
+            <div className="font-medium">Nhận xét</div>
+            <div className="text-lg font-bold">
+              {detailSubAssigment?.feedback || "Chưa có nhận xét nào"}
+            </div>
           </div>
         </div>
       </div>

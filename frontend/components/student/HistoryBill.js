@@ -88,7 +88,7 @@ function HistoryBill({ info }) {
       },
     },
     {
-      title: "Tổng học phí",
+      title: "Tổng học phí đã thanh toán",
       render: (text, record, index) => {
         return <div>{formatVND(record?.total)}</div>;
       },
