@@ -229,12 +229,12 @@ export default function LayoutAdmin({
 					),
 					key: "generalReport",
 				},
-				{
-					label: (
-						<Link href="/admin">Báo cáo theo lớp</Link>
-					),
-					key: "classReport",
-				},
+				// {
+				// 	label: (
+				// 		<Link href="/admin">Báo cáo theo lớp</Link>
+				// 	),
+				// 	key: "classReport",
+				// },
 			],
 		},
 	];

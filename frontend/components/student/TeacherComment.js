@@ -85,7 +85,7 @@ export default function TeacherComment({ info }) {
       <Form form={form} onFinish={submitSearch}>
         <Row>
           <Col xs={24} lg={16} className="flex gap-5">
-            <Form.Item name="classId" label="Loại đề xuất" className="w-full">
+            <Form.Item name="classId" label="Loại nhận xét" className="w-full">
               <Select placeholder="-- Chọn --">
                 <Select.Option value="">-- Chọn --</Select.Option>
                 {classes.map((info, index) => (

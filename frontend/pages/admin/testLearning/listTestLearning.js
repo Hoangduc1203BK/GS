@@ -82,9 +82,9 @@ const ListTestLearning = () => {
                 onClick={() => handleEdit(record)}
               />
             </Tooltip>
-            <DeleteOutlined style={{
+            {/* <DeleteOutlined style={{
               color: "#fc4a6c"
-            }} className="text-base cursor-pointer" />
+            }} className="text-base cursor-pointer" /> */}
           </Space>
         </div>;
       },

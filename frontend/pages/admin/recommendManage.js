@@ -93,7 +93,7 @@ const RecommendManage = () => {
 
   async function handleModal(open, record) {
     if (open && record?.status !== 'pending') {
-      message.error("Không thể cập nhật trạng thái!")
+      message.error("Không thể cập nhật trạng thái do đề xuất này đã được xét duyệt!")
       return
     }
     setModal({

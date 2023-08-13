@@ -31,12 +31,13 @@ export default function StudentsInClass({ info, watchHistory }) {
   const [listStudentAttendance, setListStudentAttendance] = useState([]);
 
   async function handleModal(open, record) {
+    console.log(record)
     if (open) {
       await getListUserInClass(record?.id).then(
         res => {
           if (res?.data?.length > 0) {
-            getAttendance({ classId: record?.id, date: "3", day: "2023-07-19" }).then(
-              // getAttendance({ classId: record?.id, date: dayjs().day(), day: dayjs().format("YYYY-MM-DD") }).then(
+            // getAttendance({ classId: record?.id, date: record?.date, day: record?.day }).then(
+              getAttendance({ classId: record?.id, date: dayjs().day(), day: dayjs().format("YYYY-MM-DD") }).then(
               resAtt => {
                 if (resAtt?.data?.students?.length > 0) {
                   res?.data?.forEach(i => {
@@ -165,7 +166,8 @@ export default function StudentsInClass({ info, watchHistory }) {
       {
         title: "Giới tính",
         render: (text, record, index) => {
-          return <div>{genderVNConvert(record.gender)}</div>;
+          console.log(record)
+          return <div>{record.gender}</div>;
         },
       },
       {

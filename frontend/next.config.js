@@ -10,7 +10,10 @@ const nextConfig = {
 		baseUrl: process.env.HOST,
 	},
 	images: {
-		domains: ["gs-nest.s3.ap-southeast-1.amazonaws.com", "gs-nest.s3.amazonaws.com", "gs-images-bucket.s3.ap-southeast-1.amazonaws.com"],
+		domains: [
+		 "gs-images-bucket.s3.ap-southeast-1.amazonaws.com",
+		 "gs-images-bucket.s3.amazonaws.com"
+		],
 	}
 };
 

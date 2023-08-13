@@ -29,7 +29,8 @@ const CreateClass = () => {
     {
       title: "Thứ",
       render: (text, record) => {
-        return <div>Thứ {+record?.date > 0 ? +record?.date + 1 : 8}</div>;
+        return <div>{+record?.date + 1 != 8 ? `Thứ ${+record?.date+1}`: 'Chủ nhật'}</div>
+        // return <div>Thứ {+record?.date > 0 ? +record?.date + 1 : 8}</div>;
       },
       align: "center",
     },
