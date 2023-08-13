@@ -1,8 +1,10 @@
 import { getListClass, getStatistic } from '@/api/address';
+import { MONTH } from '@/common/const';
 import { formatVND, removeVietnameseTones } from '@/common/util';
 import LayoutAdmin from '@/components/LayoutAdmin';
 import { RetweetOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Col, Divider, Empty, Input, Row, Select, Table } from 'antd';
+import dayjs from 'dayjs';
 import React, { useEffect, useState } from 'react'
 
 function ReportGeneral() {
@@ -33,7 +35,7 @@ function ReportGeneral() {
     {
       title: "Ngày kết thúc",
       render: (text, record) => {
-        return <div> {record?.endDate} </div>;
+        return <div> {record?.endDate && dayjs(record?.endDate).format("DD/MM/YYYY")} </div>;
       },
       align: "center",
     },
@@ -63,25 +65,47 @@ function ReportGeneral() {
   const [listStatistics, setListStatistics] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterClass, setFilterClass] = useState("");
+  const [valueMonth, setValueMonth] = useState((dayjs().month() + 1).toString().padStart(2, '0'));
 
   useEffect(() => {
-    getStatistic().then(
+    setLoading(true)
+    getStatistic({ month: valueMonth }).then(
       res => {
         setListStatistics(res?.data)
         setLoading(false)
-
       }
     ).catch(err => console.log('get list statistic err' + err))
-  }, []);
+  }, [valueMonth]);
+
   function handleChangeInput(e) {
     setFilterClass(e.target.value)
   }
+
   return (
     <div>
       <p className='font-semibold text-lg'>Báo cáo tổng quát lớp học</p>
       <Divider />
       <Row gutter={[8, 8]}>
-        <Col xs={24} md={12}>
+        <Col xs={24} md={8}>
+          <Select
+            className='!w-full'
+            placeholder="-- Chọn tháng --"
+            value={valueMonth}
+            onChange={(value) => {
+              console.log(value, 'valueee')
+              setValueMonth(value)
+            }}
+          >
+            {
+              MONTH?.map(el => (
+                <>
+                  <Select.Option disabled={+el.key > +dayjs().month().toString().padStart(2, '0')} value={el.value.toString().padStart(2, '0')} key={el.key}>{el.label}</Select.Option>
+                </>
+              ))
+            }
+          </Select>
+        </Col>
+        <Col xs={24} md={8}>
           <Input
             placeholder="-- Nhập tên lớp--"
             className='w-full'

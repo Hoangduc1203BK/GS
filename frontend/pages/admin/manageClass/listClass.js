@@ -1,14 +1,43 @@
 
-import { getAttendance, getListAttendance, getListClass, getListSubject, getListUser, getListUserInClass } from "@/api/address";
+import { getAttendance, getListAttendance, getListClass, getListClassRoom, getListSubject, getListUser, getListUserInClass, updateInfoClass } from "@/api/address";
 import { ApiGetFeedbacks } from "@/api/student";
 import { COLORS } from "@/common/const";
 import LayoutAdmin from "@/components/LayoutAdmin";
-import { CheckCircleFilled, CloseCircleFilled, CommentOutlined, DeleteOutlined, EditOutlined, EllipsisOutlined, EyeOutlined, HistoryOutlined, MessageOutlined, ProfileOutlined, SnippetsOutlined, TeamOutlined } from "@ant-design/icons";
-import { Avatar, Badge, Button, Col, Empty, Input, List, Modal, Row, Select, Space, Table, Tabs, Tooltip, Tour, message } from "antd";
+import { CheckCircleFilled, ClockCircleOutlined, CloseCircleFilled, CloseCircleOutlined, CommentOutlined, DeleteOutlined, EditOutlined, EllipsisOutlined, EyeOutlined, HistoryOutlined, MessageOutlined, PlusCircleOutlined, ProfileOutlined, RetweetOutlined, SnippetsOutlined, TeamOutlined, WindowsOutlined } from "@ant-design/icons";
+import { Avatar, Badge, Button, Col, Empty, Form, Input, InputNumber, List, Modal, Row, Select, Space, Table, Tabs, TimePicker, Tooltip, Tour, message } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useRef, useState } from "react";
 
 const ListClass = () => {
+  const [formUpdate] = Form.useForm()
+
+  const [modalUpdateClass, setModalUpdateClass] = useState({
+    open: false,
+    record: null
+  });
+
+  const [teachersAccepted, setTeachersAccepted] = useState([]);
+
+  function updateClass(record) {
+    const teacher = listTeacher?.find(el => el.id === record.teacher)
+    getListUser({ role: 'teacher', page: 1, size: 999, departmentId: teacher?.departmentId }).then(
+      res => {
+        setTeachersAccepted(res?.data?.result);
+      }
+    ).catch(err => message.error("Lấy dữ liệu thất bại!"))
+    const newR = JSON.parse(JSON.stringify(record))
+    formUpdate.setFieldsValue({
+      name: newR?.name,
+      teacher: newR?.teacher,
+      numberStudent: newR?.number_student,
+      fee: newR?.fee
+    })
+    newR.time_tables = newR?.time_tables?.map(el => ({ ...el, key: el.id }))
+    setModalUpdateClass({
+      open: true,
+      record: newR
+    })
+  }
 
   const columns = [
     {
@@ -66,6 +95,14 @@ const ListClass = () => {
       render: (text, record) => {
         return <div >
           <Space size="small">
+            <Tooltip title="Cập nhật thông tin lớp">
+              <RetweetOutlined
+                onClick={() => updateClass(record)}
+                style={{
+                  color: "orange"
+                }} className="text-base cursor-pointer"
+              />
+            </Tooltip>
             <Tooltip title="Lịch sử điểm danh">
               <SnippetsOutlined
                 onClick={() => watchHistory(record)}
@@ -201,7 +238,6 @@ const ListClass = () => {
   };
 
   async function detailAttendance(record) {
-    console.log(record, 'recorddd')
     await getAttendance({ classId: record?.class_id, date: record?.date, day: record?.day }).then(
       res => {
         setDetailAttend(res?.data?.students)
@@ -287,6 +323,7 @@ const ListClass = () => {
       }
     ).catch(err => console.log(err, 'errr get feedback'))
   }
+  const [listClassRoom, setListClassRoom] = useState([]);
 
   useEffect(() => {
     getListSubject({ page: 1, size: 9999 }).then(
@@ -298,6 +335,11 @@ const ListClass = () => {
     getListUser({ role: 'teacher', page: 1, size: 999 }).then(
       res => {
         setListTeacher(res?.data?.result);
+      }
+    ).catch(err => message.error("Lấy dữ liệu thất bại!"))
+    getListClassRoom().then(
+      res => {
+        setListClassRoom(res?.data)
       }
     ).catch(err => message.error("Lấy dữ liệu thất bại!"))
   }, []);
@@ -336,6 +378,77 @@ const ListClass = () => {
       setOpen(true)
     }
   }, [listSubject]);
+
+
+  function deleteTime(item) {
+    console.log(item, 'itemmm');
+    const result = modalUpdateClass?.record?.time_tables?.filter(el => el?.key !== item?.key)
+    modalUpdateClass.record.time_tables = result
+    setModalUpdateClass({
+      ...modalUpdateClass,
+      record: modalUpdateClass.record
+    })
+  }
+  function addTime() {
+    const date = formUpdate.getFieldValue("date")
+    const roomId = formUpdate.getFieldValue("roomId")
+    const start = `${dayjs(formUpdate.getFieldValue("start")).hour().toString().padStart(2, '0')}:${dayjs(formUpdate.getFieldValue("start")).minute().toString().padStart(2, '0')}`
+    const end = `${dayjs(formUpdate.getFieldValue("end")).hour().toString().padStart(2, '0')}:${dayjs(formUpdate.getFieldValue("end")).minute().toString().padStart(2, '0')}`
+    if (!date || !roomId || !start || !end) {
+      message.error("Vui lòng điền đầy đủ thông tin lịch học mới!")
+    } else {
+      const param = {
+        date: date,
+        roomId: roomId,
+        start: start,
+        end: end,
+        key: Math.random(),
+        room_name: listClassRoom?.find(el => el.id === roomId)?.name
+      }
+      modalUpdateClass?.record?.time_tables?.push(param)
+      setModalUpdateClass({
+        ...modalUpdateClass
+      })
+      formUpdate.setFieldsValue({
+        date: undefined,
+        roomId: undefined,
+        start: undefined,
+        end: undefined
+      })
+    }
+  }
+
+  async function handleUpdateClass(values) {
+    Object.keys(values).forEach(key => (values[key] === undefined || !values[key]) && delete values[key])
+    const schedules = modalUpdateClass?.record?.time_tables?.filter(el => !el.id).map(item => ({
+      date: item?.date,
+      roomId: item?.roomId,
+      start: item?.start,
+      end: item?.end
+    }))
+    const params = {
+      ...values,
+    }
+    if (schedules.length > 0) {
+      params.schedules = schedules
+    }
+    Object.keys(params).forEach(key => (params[key] === undefined || !params[key]) && delete params[key])
+    await updateInfoClass(params, modalUpdateClass?.record?.id).then(res => {
+      if (res?.data?.id) {
+        message.success("Cập nhật thông tin lớp thành công!")
+        selectSubject(res?.data?.subjectId)
+        setModalUpdateClass({
+          open: false,
+          record: null
+        })
+        formUpdate.resetFields()
+      } else {
+        message.error("Cập nhật thông tin lớp không thành công!")
+      }
+    }).catch(err => {
+      message.error('Có lỗi xảy ra! ' + err)
+    })
+  }
 
   return (
     <>
@@ -379,6 +492,148 @@ const ListClass = () => {
             </List.Item>
           )}
         />
+      </Modal>
+      <Modal
+        width={"60%"}
+        open={modalUpdateClass.open}
+        title="Cập nhật thông tin lớp"
+        footer={null}
+        onCancel={() => {
+          setModalUpdateClass({
+            open: false,
+            record: null
+          })
+        }}
+      >
+        <Form
+          labelCol={{ span: '8' }}
+          form={formUpdate}
+          onFinish={handleUpdateClass}
+        >
+          <Form.Item label="Tên lớp" name="name" rules={[{
+            required: true, message: "Đây là trường dữ liệu bắt buộc!"
+          }]}>
+            <Input placeholder="Nhập tên lớp" />
+          </Form.Item>
+          <Form.Item label="Giáo viên chủ nghiệm" name="teacher" rules={[{
+            required: true, message: "Đây là trường dữ liệu bắt buộc!"
+          }]}>
+            <Select options={teachersAccepted?.map(el => ({
+              ...el, value: el?.id, label: el.name
+            }))} placeholder="Chọn giáo viên" />
+          </Form.Item>
+          <Form.Item label="Sỹ số" name="numberStudent" rules={[{
+            required: true, message: "Đây là trường dữ liệu bắt buộc!"
+          }]}>
+            <InputNumber placeholder="Nhập sỹ số" style={{
+              width: '100%'
+            }} controls={false} />
+          </Form.Item>
+          <Form.Item label="Học phí" name="fee" rules={[{
+            required: true, message: "Đây là trường dữ liệu bắt buộc!"
+          }]}>
+            <InputNumber placeholder="Nhập học phí" controls={false} min={1}
+              style={{
+                width: '100%'
+              }}
+              formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+              parser={value => value.replace(/\$\s?|(,*)/g, "")}
+              addonAfter="VNĐ" />
+          </Form.Item>
+          <Form.Item name="date" label="Thứ"
+          // rules={[
+          //   { required: true, message: "Đây là trường dữ liệu bắt buộc!" }
+          // ]}
+          >
+            <Select
+              placeholder="-- Chọn --"
+            // disabled={disableDate}
+            >
+              <Select.Option value="1">Thứ 2</Select.Option>
+              <Select.Option value="2">Thứ 3</Select.Option>
+              <Select.Option value="3">Thứ 4</Select.Option>
+              <Select.Option value="4">Thứ 5</Select.Option>
+              <Select.Option value="5">Thứ 6</Select.Option>
+              <Select.Option value="6">Thứ 7</Select.Option>
+              <Select.Option value="7">Chủ nhật</Select.Option>
+            </Select>
+          </Form.Item>
+          <Form.Item
+            label="Phòng học"
+            name="roomId"
+          // rules={[
+          //   { required: true, message: "Đây là trường dữ liệu bắt buộc!" }
+          // ]}
+          >
+            <Select placeholder="-- Chọn --">
+              {
+                listClassRoom?.map(item => (
+                  <Select.Option value={item.id} key={item.id} >{item.name}</Select.Option>
+                ))
+              }
+            </Select>
+          </Form.Item>
+          <Form.Item
+            label="Thời gian bắt đầu buổi học"
+            name="start"
+          // rules={[
+          //   { required: true, message: "Đây là trường dữ liệu bắt buộc!" }
+          // ]}
+          >
+            <TimePicker
+              format="HH:mm"
+              placeholder="--:--"
+              style={{
+                width: '100%'
+              }}
+            />
+          </Form.Item>
+          <Form.Item
+            label="Thời gian kết thúc buổi học"
+            name="end"
+          // rules={[
+          //   { required: true, message: "Đây là trường dữ liệu bắt buộc!" }
+          // ]}
+          >
+            <TimePicker
+              format="HH:mm"
+              placeholder="--:--"
+              style={{
+                width: '100%'
+              }}
+            />
+          </Form.Item>
+          <div className="flex justify-end">
+            <Button type="primary" icon={<PlusCircleOutlined />} onClick={addTime}>Thêm lịch học</Button>
+          </div>
+          {
+            modalUpdateClass?.record?.time_tables?.map(el => (
+              <div className="relative">
+                <div className="absolute top-[-5%] right-0">
+                  <CloseCircleOutlined className="cursor-pointer " onClick={() => deleteTime(el)} />
+                </div>
+                <div className="p-5 my-5 rounded-md text-center border-1 "
+                  style={{
+                    boxShadow: "5px 5px 10px 0px gray",
+                  }}
+                ><WindowsOutlined /> {el.room_name} - <ClockCircleOutlined /> {el.date == 7 ? "Chủ nhật" : `Thứ ${+el.date + 1}`} - {el?.start} - {el?.end}</div>
+              </div>
+            ))
+          }
+          <Row gutter={[8, 8]} justify="center">
+            <Col>
+              <Button type="primary" htmlType="submit">Lưu</Button>
+            </Col>
+            <Col>
+              <Button onClick={() => {
+                setModalUpdateClass({
+                  open: false,
+                  record: null
+                })
+              }}>Hủy</Button>
+            </Col>
+          </Row>
+        </Form>
       </Modal>
       <Tabs
         onChange={handleChangeTab}
