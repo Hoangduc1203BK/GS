@@ -146,8 +146,8 @@ export class ClassService {
 
     let scheduleFilter = {
       date: "'0','1','2','3','4','5','6','7'",
-      start: 7.5,
-      end: 21.5,
+      start: 6,
+      end: 22.5,
     } as any;
 
     if (subjectId) {

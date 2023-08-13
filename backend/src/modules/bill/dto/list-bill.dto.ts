@@ -15,4 +15,10 @@ export class ListBillDto {
 	@IsNotEmpty()
 	@IsEnum(BILL_TYPE)
 	type?: string;
+
+	@ApiProperty({ required: true })
+    @IsOptional()
+	@IsNotEmpty()
+	@IsString()
+	month?: string;
 }

@@ -212,14 +212,14 @@ export class BillService {
         return result;
     }
 
-    async getStatistic() {
+    async getStatistic(monthInput?:string) {
         const current = new Date();
         let month = current.getMonth() + 1;
-        const currentMonth =  month <=9 ? `0${month}` : month.toString();
+        const currentMonth =  monthInput != null ? monthInput : (month <=9 ? `0${month}` : month.toString());
         const startOfMonth = `${current.getFullYear()}-${currentMonth}-01`;
-        const last = new Date(current.getFullYear(), current.getMonth()+1, 0)
+        const last = new Date(current.getFullYear(), monthInput != null ? Number(monthInput) : current.getMonth()+1, 0)
         const endOfMonth = `${current.getFullYear()}-${currentMonth}-${last.getDate()}`;
-        
+
         const result = [] as any;
         const listClass = await this.classRepos.find({
             where: {type: CLASS_TYPE.ACTIVE}
@@ -229,7 +229,9 @@ export class BillService {
         for(const c of listClass) {
             const listAttendance = await this.classService.listAttendance({classId: c.id, start: startOfMonth, end: endOfMonth});
             const listBillDone = await this.subBillRepos.find({
-                where: {classId: c.id, status: true}
+                where: {
+                    classId: c.id, status: true, ctime: LessThan(last)
+                }
             })
             const numberOfStudent = await this.userClassRepos.count({
                 where: {
@@ -241,7 +243,7 @@ export class BillService {
             const histories = await this.historyRepos.find({
                 where: {
                     classId: c.id,
-                    ctime : LessThan(new Date())
+                    ctime : LessThan(last)
                 }
             })
 

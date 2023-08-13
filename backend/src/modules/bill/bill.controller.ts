@@ -19,8 +19,15 @@ export class BillController {
     }
 
     @Get('/statistic')
-    async getStatistic() {
-        const result = await this.billService.getStatistic();
+    async getStatistic(@Query() query: any) {
+        const { month } = query;
+        let result;
+        if(month) {
+            result = await this.billService.getStatistic(month);
+        }
+        else {
+            result = await this.billService.getStatistic();
+        } 
 
         return result;
     }
