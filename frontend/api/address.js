@@ -237,7 +237,7 @@ export const getFee = (id) => {
 	return axios.get(`/user/admin/fee?userId=${id}`)
 }
 export const getBill = (id) => {
-	return axios.get(`/bill/${id}`)
+	return axios.get(`/bill/get?userId=${id}`)
 }
 
 export const updateBill = (params, id) => {
@@ -250,6 +250,17 @@ export const createBill = (params) => {
 
 
 
-export const getStatistic = () => {
-	return axios.get(`/bill/statistic`)
+export const getStatistic = (params) => {
+	return axios.get(`/bill/statistic`, { params: params })
+}
+
+
+export const updateInfoClass = (params, id) => {
+	return axios.patch(`/class/${id}`, params)
+}
+export const getBills = (id) => {
+	return axios.get(`/bill?userId=${id}`)
+}
+export const getOneBill = (param) => {
+	return axios.get(`/bill/get`, { params: param })
 }
