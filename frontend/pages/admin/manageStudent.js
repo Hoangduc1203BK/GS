@@ -39,7 +39,7 @@ const ManageStudent = () => {
     {
       title: "Ngày sinh",
       render: (text, record) => {
-        return <div> {dayjs(record?.birthDay).format('DD-MM-YYYY')} </div>;
+        return <div> {record?.birthDay && dayjs(record?.birthDay).format('DD-MM-YYYY')} </div>;
       },
       align: "center",
     },
@@ -188,7 +188,6 @@ const ManageStudent = () => {
             }
           ).catch(err => message.error("Có lỗi xảy ra! Vui lòng kiểm tra lại." + err))
         }
-
       }
     ).catch(err => {
       console.log(err, 'errr gets');
@@ -233,20 +232,24 @@ const ManageStudent = () => {
   }
 
   const [idSelect, setIdSelect] = useState([]);
-
+  const [recordSelected, setRecordSelected] = useState([]);
   const [formFee] = Form.useForm()
   const [loadingButton, setLoadingButton] = useState(false);
   const [openPop, setOpenPop] = useState(false);
   function handleOpenPop() {
-    setOpenPop(true)
-    if (modal.check) {
-      formFee.setFieldsValue({
-        type: dataFee?.type,
-        description: dataFee?.description,
-        day: dayjs(dataFee?.day)
-      })
+    if (recordSelected?.some(el => el?.total == 0)) {
+      message.error("Không thể đóng học phí các lớp chưa học!")
     } else {
-      formFee.resetFields()
+      setOpenPop(true)
+      if (modal.check) {
+        formFee.setFieldsValue({
+          type: dataFee?.type,
+          description: dataFee?.description,
+          day: dayjs(dataFee?.day)
+        })
+      } else {
+        formFee.resetFields()
+      }
     }
   }
 
@@ -345,6 +348,7 @@ const ManageStudent = () => {
             open: false
           })
           setDataFee({})
+          setOpenPop(false)
         }}
         footer={null}
       >
@@ -358,6 +362,7 @@ const ManageStudent = () => {
               selectedRowKeys: idSelect,
               onChange: (selectedRowKeys, selectedRows) => {
                 setIdSelect(selectedRowKeys)
+                setRecordSelected(selectedRows)
               }
             }}
             size="middle"
@@ -380,7 +385,10 @@ const ManageStudent = () => {
               cancelButtonProps={{
                 className: '!hidden'
               }}
-              // onOpenChange={handleOpenPop}
+              onOpenChange={(open) => {
+                console.log(open, 'status popconfirm')
+                if (!open) setOpenPop(false)
+              }}
               onCancel={() => {
                 setOpenPop(false)
                 formFee.resetFields()
@@ -425,7 +433,7 @@ const ManageStudent = () => {
                 </Form>
               }
             >
-              <Button ref={ref2} icon={<CheckCircleOutlined />} onClick={handleOpenPop} loading={loadingButton} type="primary">Xác nhận</Button>
+              <Button ref={ref2} icon={<CheckCircleOutlined />} disabled={idSelect.length === 0} onClick={handleOpenPop} loading={loadingButton} type="primary">Xác nhận</Button>
             </Popconfirm>
           </Col>
           <Col>

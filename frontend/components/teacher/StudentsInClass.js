@@ -263,7 +263,7 @@ export default function StudentsInClass({ info, watchHistory }) {
             {record?.time_tables
               ?.map(
                 (item) =>
-                  `Thứ ${+item?.date + 1} ( ${item?.start} : ${item?.end} ) - ${item?.room_name
+                  `${+item?.date + 1 === 8 ? 'Chủ nhật' : `Thứ ${+item?.date + 1}`} ( ${item?.start} : ${item?.end} ) - ${item?.room_name
                   }`
               )
               ?.join(", ")}
@@ -324,10 +324,13 @@ export default function StudentsInClass({ info, watchHistory }) {
             })
             setListStudentAttendance([])
           } else {
-            message.error("Cập nhật điểm danh thất bại!")
+            message.error(res?.data || "Điểm danh không thành công!")
           }
         }
-      ).catch(err => message.error("Có lỗi xảy ra! " + err))
+      ).catch(err => {
+        message.error("Có lỗi xảy ra! " + err)
+        console.log(err, 'errrr post att');
+      })
 
     } else {
       const params = {

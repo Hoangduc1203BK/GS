@@ -167,8 +167,7 @@ export default function StudentsInClass({ info }) {
             {record?.classes?.timeTables
               ?.map(
                 (item) =>
-                  `Thứ ${+item?.date + 1} ( ${item?.start} : ${item?.end} ) - ${item?.room?.name
-                  }`
+                  `${+item?.date + 1 === 8 ? 'Chủ nhật' : `Thứ ${+item?.date + 1}`} ( ${item?.start} : ${item?.end} ) - ${item?.room?.name}`
               )
               ?.join(", ")}
           </div>

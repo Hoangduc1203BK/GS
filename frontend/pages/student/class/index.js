@@ -1,9 +1,10 @@
 import LayoutAdmin from "@/components/LayoutAdmin";
+import HistoryBill from "@/components/student/HistoryBill";
 import StudentsInClass from "@/components/student/StudentsInClass";
 import StudentsInClassTest from "@/components/student/StudentsInClassTest";
 import TeacherComment from "@/components/student/TeacherComment";
 import { Tabs } from "antd";
-const LearningOutcomes = ({user}) => {
+const LearningOutcomes = ({ user }) => {
 
   const items = [
     {
@@ -20,6 +21,11 @@ const LearningOutcomes = ({user}) => {
       key: "3",
       label: `Nhận xét của giáo viên`,
       children: <TeacherComment info={user} />,
+    },
+    {
+      key: "4",
+      label: `Lịch sử đóng học phí`,
+      children: <HistoryBill info={user} />,
     },
   ];
   return <Tabs defaultActiveKey="1" items={items} />;

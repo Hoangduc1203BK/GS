@@ -277,3 +277,9 @@ export const COLORS = [
 
 export const UPLOAD_IMAGE_FILE = ["image/png", "image/jpg", "image/jpeg", "image/bmp"]
 export const UPLOAD_IMAGE_FILE_FORMAT = [".png", ".jpg", ".jpeg", ".bmp"]
+
+export const MONTH = new Array(12).fill({}).map((item, index) => ({
+  label: `Tháng ${index + 1}`,
+  value: `${index + 1}`,
+  key: index,
+}));
