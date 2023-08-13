@@ -282,7 +282,7 @@ export class UserService {
         const subAttendance = await this.subAttendanceRepos.findOne({
           where: {
             studentId: userId,
-            attendanceId: a.id,
+            attendanceId: a?.id,
             status: true,
           }
         })

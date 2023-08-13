@@ -55,7 +55,7 @@ export async function bootstrap(): Promise<NestExpressApplication> {
 	const reflector = app.get(Reflector);
 
 	// filter pipes
-	app.useGlobalFilters(new AllExceptionsFilter(adapter));
+	// app.useGlobalFilters(new AllExceptionsFilter(adapter));
 
 	app.useGlobalInterceptors(new ClassSerializerInterceptor(reflector));
 

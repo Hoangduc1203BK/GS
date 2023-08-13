@@ -3,6 +3,7 @@ import { CreateBillDto } from "./dto/create-bill.dto";
 import { BillService } from "./bill.service";
 import { ListBillDto } from "./dto/list-bill.dto";
 import { UpdateBillDto } from "./dto/updae-bill.dto";
+import { query } from "express";
 
 @Controller('bill')
 export class BillController {
@@ -24,9 +25,15 @@ export class BillController {
         return result;
     }
 
-    @Get('/:id')
-    async getBill(@Param('id') id: string) {
-        const result = await this.billService.getBill(id);
+    @Get('/get')
+    async getBill(@Query() query: any) {
+        const {userId, month } = query;
+        let result;
+        if(month) {
+            result = await this.billService.getBill(userId, month);
+        }else {
+            result = await this.billService.getBill(userId);
+        }
 
         return result;
     }

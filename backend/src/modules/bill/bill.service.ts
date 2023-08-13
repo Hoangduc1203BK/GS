@@ -9,6 +9,7 @@ import { CreateBillDto } from "./dto/create-bill.dto";
 import { ListBillDto } from "./dto/list-bill.dto";
 import { BILL_TYPE, CLASS_TYPE, USER_CLASS_TYPE } from "src/common/constants";
 import { UpdateBillDto } from "./dto/updae-bill.dto";
+import { Console } from "console";
 
 @Injectable()
 export class BillService {
@@ -26,13 +27,14 @@ export class BillService {
         private readonly generatorService: GeneratorService,
     ) { }
 
-    async getBill(userId: string) {
+    async getBill(userId: string, monthInput?: string) {
         const current = new Date();
         let month = current.getMonth() + 1;
-        const currentMonth =  month <=9 ? `0${month}` : month.toString();
+        const currentMonth =  monthInput == null ? (month <=9 ? `0${month}` : month.toString()) : monthInput;
         const startOfMonth = `${current.getFullYear()}-${currentMonth}-01`;
         const last = new Date(current.getFullYear(), current.getMonth()+1, 0)
         const endOfMonth = `${current.getFullYear()}-${currentMonth}-${last.getDate()}`;
+        
         const bills = await this.billRepos.find({
             where: { 
                 userId: userId,
