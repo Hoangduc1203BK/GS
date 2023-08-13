@@ -68,7 +68,7 @@ export class BillService {
                 numberOfStudy: rest1.numberStudy,
                 className: classes.name,
                 subject: classes.subject.name,
-                fee: rest1.status == true ? histories[histories.length - 1].newPrice : classes.fee,
+                fee: rest1.status == true ? Number(histories[histories.length - 1].newPrice) : Number(classes.fee),
             }
 
             delete item.numberStudy
@@ -234,6 +234,15 @@ export class BillService {
                 }
             })
 
+            const histories = await this.historyRepos.find({
+                where: {
+                    classId: c.id,
+                    ctime : LessThan(new Date())
+                }
+            })
+
+            const price = histories.length > 0 ? Number(histories[histories.length-1].newPrice) : Number(c.fee);
+
             let total = 0;
             let numberOfSubAttend = 0;
 
@@ -257,11 +266,11 @@ export class BillService {
                 name: c.name,
                 numberOfStudy: listAttendance.length,
                 endDate: listAttendance.length >0 ? listAttendance[listAttendance.length-1].day : null,
-                totalFee: numberOfSubAttend * Number(c.fee),
+                totalFee: numberOfSubAttend * price,
                 numberOfDone: `${listBillDone.length}/${numberOfStudent}`,
                 totalDone: total,
-                totalNotDone: numberOfSubAttend * Number(c.fee) - total,
-                teacherSalary: c.teacherRate ? listAttendance.length * Number(c.fee) * c.teacherRate : listAttendance.length * Number(c.fee) * 0.1
+                totalNotDone: numberOfSubAttend * price - total,
+                teacherSalary: Number(c.teacherRate) ? listAttendance.length * price * Number(c.teacherRate)/100 : listAttendance.length * price * 0.6
             }
 
             result.push(item)

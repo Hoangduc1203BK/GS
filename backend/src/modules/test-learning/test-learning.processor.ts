@@ -12,7 +12,7 @@ export class TestLearningConsumer {
 	@Process()
 	async sendMail(job: Job) {
 		const { name, className, date, day, mail, password} = job.data;
-		await this.mailService.sendMail(mail, 'Thông báo lịch thi thử đầu vào', './test-learning', {
+		await this.mailService.sendMail(mail, 'Thông báo lịch học thử đầu vào', './test-learning', {
 			name: name,
 			className,
             date,

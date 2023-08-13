@@ -180,9 +180,9 @@ export class UserService {
 
       const item = {
         ...c,
-        fee: c.teacher_rate != null ? c.teacher_rate * price : c.fee * 0.3,
+        fee: c.teacher_rate != null ? Number(c.teacher_rate) * Number(price)/100 : Number(c.fee) * 0.6,
         numberOfStudy: `${numberOfStudy}/${totalOfStudy}`,
-        total: c.teacher_rate != null ? (price * numberOfStudy * c.teacher_rate) / 100 : price * numberOfStudy * 0.3
+        total: c.teacher_rate != null ? Number(price) * numberOfStudy * Number(c.teacher_rate) / 100 : Number(price) * numberOfStudy * 0.6
       }
 
       result.push(item)

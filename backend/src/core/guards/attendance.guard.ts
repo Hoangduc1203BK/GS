@@ -23,10 +23,16 @@ export class AttendanceGuard implements CanActivate {
 
         const schedules = await this.timeRepos.find({ where: { classId: classId } });
         if (schedules && schedules.length > 0) {
+            const strSchedule = schedules.reduce((init, curr) => {
+                const {date, start, end} = curr
+                let mess = `${start}h-${end}h thứ ${+date+1}`
+                return [...init,mess]
+            },[] as any)
+            const errorMessage = strSchedule.join(', ')
             const currentDay = new Date().getDay();
             const schedule = schedules.find(el => Number(el.date) == currentDay);
             if (!schedule) {
-                throw new Error('Hiện không phải thời gian điểm danh của lớp với id:' + classId);
+                throw new Error('Hiện không phải thời gian điểm danh của lớp với id:' + classId + `\n Thời gian điểm danh là ${errorMessage}`);
             }
 
             let currentTime = new Date().toLocaleTimeString('it-IT');
@@ -34,7 +40,7 @@ export class AttendanceGuard implements CanActivate {
             if (time >= schedule.start && time <= schedule.end) {
                 return true
             } else {
-                throw new Error('Hiện không phải thời gian điểm danh của lớp với id:' + classId)
+                throw new Error('Hiện không phải thời gian điểm danh của lớp với id:' + classId + `\n Thời gian điểm danh là ${errorMessage}`)
             }
         }
 
