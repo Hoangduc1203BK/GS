@@ -222,7 +222,10 @@ export class BillService {
 
         const result = [] as any;
         const listClass = await this.classRepos.find({
-            where: {type: CLASS_TYPE.ACTIVE}
+            where: {
+                type: CLASS_TYPE.ACTIVE,
+            },
+            order: {ctime: 'ASC'}
         });
 
 

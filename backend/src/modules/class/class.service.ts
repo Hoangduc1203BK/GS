@@ -850,10 +850,10 @@ export class ClassService {
 
     const listMapClass = [] as any;
     const dates = {
-      '0': {
-        day: getDayOfMonth('0'),
-        classes: []
-      },
+      // '0': {
+      //   day: getDayOfMonth('0'),
+      //   classes: []
+      // },
       '1': {
         day: getDayOfMonth('1'),
         classes: []
@@ -876,6 +876,10 @@ export class ClassService {
       },
       '6': {
         day: getDayOfMonth('6'),
+        classes: []
+      },
+      '7': {
+        day: getDayOfMonth('7'),
         classes: []
       }
     } as any;
@@ -899,9 +903,9 @@ export class ClassService {
 
     for (const classes of listMapClass) {
       switch (classes.date) {
-        case '0':
-          dates['0'].classes.push(classes);
-          break;
+        // case '0':
+        //   dates['0'].classes.push(classes);
+        //   break;
         case '1':
           dates['1'].classes.push(classes);
           break;
@@ -920,6 +924,9 @@ export class ClassService {
         case '6':
           dates['6'].classes.push(classes);
           break;
+          case '7':
+            dates['7'].classes.push(classes);
+            break;
       }
     }
 
@@ -931,10 +938,10 @@ export class ClassService {
     const listClass = await this.listClass({ teacher: teacherId });
     const listMapClass = [] as any;
     const dates = {
-      '0': {
-        day: getDayOfMonth('0'),
-        classes: []
-      },
+      // '0': {
+      //   day: getDayOfMonth('0'),
+      //   classes: []
+      // },
       '1': {
         day: getDayOfMonth('1'),
         classes: []
@@ -958,6 +965,10 @@ export class ClassService {
       '6': {
         day: getDayOfMonth('6'),
         classes: []
+      },
+      '7': {
+        day: getDayOfMonth('7'),
+        classes: []
       }
     } as any;
 
@@ -980,9 +991,9 @@ export class ClassService {
 
     for (const classes of listMapClass) {
       switch (classes.date) {
-        case '0':
-          dates['0'].classes.push(classes);
-          break;
+        // case '0':
+        //   dates['0'].classes.push(classes);
+        //   break;
         case '1':
           dates['1'].classes.push(classes);
           break;
@@ -1000,6 +1011,9 @@ export class ClassService {
           break;
         case '6':
           dates['6'].classes.push(classes);
+          break;
+          case '7':
+          dates['7'].classes.push(classes);
           break;
       }
     }

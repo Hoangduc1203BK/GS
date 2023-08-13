@@ -83,7 +83,7 @@ export class TeacherRegisterClass implements ProposalStrategy {
                     './proposal',
                     {
                         name: 'đăng ký dạy lớp',
-                        status: PROPOSAL_STATUS.APPROVED,
+                        status: PROPOSAL_STATUS.REJECTED,
                         description: 'Đề xuất đăng ký lớp có id:' + proposal.subData.classId + ' chưa được phê duyệt.\n Mọi ý kiến đóng góp xin vui lòng liên hệ về quản lý trung tâm.'
                     }
                 )

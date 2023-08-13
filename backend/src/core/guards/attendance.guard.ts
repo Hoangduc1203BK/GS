@@ -24,15 +24,17 @@ export class AttendanceGuard implements CanActivate {
         const schedules = await this.timeRepos.find({ where: { classId: classId } });
         if (schedules && schedules.length > 0) {
             const strSchedule = schedules.reduce((init, curr) => {
-                const {date, start, end} = curr
-                let mess = `${start}h-${end}h ${date == '7' ? 'chủ nhật': 'thứ ' + (+date+1)}`
+                let {date, start, end} = curr
+                let formatStart = moment.utc(start*3600*1000).format('HH:mm')
+                let formatEnd = moment.utc(end*3600*1000).format('HH:mm')
+                let mess = `${formatStart}-${formatEnd} ${date == '7' ? 'chủ nhật': 'thứ ' + (+date+1)}.`
                 return [...init,mess]
             },[] as any)
             const errorMessage = strSchedule.join(', ')
             const currentDay = new Date().getDay();
             const schedule = schedules.find(el => Number(el.date) == currentDay);
             if (!schedule) {
-                const strMess = `Hiện không phải thời gian điểm danh của lớp. Thời gian điểm danh là ${errorMessage}`;
+                const strMess = `Hiện không phải thời gian điểm danh của lớp. Thời gian điểm danh là ${errorMessage}.`;
                 req["errorMessage"] = strMess;
 
                 return true;

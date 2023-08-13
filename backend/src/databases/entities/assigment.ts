@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, OneToMany, OneToOne, BeforeUpdate, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, OneToMany, OneToOne, BeforeUpdate, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
 import { Department } from './department';
 import { Subject } from './subject';
 import { TimeTable } from './time-table';
@@ -64,7 +64,7 @@ export class Assigment {
     })
     status: string;
 
-    @Column({
+    @CreateDateColumn({
 		name: 'created_at',
 		type: 'timestamp',
 		default: () => 'CURRENT_TIMESTAMP',
