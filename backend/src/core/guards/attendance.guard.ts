@@ -25,7 +25,7 @@ export class AttendanceGuard implements CanActivate {
         if (schedules && schedules.length > 0) {
             const strSchedule = schedules.reduce((init, curr) => {
                 const {date, start, end} = curr
-                let mess = `${start}h-${end}h thứ ${+date+1}`
+                let mess = `${start}h-${end}h ${date == '7' ? 'chủ nhật': 'thứ ' + (+date+1)}`
                 return [...init,mess]
             },[] as any)
             const errorMessage = strSchedule.join(', ')

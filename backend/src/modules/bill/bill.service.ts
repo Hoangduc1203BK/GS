@@ -34,7 +34,7 @@ export class BillService {
         const startOfMonth = `${current.getFullYear()}-${currentMonth}-01`;
         const last = new Date(current.getFullYear(), current.getMonth()+1, 0)
         const endOfMonth = `${current.getFullYear()}-${currentMonth}-${last.getDate()}`;
-        
+
         const bills = await this.billRepos.find({
             where: { 
                 userId: userId,
@@ -56,12 +56,14 @@ export class BillService {
         const bill = bills[bills.length-1];
 
         const { user, subBills, ...rest } = bill;
-        const subBillResult = subBills.map(async(el) => {
+        const subBillResult =await Promise.all(subBills.map(async(el) => {
             const histories = await this.historyRepos.find({
                 where: {
+                    classId: el.classId,
                     ctime: LessThan(el.mtime)
                 }
             });
+
 
             const { classes, ...rest1 } = el;
 
@@ -76,7 +78,7 @@ export class BillService {
             delete item.numberStudy
 
             return item;
-        })
+        }));
 
         const result = {
             ...rest,
