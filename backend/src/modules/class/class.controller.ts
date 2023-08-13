@@ -55,7 +55,7 @@ export class ClassController {
   }
 
   @Post('/attendance')
-  // @UseGuards(AttendanceGuard)
+  @UseGuards(AttendanceGuard)
   async createAttendance(@Body() createAttendanceDto: CreateAttendanceDto) {
     const result = await this.classService.createAttendance(
       createAttendanceDto,
@@ -65,7 +65,7 @@ export class ClassController {
   }
 
   @Patch('/attendance')
-  // @UseGuards(AttendanceGuard)
+  @UseGuards(AttendanceGuard)
   async updateAttendance(
     @Query() query: any,
     @Body() updateAttendanceDto: UpdateAttendanceDto,
