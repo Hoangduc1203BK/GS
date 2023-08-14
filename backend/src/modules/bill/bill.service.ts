@@ -27,7 +27,7 @@ export class BillService {
         private readonly generatorService: GeneratorService,
     ) { }
 
-    async getBill(userId: string, monthInput?: string) {
+    async getBill(userId: string, monthInput?: string, billOf?: string) {
         const current = new Date();
         let month = current.getMonth() + 1;
         const currentMonth =  monthInput == null ? (month <=9 ? `0${month}` : month.toString()) : monthInput;
@@ -39,6 +39,7 @@ export class BillService {
             where: { 
                 userId: userId,
                 day: LessThan(endOfMonth),
+                // billOf: billOf
              },
             relations: ['user', 'subBills', 'subBills.classes', 'subBills.classes.subject']
         })

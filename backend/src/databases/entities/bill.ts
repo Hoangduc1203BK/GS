@@ -33,6 +33,13 @@ export class Bill {
     type: string;
 
     @Column({
+        type: 'varchar',
+        name: 'bill_of',
+        nullable: true,
+    })
+    billOf : string;
+
+    @Column({
         type: 'decimal',
         precision: 10,
         scale: 2,

@@ -120,3 +120,8 @@ export enum QUEUE_JOB {
   EXAM = 'exam',
   TEST_LEARNING = 'test-learning'
 }
+
+export enum BILL_TYPE1 {
+  TEACHER = 'teacher',
+  STUDENT = 'student'
+}
