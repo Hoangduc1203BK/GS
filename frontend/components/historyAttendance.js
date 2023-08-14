@@ -5,7 +5,6 @@ import dayjs from "dayjs";
 import { useState } from "react";
 
 const HistoryAttendance = ({ dataAttendance, listTeacher }) => {
-  console.log(dataAttendance, 'data');
   const [detailAttend, setDetailAttend] = useState([]);
   const [modal, setModal] = useState(false);
 

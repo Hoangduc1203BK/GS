@@ -33,4 +33,9 @@ export class CreateBillDto {
 	@IsNotEmpty()
 	@IsArray()
 	subBills: SUB_BILL[];
+
+	@ApiProperty({required: true})
+	@IsNotEmpty()
+	@IsString()
+	billOf: string;
 }

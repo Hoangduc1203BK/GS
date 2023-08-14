@@ -74,6 +74,8 @@ export class BillService {
                 className: classes.name,
                 subject: classes.subject.name,
                 fee: rest1.status == true ? Number(histories[histories.length - 1].newPrice) : Number(classes.fee),
+                teacher_rate: Number(classes.teacherRate),
+                teacherFee: Number(histories[histories.length - 1].newPrice) * Number(classes.teacherRate)/100,
             }
 
             delete item.numberStudy

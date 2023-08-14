@@ -44,6 +44,13 @@ export class UserController {
         return result;
     }
 
+    @Get('/admin/time-keeping')
+    async listTimeKeepingOfTeacher(@Query('userId') userId: string) {
+        const result = await this.userService.listTimeKeeping(userId, {});
+
+        return result;
+    }
+
     @UseGuards(JwtAuthGuard)
     @Get('/fee')
     async listFee(@Req() req: Request, @Query() query: ListFeetDto) {

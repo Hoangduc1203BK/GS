@@ -255,10 +255,15 @@ const ManageStudent = () => {
 
   async function confirm() {
     setLoadingButton(true)
+    if(recordSelected?.some(el => +el?.total === 0)){
+      message.error("Vui lòng bỏ tích chọn lớp chưa học buổi nào!")
+      return
+    }
     const params = {
       day: dayjs(formFee.getFieldValue("day")).format('YYYY-MM-DD'),
       type: formFee.getFieldValue("type"),
       description: formFee.getFieldValue("description"),
+      billOf: "student"
     }
     if (modal.check) {
       const bills = dataFee?.subBills?.map(i => ({

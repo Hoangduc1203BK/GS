@@ -308,6 +308,11 @@ export default function StudentsInClass({ info, watchHistory }) {
   };
 
   async function saveAttendance() {
+    console.log(info, 'user');
+    if(info?.id !== modal.data?.teacher_of_day) {
+      message.error("Không thể điểm danh do không phải giáo viên dạy buổi này!")
+      return
+    }
     if (modal.mode == 0) {
       const params = {
         classId: modal.data?.id,

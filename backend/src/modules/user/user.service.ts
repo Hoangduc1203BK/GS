@@ -182,7 +182,8 @@ export class UserService {
         ...c,
         fee: c.teacher_rate != null ? Number(c.teacher_rate) * Number(price)/100 : Number(c.fee) * 0.6,
         numberOfStudy: `${numberOfStudy}/${totalOfStudy}`,
-        total: c.teacher_rate != null ? Number(price) * numberOfStudy * Number(c.teacher_rate) / 100 : Number(price) * numberOfStudy * 0.6
+        total: c.teacher_rate != null ? Number(price) * numberOfStudy * Number(c.teacher_rate) / 100 : Number(price) * numberOfStudy * 0.6,
+        teacher_rate: Number(c.teacher_rate)
       }
 
       result.push(item)

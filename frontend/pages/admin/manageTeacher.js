@@ -1,8 +1,9 @@
-import { getListDepartment, getListUser } from "@/api/address";
+import { createBill, getAdminTimeKeeping, getBill, getListDepartment, getListUser, getOneBill } from "@/api/address";
+import { formatVND } from "@/common/util";
 import AddEditTs from "@/components/AddEditTS";
 import LayoutAdmin from "@/components/LayoutAdmin";
-import { PlusCircleOutlined, RetweetOutlined, ScheduleOutlined, SearchOutlined } from "@ant-design/icons";
-import { Button, Col, Empty, Form, Input, Row, Select, Space, Table, Tooltip } from "antd";
+import { CheckCircleOutlined, FundOutlined, PlusCircleOutlined, RetweetOutlined, ScheduleOutlined, SearchOutlined } from "@ant-design/icons";
+import { Button, Col, Empty, Form, Input, Modal, Popconfirm, Row, Select, Space, Table, Tag, Tooltip, message } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 
@@ -71,6 +72,15 @@ const ManageTeacher = () => {
                 onClick={() => handleOpenForm(true, true, record)}
               />
             </Tooltip>
+            <Tooltip title="Xác nhận chấm công">
+              <FundOutlined 
+                style={{
+                  color: "red"
+                }} 
+                className="text-base cursor-pointer"
+                onClick={() => handleModal(true, record)}
+              />
+            </Tooltip>
           </Space>
         </div>;
       },
@@ -91,6 +101,103 @@ const ManageTeacher = () => {
     open: false,
     checkEdit: false
   });
+
+  const [modal, setModal] = useState({
+    open: false,
+    record: null,
+    check: true // true = getBills have data || false = getTimeKeeping
+  })
+  const [data, setData] = useState({})
+
+  
+  const columnsFee = [
+    {
+      title: "Tên lớp",
+      render: (text, record, index) => {
+        return <div>{record?.className}</div>;
+      },
+    },
+    {
+      title: "Môn học",
+      render: (text, record, index) => {
+        return <div>{record.subject}</div>;
+      },
+    },
+    {
+      title: "Số ngày công",
+      render: (text, record, index) => {
+        return <div>{record.numberOfStudy}</div>;
+      },
+    },
+    {
+      title: "Chiết khấu",
+      render: (text, record, index) => {
+        return <div>{record.teacher_rate}%</div>;
+      },
+    },
+    {
+      title: "Tiền công",
+      render: (text, record, index) => {
+        return <div>{formatVND(modal.check ? +record?.teacherFee : +record?.fee)}</div>;
+      },
+    }, 
+    {
+      title: "Tổng tiền",
+      render: (text, record, index) => {
+        return <div>{formatVND(+record?.total)}</div>;
+      },
+    },
+    {
+      title: "Trạng thái",
+      render: (text, record) => {
+        return <div>{<Tag color={"green"} icon={<CheckCircleOutlined />}>Đã xác nhận</Tag>}</div>;
+      },
+    },
+  ];
+
+  useEffect(() => {
+    if(!modal.check){
+      columnsFee.splice(6, 1)
+    }
+  }, [modal])
+
+  async function handleModal(option, record) {
+    if(option && record.id){
+      await getOneBill({ userId: record?.id, month: (dayjs().month() + 1).toString().padStart(2, '0') }).then(
+        res => {
+          if(res?.data?.id) {
+            setData(res?.data)
+            setModal({
+              open: option,
+              record: record,
+              check: true
+            })
+          } else {
+            getAdminTimeKeeping({ userId: record.id }).then(
+              res => {
+                if(res?.data?.id){
+                  setData(res?.data)
+                  setModal({
+                    open: option,
+                    record: record,
+                    check: false
+                  })
+                } else {
+                  message.error("Vui lòng kiểm tra lại!")
+                }
+              }
+            ).catch(err => message.error("Không thể lấy dữ liệu chấm công!"))
+          }
+        }
+      ).catch(err => console.log(err ,'err get bill'))
+    } else {
+      setModal({
+        open: false,
+        record: null,
+        check: true
+      })
+    }
+  }
   const [dataEdit, setDataEdit] = useState({});
   function handleOpenForm(open, edit, record) {
     setCheck({
@@ -138,9 +245,83 @@ const ManageTeacher = () => {
     })
   }
 
+  async function confirm() {
+    const params = {
+      userId: modal?.record?.id,
+      type: "in-cash",
+      description: "thanh toán học phí tháng " + (dayjs().month() + 1).toString().padStart(2, '0'),
+      day: dayjs().format("YYYY-MM-DD"),
+      billOf: "teacher",
+      subBills: data?.classes?.map(el => ({
+        classId: el?.classId,
+        numberStudy: el?.numberOfStudy,
+        total: +el?.total,
+        status: true
+      }))
+    }
+    createBill(params).then(
+      res => {
+        if (res?.data?.id) {
+          message.success("Xác nhận chấm công thành công!")
+          setModal({
+            open: false,
+            check: true,
+            record: null
+          })
+          // setLoadingButton(false)
+        } else {
+          message.error("Xác nhận chấm công thất bại!")
+        }
+      }
+    ).catch(err => message.error("Có lỗi xảy ra! Vui lòng kiểm tra lại." + err))
+  }
+  console.log(data, 'dataa');
   return (
     <>
-
+      <Modal 
+        open={modal.open}
+        onCancel={() => handleModal(false, null)}
+        title={"Bảng chấm công tháng " + (dayjs().month() + 1).toString().padStart(2, '0')}
+        width={"70%"}
+        footer={null}
+      >
+        <Table
+            // rowSelection={{
+            //   type: 'checkbox',
+            //   selectedRowKeys: idSelect,
+            //   onChange: (selectedRowKeys, selectedRows) => {
+            //     setIdSelect(selectedRowKeys)
+            //     setRecordSelected(selectedRows)
+            //   }
+            // }}
+            locale={{
+              emptyText: <div style={{ marginTop: '20px' }}>{data?.classes?.length === 0 ? <Empty description="Chưa có buổi học nào!" /> : null}</div>,
+            }}
+            size="middle"
+            dataSource={modal?.check ? data?.subBills?.map(i => ({ ...i, key: i?.classId })) : data?.classes?.map(i => ({ ...i, key: i?.classId })) }
+            columns={columnsFee}
+            bordered
+            scroll={{ x: 700 }}
+            pagination={false}
+          />
+        <Row gutter={[8, 8]} justify='end' className="!mt-4">
+          <Col>
+            <Popconfirm
+              title="Xác nhận bảng chấm công?"
+              placement="topRight"
+              onConfirm={confirm}
+              okText="Lưu"
+              cancelText="Hủy"
+              disabled={modal.check}
+            >
+              <Button disabled={modal.check} type="primary">Xác nhận</Button>
+            </Popconfirm>
+          </Col>
+          <Col>
+            <Button onClick={() => handleModal(false, null)}>Hủy</Button>
+          </Col>
+        </Row>
+      </Modal>
       {
         check.open ? <AddEditTs dataEdit={dataEdit} checkEdit={check.checkEdit} mode={1} handleOpenForm={handleOpenForm} />
           :
@@ -202,7 +383,7 @@ const ManageTeacher = () => {
               bordered
               onChange={handleChangeTable}
               pagination={{
-                hideOnSinglePage: true,
+                // hideOnSinglePage: true,
                 locale: { items_per_page: "/ trang" },
                 total: total,
                 showTotal: (total, range) => (
