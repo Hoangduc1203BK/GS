@@ -234,11 +234,23 @@ export class BillService {
 
         for(const c of listClass) {
             const listAttendance = await this.classService.listAttendance({classId: c.id, start: startOfMonth, end: endOfMonth});
-            const listBillDone = await this.subBillRepos.find({
+            let listBillDone = await this.subBillRepos.find({
                 where: {
                     classId: c.id, status: true, ctime: LessThan(last)
                 }
             })
+
+            let bills = await this.billRepos.find({
+                where: {
+                    billOf: 'student'
+                }
+            })
+
+
+            listBillDone = listBillDone.filter(sub => {
+                return bills.some(b => b.id === sub.billId);
+              });
+            
             const numberOfStudent = await this.userClassRepos.count({
                 where: {
                     classId: c.id,
