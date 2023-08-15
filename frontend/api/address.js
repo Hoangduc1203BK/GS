@@ -268,3 +268,8 @@ export const getOneBill = (param) => {
 export const getAdminTimeKeeping = (param) => {
 	return axios.get(`/user/admin/time-keeping`, { params: param })
 }
+
+
+export const getDetailStatistic = id => {
+	return axios.get(`/bill/statistic/detail/${id}`)
+}

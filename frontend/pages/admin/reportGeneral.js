@@ -1,9 +1,9 @@
-import { getListClass, getStatistic } from '@/api/address';
+import { getDetailStatistic, getListClass, getStatistic } from '@/api/address';
 import { MONTH } from '@/common/const';
 import { formatVND, removeVietnameseTones } from '@/common/util';
 import LayoutAdmin from '@/components/LayoutAdmin';
-import { RetweetOutlined, SearchOutlined } from '@ant-design/icons';
-import { Button, Col, Divider, Empty, Input, Row, Select, Table } from 'antd';
+import { CheckCircleOutlined, RetweetOutlined, SearchOutlined, SyncOutlined } from '@ant-design/icons';
+import { Button, Col, Divider, Empty, Input, Row, Select, Table, Tag } from 'antd';
 import dayjs from 'dayjs';
 import React, { useEffect, useState } from 'react'
 
@@ -66,6 +66,81 @@ function ReportGeneral() {
   const [loading, setLoading] = useState(true);
   const [filterClass, setFilterClass] = useState("");
   const [valueMonth, setValueMonth] = useState((dayjs().month() + 1).toString().padStart(2, '0'));
+  const [expandedKey, setExpandedKey] = useState([]);
+  const [loadingExpand, setLoadingExpand] = useState(false);
+  const [dataDetail, setDataDetail] = useState([])
+  
+  async function expandTable(expanded, record) {
+    setLoadingExpand(true)
+    if (!expanded) {
+      setExpandedKey([])
+      setDataDetail([])
+      setLoadingExpand(false)
+    }
+    else if (expanded) {
+      setExpandedKey([record?.id])
+      await getDetailStatistic(record?.id).then(
+        res => {
+          setDataDetail(res?.data?.map((i, index) => ({ ...i, key: i?.id, number: index + 1 })))
+          setLoadingExpand(false)
+        }
+      ).catch(err => message.error("Lấy dữ liệu chi tiết thống kê thất bại!"))
+    }
+  }
+
+  const expandedRowRender = () => {
+    const columnsDetail = [
+      {
+        title: 'Mã học sinh',
+        dataIndex: 'id',
+        key: 'id',
+      },
+      {
+        title: 'Học sinh',
+        dataIndex: 'name',
+        key: 'name',
+      },
+      {
+        title: 'Số điện thoại',
+        dataIndex: 'phoneNumber',
+        key: 'phoneNumber',
+      },
+      {
+        title: 'Địa chỉ',
+        dataIndex: 'address',
+        key: 'address',
+      },
+      {
+        title: 'Số buổi học',
+        key: 'numberOfStudy',
+        dataIndex: 'numberOfStudy',
+      },
+      {
+        title: 'Tổng học phí',
+        key: 'total',
+        dataIndex: 'total',
+        render: (text, record) => {
+          return <div>{formatVND(record?.total)}</div>;
+        },
+      },
+      {
+        title: 'Trạng thái',
+        key: 'status',
+        dataIndex: 'status',
+        render: (text, record) => {
+          return <div>{<Tag color={record?.status ? "green" : "blue"} icon={record?.status ? <CheckCircleOutlined /> : <SyncOutlined spin />}>{record?.status ? "Đã thanh toán" : "Chờ thanh toán"}</Tag>}</div>;
+        },
+      },
+    ];
+    return <Table columns={columnsDetail} dataSource={dataDetail} pagination={false}
+      locale={{
+        emptyText: <div style={{ marginTop: '20px' }}>{dataDetail?.length === 0 ? <Empty description="Không có bản ghi dữ liệu nào!" /> : null}</div>,
+      }}
+      loading={loadingExpand}
+    />;
+  };
+
+
 
   useEffect(() => {
     setLoading(true)
@@ -123,6 +198,12 @@ function ReportGeneral() {
         style={{
           margin: '20px 0px',
           width: '100%'
+        }}
+        
+        expandable={{
+          expandedRowKeys: expandedKey,
+          expandedRowRender,
+          onExpand: expandTable,
         }}
         dataSource={listStatistics?.filter(e => removeVietnameseTones(e?.name?.toLowerCase()).includes(removeVietnameseTones(filterClass?.toLowerCase())))?.map(i => ({ ...i, key: i?.id }))}
         columns={columns}
