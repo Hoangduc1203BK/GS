@@ -303,4 +303,54 @@ export class BillService {
         return result
         
     }
+
+    async getDetailStatistic(classId: string) {
+        const listUserInClass = await this.classService.listUserInClass(classId, USER_CLASS_TYPE.MAIN);
+        const subBillsDone = await this.subBillRepos.find({
+            where: {
+                classId: classId
+            }
+        })
+
+        let result = [] as any;
+        for(const u of listUserInClass) {
+            const feeOfStudent = await this.userService.listFee(u.id, {});
+            const billOfStudent = await this.billRepos.findOne({
+                where: {
+                    userId: u.id
+                },
+                relations: ['subBills']
+            })
+
+
+            if(billOfStudent && billOfStudent.subBills.some(el => el.classId == classId && el.status == true)) {
+                const classes = billOfStudent.subBills.find(el => el.classId == classId);
+                const item = {
+                    id: u.id,
+                    name: u.name,
+                    phoneNumber: u.phoneNumber,
+                    address: u?.address,
+                    numberOfStudy: classes.numberStudy,
+                    total: Number(classes.total),
+                    status: true
+                }
+                result.push(item)
+            }else {
+                const classes = feeOfStudent.classes.find(el => el.classId == classId)
+                const item = {
+                    id: u.id,
+                    name: u.name, 
+                    phoneNumber: u.phoneNumber,
+                    address: u?.address,
+                    numberOfStudy: classes.numberOfStudy,
+                    total: Number(classes.fee) * Number(classes.numberOfStudy[0]),
+                    status: false
+                }
+
+                result.push(item)
+            }
+        }
+
+        return result;
+    }
 }

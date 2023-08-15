@@ -266,7 +266,7 @@ export class UserService {
       const item = {
         classId: classId,
         className: classes.name,
-        fee: price,
+        fee: Number(price),
         subject: classes.subject.name,
         grade: classes.subject.grade
       }

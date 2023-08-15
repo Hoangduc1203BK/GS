@@ -11,6 +11,13 @@ export class BillController {
         private readonly billService: BillService,
     ) {}
 
+    @Get('/statistic/detail/:classId')
+    async getStatisticDetail(@Param('classId') classId: string) {
+        const result = await this.billService.getDetailStatistic(classId);
+
+        return result;
+    }
+
     @Post('/')
     async createPost(@Body() dto: CreateBillDto) {
         const result = await this.billService.createBill(dto);
